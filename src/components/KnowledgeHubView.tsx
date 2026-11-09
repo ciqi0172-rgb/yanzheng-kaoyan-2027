@@ -2,6 +2,7 @@ import React, { useEffect, useMemo, useState } from 'react';
 import { HAT_QUESTIONS } from '../data/hatQuestions';
 import { ESSAY_TEMPLATES } from '../data/essayTemplates';
 import { HAT_SOURCE_COVERAGE } from '../data/hatSourceCoverage';
+import { TEMPLATE_SOURCE_COVERAGE } from '../data/templateSourceCoverage';
 import { Search, BookOpen, ClipboardList, Library, Plus, Trash2, Download, CheckCircle2 } from 'lucide-react';
 
 type HubMode = 'search' | 'pending' | 'templates';
@@ -98,6 +99,7 @@ export const KnowledgeHubView: React.FC = () => {
         </div>
         <div className="text-sm text-stone-500">结构化帽子题 {HAT_QUESTIONS.length} 条 · 大题模板 {ESSAY_TEMPLATES.length} 条</div>
       <div className="mt-3 rounded-xl border border-amber-200 bg-amber-50 dark:bg-amber-950/20 dark:border-amber-900 p-3 text-sm text-amber-900 dark:text-amber-200"><strong>原始资料核验进度：</strong>《{HAT_SOURCE_COVERAGE.sourceFile}》共 {HAT_SOURCE_COVERAGE.totalPages} 页，已建立 {HAT_SOURCE_COVERAGE.extractedPages} 页 OCR 底稿；人工核验 {HAT_SOURCE_COVERAGE.verifiedPages} 页，{HAT_SOURCE_COVERAGE.pendingManualVerificationPages.length} 页仍待逐页核对。OCR 仅供检索定位，不能直接视为标准答案。</div>
+      <div className="mt-2 rounded-xl border border-sky-200 bg-sky-50 dark:bg-sky-950/20 dark:border-sky-900 p-3 text-sm text-sky-900 dark:text-sky-200"><strong>答题模板核验进度：</strong>《{TEMPLATE_SOURCE_COVERAGE.sourceFile}》共 {TEMPLATE_SOURCE_COVERAGE.totalPages} 页，目前结构化模板 {TEMPLATE_SOURCE_COVERAGE.structuredTemplateCount} 条；人工逐页核验 {TEMPLATE_SOURCE_COVERAGE.verifiedPages} 页，{TEMPLATE_SOURCE_COVERAGE.pendingManualVerificationPages.length} 页待核对。条目数量不代表原文覆盖完整。</div>
       </div>
       <div className="mt-5 grid grid-cols-1 sm:grid-cols-3 gap-2">
         <button onClick={() => setMode('search')} className={buttonClass + ' flex items-center justify-center gap-2 ' + (mode === 'search' ? 'bg-rose-600 text-white' : 'bg-stone-100 dark:bg-stone-800 text-stone-700 dark:text-stone-200')}><Search size={16}/>知识点检索</button>
