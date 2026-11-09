@@ -2,7 +2,7 @@ import React, { useEffect, useMemo, useState } from 'react';
 import sourceHtml from '../data/hat-source.html?raw';
 import { Search, FileText, LoaderCircle } from 'lucide-react';
 
-type SourceItem = { id: number; subject: string; chapter: string; section: string; text: string; textHtml: string; sourceHtml: string; answer: string; kind: string };
+type SourceItem = { id: number; subject: string; chapter: string; section: string; text: string; textHtml: string; sourceHtml: string; answer: string; kind: string; needsReview: boolean };
 
 export const KnowledgeHubView: React.FC = () => {
   const [items, setItems] = useState<SourceItem[]>([]);
@@ -29,14 +29,40 @@ export const KnowledgeHubView: React.FC = () => {
           fragment.body.innerHTML = rawHtml;
           const answerNodes = Array.from(fragment.body.querySelectorAll('u'));
           const boldNodes = Array.from(fragment.body.querySelectorAll('b,strong'));
-          const selectedAnswers = answerNodes.length ? answerNodes : (boldNodes.length ? [boldNodes[boldNodes.length - 1]] : []);
-          const answer = selectedAnswers.map(el => (el.textContent || '').replace(/\s+/g, ' ').trim()).filter(Boolean).join('；');
-          selectedAnswers.forEach(el => {
+          const redStyle = 'color:#dc2626;font-weight:800;text-decoration:underline;text-decoration-color:#dc2626';
+          let answer = '';
+          if (answerNodes.length) {
+            answer = answerNodes.map(el => (el.textContent || '').replace(/\s+/g, ' ').trim()).filter(Boolean).join('；');
+            answerNodes.forEach(el => {
+              const span = fragment.createElement('span');
+              span.setAttribute('style', redStyle);
+              span.innerHTML = el.innerHTML;
+              el.replaceWith(span);
+            });
+          } else if (boldNodes.length >= 2) {
+            // In 史纲/马原 the source commonly bolds both the cue and the answer; the final bold span is the answer.
+            const selected = boldNodes[boldNodes.length - 1];
+            answer = (selected.textContent || '').replace(/\s+/g, ' ').trim();
             const span = fragment.createElement('span');
-            span.setAttribute('style', 'color:#dc2626;font-weight:800;text-decoration:underline;text-decoration-color:#dc2626');
-            span.innerHTML = el.innerHTML;
-            el.replaceWith(span);
-          });
+            span.setAttribute('style', redStyle);
+            span.innerHTML = selected.innerHTML;
+            selected.replaceWith(span);
+          } else if (boldNodes.length === 1) {
+            // In 新思想/毛中特 a lone bold span is often the cue word, while the answer follows it.
+            // Highlight the trailing source text instead of incorrectly coloring the cue word as the answer.
+            const cue = boldNodes[0];
+            const range = fragment.createRange();
+            range.setStartAfter(cue);
+            if (fragment.body.lastChild) range.setEndAfter(fragment.body.lastChild);
+            const tail = range.cloneContents();
+            answer = (tail.textContent || '').replace(/\s+/g, ' ').trim().replace(/^(?:(?:是|为|包括|有)\s*)?[：:]\s*/, '').trim();
+            if (answer) {
+              const span = fragment.createElement('span');
+              span.setAttribute('style', redStyle);
+              span.appendChild(range.extractContents());
+              range.insertNode(span);
+            }
+          }
           return {
             text: (fragment.body.textContent || '').replace(/\s+/g, ' ').trim(),
             textHtml: fragment.body.innerHTML,
@@ -78,6 +104,7 @@ export const KnowledgeHubView: React.FC = () => {
               sourceHtml: rawHtml,
               answer: built.answer,
               kind: '题目',
+              needsReview: !built.answer,
             };
             parsed.push(item);
             lastItem = item;
@@ -92,6 +119,7 @@ export const KnowledgeHubView: React.FC = () => {
             lastItem.text = built.text;
             lastItem.textHtml = built.textHtml;
             lastItem.answer = built.answer;
+            lastItem.needsReview = !built.answer;
             return;
           }
 
@@ -107,6 +135,7 @@ export const KnowledgeHubView: React.FC = () => {
             sourceHtml: rawHtml,
             answer: built.answer,
             kind: '原文',
+            needsReview: !built.answer,
           };
           parsed.push(item);
           lastItem = item;
