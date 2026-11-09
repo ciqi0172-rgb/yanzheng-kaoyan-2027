@@ -13,7 +13,7 @@ import {
   Flame
 } from 'lucide-react';
 
-export type TabKey = 'flashcard' | 'exam' | 'essay' | 'confusion' | 'ebbinghaus' | 'roadmap';
+export type TabKey = 'flashcard' | 'exam' | 'essay' | 'confusion' | 'ebbinghaus' | 'roadmap' | 'knowledge';
 
 interface HeaderProps {
   activeTab: TabKey;
@@ -46,6 +46,7 @@ export const Header: React.FC<HeaderProps> = ({
       badge: dueReviewCount > 0 ? dueReviewCount : undefined 
     },
     { key: 'roadmap', label: '三阶段冲刺路径', icon: <Compass className="w-4 h-4" /> },
+    { key: 'knowledge', label: '知识库与模板', icon: <BookOpen className="w-4 h-4" /> },
   ];
 
   return (
