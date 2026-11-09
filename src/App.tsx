@@ -6,6 +6,7 @@ import { EssayDeconstructorView } from './components/EssayDeconstructorView';
 import { ConfusionView } from './components/ConfusionView';
 import { EbbinghausDashboard } from './components/EbbinghausDashboard';
 import { StudyPathView } from './components/StudyPathView';
+import { KnowledgeHubView } from './components/KnowledgeHubView';
 import { ConfusionModal } from './components/ConfusionModal';
 import { QuickQuizModal } from './components/QuickQuizModal';
 
@@ -158,6 +159,9 @@ export default function App() {
         {activeTab === 'roadmap' && (
           <StudyPathView onNavigateTab={handleNavigateTab} />
         )}
+
+        {/* New standalone knowledge search, pending records, and answer templates. Existing masking code is untouched. */}
+        {activeTab === 'knowledge' && <KnowledgeHubView />}
       </main>
 
       {/* Footer */}
