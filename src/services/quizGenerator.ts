@@ -72,7 +72,10 @@ export function buildHatQuestionOptions(
     { id: 'leadership', terms: ['领导', '主体', '核心力量'] },
   ];
   const getConceptFamilies = (item: { hatType?: string; hatKeyword?: string; stem?: string }) => {
-    const text = normalize([item.hatType, item.hatKeyword, item.stem].filter(Boolean).join(' '));
+    // Use the actual question wording and discriminant keyword as evidence.
+    // hatType is a legacy classification and can be broad or imperfect, so it must not
+    // independently make an unrelated question look conceptually similar.
+    const text = normalize([item.hatKeyword, item.stem].filter(Boolean).join(' '));
     return conceptFamilies.filter(family =>
       family.terms.some(term => text.includes(normalize(term)))
     ).map(family => family.id);
@@ -167,7 +170,9 @@ export function buildHatQuestionOptions(
     // or precise hat keyword/type. Subject-only matches are not valid distractors.
     ((Boolean(question.confusionGroup) && item.confusionGroup === question.confusionGroup) ||
       (normalize(question.hatKeyword).length >= 4 && item.hatKeyword === question.hatKeyword) ||
-      (normalize(question.hatType).length >= 4 && item.hatType === question.hatType) ||
+      (normalize(question.hatType).length >= 4 && item.hatType === question.hatType &&
+        (item.chapter === question.chapter ||
+          getConceptFamilies(item).some(family => questionFamilies.has(family)))) ||
       // A controlled same-subject concept-family match expands coverage without pulling
       // arbitrary answers from unrelated chapters or subjects.
       (item.subject === question.subject &&
