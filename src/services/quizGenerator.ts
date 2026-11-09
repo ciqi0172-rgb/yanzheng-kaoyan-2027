@@ -171,7 +171,7 @@ export function buildHatQuestionOptions(
     ((Boolean(question.confusionGroup) && item.confusionGroup === question.confusionGroup) ||
       (normalize(question.hatKeyword).length >= 4 && item.hatKeyword === question.hatKeyword) ||
       (normalize(question.hatType).length >= 4 && item.hatType === question.hatType &&
-        (item.chapter === question.chapter ||
+        (item.subject === question.subject ||
           getConceptFamilies(item).some(family => questionFamilies.has(family)))) ||
       // A controlled same-subject concept-family match expands coverage without pulling
       // arbitrary answers from unrelated chapters or subjects.
