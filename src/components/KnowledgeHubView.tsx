@@ -26,14 +26,16 @@ export const KnowledgeHubView: React.FC = () => {
         let chapter = '未分类章节';
         let section = '';
         doc.body.querySelectorAll('h1,h2,h3,li,p').forEach(node => {
-          const text = (node.textContent || '').replace(/\\s+/g, ' ').trim();
+          const text = (node.textContent || '').replace(/\s+/g, ' ').trim();
           if (!text) return;
           if (node.tagName === 'H1') { subject = text; chapter = '导论'; section = ''; return; }
           if (node.tagName === 'H2') { chapter = text; section = ''; return; }
           if (node.tagName === 'H3') { section = text; return; }
           if (node.tagName === 'P' && /^-?\\s*\\d+\\s*-?$/.test(text)) return;
           if (node.tagName === 'LI' || node.tagName === 'P') {
-            const answer = node.querySelector('u')?.textContent?.replace(/\\s+/g, ' ').trim() || '';\n            const cleanText = text.replace(/\\s+/g, ' ').trim();\n            parsed.push({ id: parsed.length + 1, subject, chapter, section, text: cleanText, answer, kind: node.tagName === 'LI' ? '题目' : '原文' });
+            const answer = node.querySelector('u')?.textContent?.replace(/\s+/g, ' ').trim() || '';
+            const cleanText = text.replace(/\s+/g, ' ').trim();
+            parsed.push({ id: parsed.length + 1, subject, chapter, section, text: cleanText, answer, kind: node.tagName === 'LI' ? '题目' : '原文' });
           }
         });
         if (!alive) return;
