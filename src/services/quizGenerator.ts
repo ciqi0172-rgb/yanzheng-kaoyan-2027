@@ -219,6 +219,11 @@ export function buildHatQuestionOptions(
     ...combinedCandidates.filter(item => item.confusionGroup && item.confusionGroup === question.confusionGroup),
     ...combinedCandidates.filter(item => normalize(question.hatKeyword).length >= 4 && item.hatKeyword === question.hatKeyword),
     ...combinedCandidates.filter(item => normalize(question.hatType).length >= 4 && item.hatType === question.hatType),
+    ...combinedCandidates.filter(item =>
+      item.source === 'source' &&
+      item.subject === question.subject &&
+      getConceptFamilies(item).some(family => questionFamilies.has(family))
+    ),
   ].filter((item, index, items) => items.findIndex(other => other.id === item.id) === index)
   .sort((a, b) => {
     const priority = (item: Candidate) =>
