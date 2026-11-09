@@ -50,6 +50,14 @@ const expectedBySubject: Record<string, number> = {
   '肖 1000 帽子题新思想': 171,
 };
 const actualBySubject: Record<string, number> = {};
+const expectedPageMarkersBySubject: Record<string, number> = {
+  '肖 1000 帽子题思修': 6,
+  '肖 1000 帽子题毛中特': 8,
+  '肖 1000 帽子题：史纲': 11,
+  '肖 1000 帽子题：马原': 11,
+  '肖 1000 帽子题新思想': 12,
+};
+const actualPageMarkersBySubject: Record<string, number> = {};
 const sourceQuestionsWithoutFormatting: Array<{ subject: string; text: string }> = [];
 let currentSubject = '未分类';
 const tokenPattern = /<(h1|h2|h3|li|p)\b[^>]*>([\s\S]*?)<\/\1>/gi;
@@ -70,10 +78,15 @@ while ((match = tokenPattern.exec(sourceHtml)) !== null) {
   if (tag === 'h1') {
     currentSubject = text;
     actualBySubject[currentSubject] ??= 0;
+    actualPageMarkersBySubject[currentSubject] ??= 0;
     continue;
   }
   if (tag !== 'li' && tag !== 'p') continue;
-  if (!text || /^-?\s*\d+\s*-?$/.test(text) || /^(?:27\s*)?肖\s*1000\s*帽子题/.test(text)) continue;
+  if (tag === 'p' && /^-?\s*\d+\s*-?$/.test(text)) {
+    actualPageMarkersBySubject[currentSubject] = (actualPageMarkersBySubject[currentSubject] ?? 0) + 1;
+    continue;
+  }
+  if (!text || /^(?:27\s*)?肖\s*1000\s*帽子题/.test(text)) continue;
   if (!/^\d+\s*[.、．]/.test(text)) continue;
   actualBySubject[currentSubject] = (actualBySubject[currentSubject] ?? 0) + 1;
   if (!/<u\b|<b\b|<strong\b/i.test(raw)) {
@@ -97,6 +110,17 @@ for (const subject of Object.keys(actualBySubject)) {
     issues.push({ dataset: '原始帽子题 HTML', id: subject, field: 'subject', message: '出现未登记的科目标题，请核查是否误混入其他资料' });
   }
 }
+for (const [subject, expected] of Object.entries(expectedPageMarkersBySubject)) {
+  const actual = actualPageMarkersBySubject[subject] ?? 0;
+  if (actual !== expected) {
+    issues.push({
+      dataset: '原始帽子题 HTML',
+      id: subject,
+      field: 'pageCount',
+      message: `页码标记应为 ${expected} 个，实际为 ${actual} 个`,
+    });
+  }
+}
 if (sourceQuestionsWithoutFormatting.length) {
   warnings.push({
     dataset: '原始帽子题 HTML',
@@ -109,6 +133,8 @@ const sourceQuestionCount = Object.values(actualBySubject).reduce((sum, count) =
 const counts = {
   searchableSourceQuestions: sourceQuestionCount,
   sourceQuestionsBySubject: actualBySubject,
+  sourcePageMarkersBySubject: actualPageMarkersBySubject,
+  sourcePageMarkers: Object.values(actualPageMarkersBySubject).reduce((sum, count) => sum + count, 0),
   structuredHatQuestions: HAT_QUESTIONS.length,
   essayTemplates: ESSAY_TEMPLATES.length,
   sourceFile: 'src/data/hat-source.html',
