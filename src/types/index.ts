@@ -44,6 +44,10 @@ export interface HatQuestion {
   confusionGroup?: string; // 容易混淆的分组标签
   examType: '单选' | '多选';
   sourcePage?: string;
+  chapter?: string;
+  sourceNumber?: number;
+  sourceSection?: string;
+  needsReview?: boolean;
   options?: HatQuestionOption[]; // 精心编排的4个选项
 }
 
