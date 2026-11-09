@@ -20,10 +20,16 @@ function checkUniqueIds(dataset: string, rows: Array<{ id: string }>) {
 
 checkUniqueIds('帽子题结构化数据', HAT_QUESTIONS);
 for (const q of HAT_QUESTIONS) {
-  for (const field of ['subject', 'hatType', 'hatKeyword', 'examType', 'sourcePage', 'stem', 'answer', 'trapAnalysis'] as const) {
+  for (const field of ['subject', 'hatType', 'hatKeyword', 'examType', 'sourcePage', 'stem', 'trapAnalysis'] as const) {
     if (!String(q[field] ?? '').trim()) {
       issues.push({ dataset: '帽子题结构化数据', id: q.id, field, message: '必填字段为空' });
     }
+  }
+  if (!q.answer?.trim() && !q.needsReview) {
+    issues.push({ dataset: '帽子题结构化数据', id: q.id, field: 'answer', message: '答案为空但未标记待核验' });
+  }
+  if (q.needsReview && q.answer?.trim()) {
+    warnings.push({ dataset: '帽子题结构化数据', id: q.id, message: '题目标记待核验但已有答案文本，请确认是否可恢复练习' });
   }
 }
 
@@ -129,6 +135,20 @@ if (sourceQuestionsWithoutFormatting.length) {
   });
 }
 
+const expectedStructuredCount = 684;
+if (HAT_QUESTIONS.length !== expectedStructuredCount) {
+  issues.push({
+    dataset: '帽子题结构化数据',
+    id: 'source-coverage',
+    field: 'count',
+    message: `结构化题库应完整收录 ${expectedStructuredCount} 道原文编号题，实际为 ${HAT_QUESTIONS.length}`,
+  });
+}
+const structuredNeedsReview = HAT_QUESTIONS.filter(q => q.needsReview).length;
+const structuredPlayable = HAT_QUESTIONS.filter(q => !q.needsReview && Boolean(q.answer?.trim())).length;
+if (structuredNeedsReview + structuredPlayable !== HAT_QUESTIONS.length) {
+  issues.push({ dataset: '帽子题结构化数据', id: 'review-status', field: 'count', message: '待核验题与可练习题数量无法覆盖全部题目' });
+}
 const sourceQuestionCount = Object.values(actualBySubject).reduce((sum, count) => sum + count, 0);
 const counts = {
   searchableSourceQuestions: sourceQuestionCount,
@@ -136,6 +156,8 @@ const counts = {
   sourcePageMarkersBySubject: actualPageMarkersBySubject,
   sourcePageMarkers: Object.values(actualPageMarkersBySubject).reduce((sum, count) => sum + count, 0),
   structuredHatQuestions: HAT_QUESTIONS.length,
+  structuredPlayableQuestions: structuredPlayable,
+  structuredNeedsReviewQuestions: structuredNeedsReview,
   essayTemplates: ESSAY_TEMPLATES.length,
   sourceFile: 'src/data/hat-source.html',
   issues: issues.length,
