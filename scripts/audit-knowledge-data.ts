@@ -43,7 +43,7 @@ for (const page of HAT_SOURCE_PAGES) {
   if (sourcePages.has(page.sourcePage)) issues.push({ dataset: '原文页面索引', id: String(page.sourcePage), field: 'sourcePage', message: 'PDF 页码重复' });
   sourcePages.add(page.sourcePage);
   if (!page.text?.trim()) issues.push({ dataset: '原文页面索引', id: String(page.sourcePage), field: 'text', message: '页面摘录为空' });
-  if (page.status !== '原文摘录-待完整核验') issues.push({ dataset: '原文页面索引', id: String(page.sourcePage), field: 'status', message: '原文摘录必须保持待核验状态' });
+  if (page.status !== 'OCR-待人工核验') issues.push({ dataset: '原文页面索引', id: String(page.sourcePage), field: 'status', message: '原文 OCR 必须保持待人工核验状态' });
 }
 
 const counts = { hatQuestions: HAT_QUESTIONS.length, essayTemplates: ESSAY_TEMPLATES.length, sourcePages: HAT_SOURCE_PAGES.length, issues: issues.length };
