@@ -234,7 +234,7 @@ export function buildHatQuestionOptions(
       (normalize(question.hatKeyword).length >= 4 && item.hatKeyword === question.hatKeyword ? 50 : 0) +
       (normalize(question.hatType).length >= 4 && item.hatType === question.hatType ? 25 : 0) +
       (item.subject === question.subject && getConceptFamilies(item).some(family => questionFamilies.has(family)) ? 20 : 0) +
-      (item.chapter === question.chapter ? 10 : 0);
+      (item.chapter === question.chapter ? 35 : 0);
     const priorityDifference = priority(b) - priority(a);
     if (priorityDifference !== 0) return priorityDifference;
     return Math.abs(a.answer.trim().length - correctAnswer.length) -
