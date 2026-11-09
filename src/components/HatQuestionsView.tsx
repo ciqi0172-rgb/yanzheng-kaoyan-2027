@@ -83,6 +83,7 @@ export const HatQuestionsView: React.FC<HatQuestionsViewProps> = ({
   // Filtered Questions
   const filteredQuestions = useMemo(() => {
     return questions.filter((q) => {
+      if (q.needsReview && drillMode !== 'grid') return false;
       if (selectedSubject !== '全部' && q.subject !== selectedSubject) {
         return false;
       }
@@ -109,7 +110,7 @@ export const HatQuestionsView: React.FC<HatQuestionsViewProps> = ({
       }
       return true;
     });
-  }, [questions, selectedSubject, selectedHat, onlyRedMarked, onlyDueReview, searchQuery, reviews]);
+  }, [questions, selectedSubject, selectedHat, onlyRedMarked, onlyDueReview, searchQuery, reviews, drillMode]);
 
   const activeQuestion: HatQuestion | undefined = filteredQuestions[cardIndex];
 
@@ -191,14 +192,14 @@ export const HatQuestionsView: React.FC<HatQuestionsViewProps> = ({
                 肖1000 帽子题全真题库
               </span>
               <span className="text-xs text-stone-500 dark:text-stone-400">
-                已整编为高质量实战单选题与默写题 · 共 <strong className="text-stone-800 dark:text-stone-200">{questions.length}</strong> 道
+                原文全量收录 · 共 <strong className="text-stone-800 dark:text-stone-200">{questions.length}</strong> 道，含答案待核验题
               </span>
             </div>
             <h1 className="text-xl sm:text-2xl font-black text-stone-900 dark:text-stone-100 tracking-tight">
               政治“帽子题”全真实战刷题与陷阱突破
             </h1>
             <p className="text-xs text-stone-600 dark:text-stone-400 mt-0.5">
-              题干精设4项严密选择，深度还原肖1000易混干扰项。做题即可检验知识点，做错自动归入艾宾浩斯错题库。
+              题干精设4项严密选择，深度还原肖1000易混干扰项。已核验答案的题目进入四选一练习；原文答案标记不完整的题目保留在清单中，核验前不参与出题。
             </p>
           </div>
 
@@ -695,8 +696,8 @@ export const HatQuestionsView: React.FC<HatQuestionsViewProps> = ({
       {drillMode === 'grid' && (
         <div className="space-y-4">
           <div className="flex items-center justify-between text-xs text-stone-500">
-            <span>找到 {filteredQuestions.length} 道高频题目</span>
-            <span>点击任意题目直接启动真题四选一模考</span>
+            <span>找到 {filteredQuestions.length} 道原文题目（含待核验记录）</span>
+            <span>仅答案已核验的题目可启动四选一模考</span>
           </div>
 
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
@@ -733,10 +734,10 @@ export const HatQuestionsView: React.FC<HatQuestionsViewProps> = ({
                       {q.stem}
                     </h3>
 
-                    <div className="p-2.5 rounded-lg bg-emerald-50 dark:bg-emerald-950/40 border border-emerald-200 mb-2">
-                      <span className="text-[10px] text-emerald-600 block">标准帽子答案：</span>
-                      <span className="text-xs font-black text-emerald-900 dark:text-emerald-200">
-                        {q.answer}
+                    <div className={`p-2.5 rounded-lg border mb-2 ${q.needsReview ? 'bg-amber-50 dark:bg-amber-950/30 border-amber-300' : 'bg-emerald-50 dark:bg-emerald-950/40 border-emerald-200'}`}>
+                      <span className={`text-[10px] block ${q.needsReview ? 'text-amber-700 dark:text-amber-300' : 'text-emerald-600'}`}>{q.needsReview ? '原文答案标记待核验：' : '原文标准答案：'}</span>
+                      <span className={`text-xs font-black ${q.needsReview ? 'text-amber-900 dark:text-amber-200' : 'text-emerald-900 dark:text-emerald-200'}`}>
+                        {q.answer || '原文未标出可确认答案，暂不生成选项'}
                       </span>
                     </div>
 
@@ -750,21 +751,25 @@ export const HatQuestionsView: React.FC<HatQuestionsViewProps> = ({
                       {review ? `已做 ${review.totalAttempts} 次 · 阶段 ${review.level}` : '未做题'}
                     </span>
 
-                    <button
-                      onClick={() => {
-                        const targetIdx = filteredQuestions.findIndex((item) => item.id === q.id);
-                        if (targetIdx !== -1) {
-                          setCardIndex(targetIdx);
-                          setDrillMode('exam');
-                          setSelectedOptionKey(null);
-                          setHasAnswered(false);
-                        }
-                      }}
-                      className="text-rose-600 dark:text-rose-400 font-bold hover:underline flex items-center gap-0.5"
-                    >
-                      <span>进四选一实做</span>
-                      <ArrowRight className="w-3 h-3" />
-                    </button>
+                    {q.needsReview ? (
+                      <span className="text-amber-700 dark:text-amber-300 font-bold">答案待核验</span>
+                    ) : (
+                      <button
+                        onClick={() => {
+                          const targetIdx = filteredQuestions.findIndex((item) => item.id === q.id);
+                          if (targetIdx !== -1) {
+                            setCardIndex(targetIdx);
+                            setDrillMode('exam');
+                            setSelectedOptionKey(null);
+                            setHasAnswered(false);
+                          }
+                        }}
+                        className="text-rose-600 dark:text-rose-400 font-bold hover:underline flex items-center gap-0.5"
+                      >
+                        <span>进四选一实做</span>
+                        <ArrowRight className="w-3 h-3" />
+                      </button>
+                    )}
                   </div>
                 </div>
               );
