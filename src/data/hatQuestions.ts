@@ -3,7 +3,7 @@
  * SPDX-License-Identifier: Apache-2.0
  *
  * Structured from the original 48-page source HTML. Original wording and marked answers are retained.
- * Records without a verifiable answer mark remain in the bank with needsReview=true and are not quizzed.
+ * Records without a verifiable answer mark remain with needsReview=true and are excluded from drills.
  */
 import { HatQuestion } from '../types';
 
@@ -8273,11 +8273,11 @@ export const HAT_QUESTIONS: HatQuestion[] = [
     "hatKeyword": "“两个结合”",
     "examType": "多选",
     "sourcePage": "P93-P94",
-    "stem": "“两个结合”是：开辟和发展中国特色社会主义的必由之路；推进马克思主义中国化时代化的根本途径；我们取得成功的最大法宝",
-    "answer": "",
-    "trapAnalysis": "原文未提供可确认的答案标记，暂不生成可作答选项。",
+    "stem": "“两个结合”是：",
+    "answer": "开辟和发展中国特色社会主义的必由之路；推进马克思主义中国化时代化的根本途径；我们取得成功的最大法宝",
+    "trapAnalysis": "原始资料题目。答案以原文标记为准；注意辨析题干限定词。",
     "confusionGroup": "新思想-导 论-“两个结合”",
-    "needsReview": true,
+    "needsReview": false,
     "sourceSection": "多选 (P93-P94)"
   },
   {
@@ -8289,11 +8289,11 @@ export const HAT_QUESTIONS: HatQuestion[] = [
     "hatKeyword": "结果",
     "examType": "多选",
     "sourcePage": "P93-P94",
-    "stem": "“结合”的结果是：造就了一个有机统一的新的文化生命体；让马克思主义成为中国的；让中华优秀传统文化成为现代的；让经由“结合”而形成的新文化成为中国式现代化的文化形态",
-    "answer": "",
-    "trapAnalysis": "原文未提供可确认的答案标记，暂不生成可作答选项。",
+    "stem": "“结合”的结果是：",
+    "answer": "造就了一个有机统一的新的文化生命体；让马克思主义成为中国的；让中华优秀传统文化成为现代的；让经由“结合”而形成的新文化成为中国式现代化的文化形态",
+    "trapAnalysis": "原始资料题目。答案以原文标记为准；注意辨析题干限定词。",
     "confusionGroup": "新思想-导 论-结果",
-    "needsReview": true,
+    "needsReview": false,
     "sourceSection": "多选 (P93-P94)"
   },
   {
@@ -8305,11 +8305,11 @@ export const HAT_QUESTIONS: HatQuestion[] = [
     "hatKeyword": "“两个结合”",
     "examType": "多选",
     "sourcePage": "P93-P94",
-    "stem": "“两个结合”：是对坚持和发展马克思主义作出的重大理论贡献；表明我们党对中国道路、理论、制度的认识达到了新高度；表明我们的历史自信、文化自信达到了新高度；表明我们党在传承中华优秀传统文化中推进理论创新的自觉性达到了新高度",
-    "answer": "",
-    "trapAnalysis": "原文未提供可确认的答案标记，暂不生成可作答选项。",
+    "stem": "“两个结合”：",
+    "answer": "是对坚持和发展马克思主义作出的重大理论贡献；表明我们党对中国道路、理论、制度的认识达到了新高度；表明我们的历史自信、文化自信达到了新高度；表明我们党在传承中华优秀传统文化中推进理论创新的自觉性达到了新高度",
+    "trapAnalysis": "原始资料题目。答案以原文标记为准；注意辨析题干限定词。",
     "confusionGroup": "新思想-导 论-“两个结合”",
-    "needsReview": true,
+    "needsReview": false,
     "sourceSection": "多选 (P93-P94)"
   },
   {
@@ -8321,11 +8321,11 @@ export const HAT_QUESTIONS: HatQuestion[] = [
     "hatKeyword": "回答的重大时代课题",
     "examType": "多选",
     "sourcePage": "P93-P94",
-    "stem": "新思想科学回答的重大时代课题是：新时代坚持和发展什么样的中国特色社会主义、怎样坚持和发展中国特色社会主义；建设什么样的社会主义现代化强国、怎样建设社会主义现代化强国；建设什么样的长期执政的马克思主义政党、怎样建设长期执政的马克思主义政党",
-    "answer": "",
-    "trapAnalysis": "原文未提供可确认的答案标记，暂不生成可作答选项。",
+    "stem": "新思想科学回答的重大时代课题是：",
+    "answer": "新时代坚持和发展什么样的中国特色社会主义、怎样坚持和发展中国特色社会主义；建设什么样的社会主义现代化强国、怎样建设社会主义现代化强国；建设什么样的长期执政的马克思主义政党、怎样建设长期执政的马克思主义政党",
+    "trapAnalysis": "原始资料题目。答案以原文标记为准；注意辨析题干限定词。",
     "confusionGroup": "新思想-导 论-回答的重大时代课题",
-    "needsReview": true,
+    "needsReview": false,
     "sourceSection": "多选 (P93-P94)"
   },
   {
@@ -8337,11 +8337,11 @@ export const HAT_QUESTIONS: HatQuestion[] = [
     "hatKeyword": "新思想",
     "examType": "多选",
     "sourcePage": "P93-P94",
-    "stem": "新思想：是当代中国马克思主义、21 世纪马克思主义；是中华文化和中国精神的时代精华；实现了马克思主义中国化时代化新的飞跃；是新时代党和国家事业发展的根本遵循",
-    "answer": "",
-    "trapAnalysis": "原文未提供可确认的答案标记，暂不生成可作答选项。",
+    "stem": "新思想：",
+    "answer": "是当代中国马克思主义、21 世纪马克思主义；是中华文化和中国精神的时代精华；实现了马克思主义中国化时代化新的飞跃；是新时代党和国家事业发展的根本遵循",
+    "trapAnalysis": "原始资料题目。答案以原文标记为准；注意辨析题干限定词。",
     "confusionGroup": "新思想-导 论-新思想",
-    "needsReview": true,
+    "needsReview": false,
     "sourceSection": "多选 (P93-P94)"
   },
   {
@@ -8353,11 +8353,11 @@ export const HAT_QUESTIONS: HatQuestion[] = [
     "hatKeyword": "“两个确立”",
     "examType": "多选",
     "sourcePage": "P93-P94",
-    "stem": "“两个确立”：是党在新时代取得的重大政治成果；反映了全党全军全国各族人民共同心愿；是新时代党和国家事业取得历史性成就、发生历史性变革的决定性因素；是党和人民应对一切不确定性的最大确定性、最大底气、最大保证",
-    "answer": "",
-    "trapAnalysis": "原文未提供可确认的答案标记，暂不生成可作答选项。",
+    "stem": "“两个确立”：",
+    "answer": "是党在新时代取得的重大政治成果；反映了全党全军全国各族人民共同心愿；是新时代党和国家事业取得历史性成就、发生历史性变革的决定性因素；是党和人民应对一切不确定性的最大确定性、最大底气、最大保证",
+    "trapAnalysis": "原始资料题目。答案以原文标记为准；注意辨析题干限定词。",
     "confusionGroup": "新思想-导 论-“两个确立”",
-    "needsReview": true,
+    "needsReview": false,
     "sourceSection": "多选 (P93-P94)"
   },
   {
@@ -9085,14 +9085,14 @@ export const HAT_QUESTIONS: HatQuestion[] = [
     "subject": "新思想",
     "chapter": "第六章 推动高质量发展",
     "sourceNumber": 31,
-    "hatType": "其他",
-    "hatKeyword": "待核验",
+    "hatType": "基础/前提",
+    "hatKeyword": "重要前提和保障",
     "examType": "单选",
     "sourcePage": "P85-P86",
     "stem": "构建新发展格局的重要前提和保障是",
     "answer": "牢牢守住安全发展这条底线",
     "trapAnalysis": "原始资料题目。答案以原文标记为准；注意辨析题干限定词。",
-    "confusionGroup": "新思想-第六章 推动高质量发展-未标注",
+    "confusionGroup": "新思想-第十三章 维护和塑造国家安全-重要前提和保障",
     "needsReview": false,
     "sourceSection": "单选 (P85-P86)"
   },
@@ -9633,11 +9633,11 @@ export const HAT_QUESTIONS: HatQuestion[] = [
     "hatKeyword": "全过程人民民主",
     "examType": "多选",
     "sourcePage": "P102-P104",
-    "stem": "全过程人民民主是：全链条、全方位、全覆盖的民主；最广泛、最真实、最管用的民主",
-    "answer": "",
-    "trapAnalysis": "原文未提供可确认的答案标记，暂不生成可作答选项。",
+    "stem": "全过程人民民主是：",
+    "answer": "全链条、全方位、全覆盖的民主；最广泛、最真实、最管用的民主",
+    "trapAnalysis": "原始资料题目。答案以原文标记为准；注意辨析题干限定词。",
     "confusionGroup": "新思想-第八章 发展全过程人民民主-全过程人民民主",
-    "needsReview": true,
+    "needsReview": false,
     "sourceSection": "多选 (P102-P104)"
   },
   {
@@ -9681,11 +9681,11 @@ export const HAT_QUESTIONS: HatQuestion[] = [
     "hatKeyword": "中国人民政治协商会议",
     "examType": "多选",
     "sourcePage": "P102-P104",
-    "stem": "中国人民政治协商会议是：实行中国共产党领导的多党合作和政治协商制度的重要机构；我国政治生活中发扬社会主义民主、实践全过程人民民主的重要形式；社会主义协商民主的重要渠道和专门协商机构；国家治理体系的重要组成部分",
-    "answer": "",
-    "trapAnalysis": "原文未提供可确认的答案标记，暂不生成可作答选项。",
+    "stem": "中国人民政治协商会议是：",
+    "answer": "实行中国共产党领导的多党合作和政治协商制度的重要机构；我国政治生活中发扬社会主义民主、实践全过程人民民主的重要形式；社会主义协商民主的重要渠道和专门协商机构；国家治理体系的重要组成部分",
+    "trapAnalysis": "原始资料题目。答案以原文标记为准；注意辨析题干限定词。",
     "confusionGroup": "新思想-第八章 发展全过程人民民主-中国人民政治协商会议",
-    "needsReview": true,
+    "needsReview": false,
     "sourceSection": "多选 (P102-P104)"
   },
   {
@@ -9697,11 +9697,11 @@ export const HAT_QUESTIONS: HatQuestion[] = [
     "hatKeyword": "协商民主",
     "examType": "多选",
     "sourcePage": "P102-P104",
-    "stem": "协商民主是实践全过程人民民主的重要形式，是：我国社会主义民主政治的特有形式和独特优势；党的群众路线在政治领域的重要体现；中国共产党领导人民有效治理国家、保证人民当家作主的重要制度安排",
-    "answer": "",
-    "trapAnalysis": "原文未提供可确认的答案标记，暂不生成可作答选项。",
+    "stem": "协商民主是实践全过程人民民主的重要形式，是：",
+    "answer": "我国社会主义民主政治的特有形式和独特优势；党的群众路线在政治领域的重要体现；中国共产党领导人民有效治理国家、保证人民当家作主的重要制度安排",
+    "trapAnalysis": "原始资料题目。答案以原文标记为准；注意辨析题干限定词。",
     "confusionGroup": "新思想-第八章 发展全过程人民民主-协商民主",
-    "needsReview": true,
+    "needsReview": false,
     "sourceSection": "多选 (P102-P104)"
   },
   {
@@ -9713,11 +9713,11 @@ export const HAT_QUESTIONS: HatQuestion[] = [
     "hatKeyword": "发展基层民主",
     "examType": "多选",
     "sourcePage": "P102-P104",
-    "stem": "发展基层民主：是实现人民有效政治参与的重要渠道；是人民当家作主的有效途径；是社会主义民主最广泛的实践；彰显了人民当家作主的广泛性、真实性、有效性",
-    "answer": "",
-    "trapAnalysis": "原文未提供可确认的答案标记，暂不生成可作答选项。",
+    "stem": "发展基层民主：",
+    "answer": "是实现人民有效政治参与的重要渠道；是人民当家作主的有效途径；是社会主义民主最广泛的实践；彰显了人民当家作主的广泛性、真实性、有效性",
+    "trapAnalysis": "原始资料题目。答案以原文标记为准；注意辨析题干限定词。",
     "confusionGroup": "新思想-第八章 发展全过程人民民主-发展基层民主",
-    "needsReview": true,
+    "needsReview": false,
     "sourceSection": "多选 (P102-P104)"
   },
   {
@@ -9729,11 +9729,11 @@ export const HAT_QUESTIONS: HatQuestion[] = [
     "hatKeyword": "统一战线",
     "examType": "多选",
     "sourcePage": "P102-P104",
-    "stem": "统一战线是：党克敌制胜、执政兴国的重要法宝；团结海内外全体中华儿女实现中华民族伟大复兴的重要法宝；党的总路线总政策的重要组成部分",
-    "answer": "",
-    "trapAnalysis": "原文未提供可确认的答案标记，暂不生成可作答选项。",
+    "stem": "统一战线是：",
+    "answer": "党克敌制胜、执政兴国的重要法宝；团结海内外全体中华儿女实现中华民族伟大复兴的重要法宝；党的总路线总政策的重要组成部分",
+    "trapAnalysis": "原始资料题目。答案以原文标记为准；注意辨析题干限定词。",
     "confusionGroup": "新思想-第八章 发展全过程人民民主-统一战线",
-    "needsReview": true,
+    "needsReview": false,
     "sourceSection": "多选 (P102-P104)"
   },
   {
@@ -9745,11 +9745,11 @@ export const HAT_QUESTIONS: HatQuestion[] = [
     "hatKeyword": "法治之魂",
     "examType": "单选",
     "sourcePage": "P88",
-    "stem": "中国特色社会主义法治之魂是：党的领导",
-    "answer": "",
-    "trapAnalysis": "原文未提供可确认的答案标记，暂不生成可作答选项。",
+    "stem": "中国特色社会主义法治之魂是：",
+    "answer": "党的领导",
+    "trapAnalysis": "原始资料题目。答案以原文标记为准；注意辨析题干限定词。",
     "confusionGroup": "新思想-第九章 全面依法治国-法治之魂",
-    "needsReview": true,
+    "needsReview": false,
     "sourceSection": "单选（P88）"
   },
   {
@@ -9761,11 +9761,11 @@ export const HAT_QUESTIONS: HatQuestion[] = [
     "hatKeyword": "根本目的",
     "examType": "单选",
     "sourcePage": "P88",
-    "stem": "推进全面依法治国，根本目的是：依法保障人民权益",
-    "answer": "",
-    "trapAnalysis": "原文未提供可确认的答案标记，暂不生成可作答选项。",
+    "stem": "推进全面依法治国，根本目的是：",
+    "answer": "依法保障人民权益",
+    "trapAnalysis": "原始资料题目。答案以原文标记为准；注意辨析题干限定词。",
     "confusionGroup": "新思想-第九章 全面依法治国-根本目的",
-    "needsReview": true,
+    "needsReview": false,
     "sourceSection": "单选（P88）"
   },
   {
@@ -9777,11 +9777,11 @@ export const HAT_QUESTIONS: HatQuestion[] = [
     "hatKeyword": "平等",
     "examType": "单选",
     "sourcePage": "P88",
-    "stem": "平等是：社会主义法律的基本属性",
-    "answer": "",
-    "trapAnalysis": "原文未提供可确认的答案标记，暂不生成可作答选项。",
+    "stem": "平等是：",
+    "answer": "社会主义法律的基本属性",
+    "trapAnalysis": "原始资料题目。答案以原文标记为准；注意辨析题干限定词。",
     "confusionGroup": "新思想-第九章 全面依法治国-平等",
-    "needsReview": true,
+    "needsReview": false,
     "sourceSection": "单选（P88）"
   },
   {
@@ -9793,11 +9793,11 @@ export const HAT_QUESTIONS: HatQuestion[] = [
     "hatKeyword": "总抓手",
     "examType": "单选",
     "sourcePage": "P88",
-    "stem": "全面推进依法治国的总抓手是：建设中国特色社会主义法治体系",
-    "answer": "",
-    "trapAnalysis": "原文未提供可确认的答案标记，暂不生成可作答选项。",
+    "stem": "全面推进依法治国的总抓手是：",
+    "answer": "建设中国特色社会主义法治体系",
+    "trapAnalysis": "原始资料题目。答案以原文标记为准；注意辨析题干限定词。",
     "confusionGroup": "新思想-第九章 全面依法治国-总抓手",
-    "needsReview": true,
+    "needsReview": false,
     "sourceSection": "单选（P88）"
   },
   {
@@ -9809,11 +9809,11 @@ export const HAT_QUESTIONS: HatQuestion[] = [
     "hatKeyword": "首要任务",
     "examType": "单选",
     "sourcePage": "P88",
-    "stem": "坚持依宪治国、依宪执政，作为首要任务的是：全面贯彻实施宪法",
-    "answer": "",
-    "trapAnalysis": "原文未提供可确认的答案标记，暂不生成可作答选项。",
+    "stem": "坚持依宪治国、依宪执政，作为首要任务的是：",
+    "answer": "全面贯彻实施宪法",
+    "trapAnalysis": "原始资料题目。答案以原文标记为准；注意辨析题干限定词。",
     "confusionGroup": "新思想-第九章 全面依法治国-首要任务",
-    "needsReview": true,
+    "needsReview": false,
     "sourceSection": "单选（P88）"
   },
   {
@@ -9825,11 +9825,11 @@ export const HAT_QUESTIONS: HatQuestion[] = [
     "hatKeyword": "重点任务和主体工程",
     "examType": "单选",
     "sourcePage": "P88",
-    "stem": "全面依法治国的重点任务和主体工程是：法治政府建设",
-    "answer": "",
-    "trapAnalysis": "原文未提供可确认的答案标记，暂不生成可作答选项。",
+    "stem": "全面依法治国的重点任务和主体工程是：",
+    "answer": "法治政府建设",
+    "trapAnalysis": "原始资料题目。答案以原文标记为准；注意辨析题干限定词。",
     "confusionGroup": "新思想-第九章 全面依法治国-重点任务和主体工程",
-    "needsReview": true,
+    "needsReview": false,
     "sourceSection": "单选（P88）"
   },
   {
