@@ -31,9 +31,10 @@ export const KnowledgeHubView: React.FC = () => {
           if (node.tagName === 'H1') { subject = text; chapter = '导论'; section = ''; return; }
           if (node.tagName === 'H2') { chapter = text; section = ''; return; }
           if (node.tagName === 'H3') { section = text; return; }
-          if (node.tagName === 'P' && /^-?\\s*\\d+\\s*-?$/.test(text)) return;
+          if (node.tagName === 'P' && /^-?\s*\d+\s*-?$/.test(text)) return;
           if (node.tagName === 'LI' || node.tagName === 'P') {
-            const answer = node.querySelector('u')?.textContent?.replace(/\s+/g, ' ').trim() || '';
+            const markedAnswers = Array.from(node.querySelectorAll('u, b, strong'));
+            const answer = (markedAnswers[markedAnswers.length - 1]?.textContent || '').replace(/\s+/g, ' ').trim();
             const cleanText = text.replace(/\s+/g, ' ').trim();
             parsed.push({ id: parsed.length + 1, subject, chapter, section, text: cleanText, answer, kind: node.tagName === 'LI' ? '题目' : '原文' });
           }
