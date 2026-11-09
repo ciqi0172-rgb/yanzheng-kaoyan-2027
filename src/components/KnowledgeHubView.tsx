@@ -33,14 +33,26 @@ export const KnowledgeHubView: React.FC = () => {
           if (node.tagName === 'H3') { section = text; return; }
           if (node.tagName === 'P' && /^-?\s*\d+\s*-?$/.test(text)) return;
           if (node.tagName === 'LI' || node.tagName === 'P') {
-            // In the source HTML, <u> marks the answer; <b>/<strong> marks the tested keyword in the question.
-            // Never mistake a bold keyword for the answer.
+            // 思修、毛中特、新思想通常用 <u> 标答案；史纲、马原的答案则用 <b>/<strong>，
+            // 同时题干关键词也加粗。因此：优先标红所有 <u>；没有 <u> 时，只标红最后一个加粗片段作为答案。
             const answerNodes = Array.from(node.querySelectorAll('u'));
-            const answers = answerNodes.map(el => (el.textContent || '').replace(/\s+/g, ' ').trim()).filter(Boolean);
+            const boldNodes = Array.from(node.querySelectorAll('b,strong'));
+            const selectedAnswers = answerNodes.length ? answerNodes : (boldNodes.length ? [boldNodes[boldNodes.length - 1]] : []);
+            const answers = selectedAnswers.map(el => (el.textContent || '').replace(/\s+/g, ' ').trim()).filter(Boolean);
             const answer = answers.join('；');
             const cleanText = text.replace(/\s+/g, ' ').trim();
-            // Preserve the source markup and explicitly color every underlined answer segment red.
-            const textHtml = node.innerHTML.replace(/<u\b[^>]*>([\s\S]*?)<\/u>/gi, '<span style="color:#dc2626;font-weight:800;text-decoration:underline;text-decoration-color:#dc2626">$1</span>');
+            // Clone the original node, highlight answer markers, and leave question keywords unchanged.
+            const displayNode = node.cloneNode(true) as HTMLElement;
+            const underlineAnswers = Array.from(displayNode.querySelectorAll('u'));
+            const boldAnswers = Array.from(displayNode.querySelectorAll('b,strong'));
+            const nodesToHighlight = underlineAnswers.length ? underlineAnswers : (boldAnswers.length ? [boldAnswers[boldAnswers.length - 1]] : []);
+            nodesToHighlight.forEach(el => {
+              const span = doc.createElement('span');
+              span.setAttribute('style', 'color:#dc2626;font-weight:800;text-decoration:underline;text-decoration-color:#dc2626');
+              span.innerHTML = el.innerHTML;
+              el.replaceWith(span);
+            });
+            const textHtml = displayNode.innerHTML;
             parsed.push({ id: parsed.length + 1, subject, chapter, section, text: cleanText, textHtml, answer, kind: node.tagName === 'LI' ? '题目' : '原文' });
           }
         });
