@@ -1,100 +1,94 @@
 import { HatQuestion, HatQuestionOption } from '../types';
 
 const KEYS: HatQuestionOption['key'][] = ['A', 'B', 'C', 'D'];
-const normalize = (value: string) => value.replace(/[\s，。；：、（）()“”‘’]/g, '').toLocaleLowerCase();
+const normalize = (value: string) => value.replace(/[\s，。；;：:、（）()“”‘’]/g, '').toLocaleLowerCase();
+const answerParts = (question: HatQuestion) =>
+  question.examType === '多选'
+    ? question.answer.split(/[；;]/).map(part => normalize(part)).filter(Boolean).length
+    : 1;
 
 /**
- * Builds one-answer, four-option practice from the existing source-backed hat-question bank.
- * Distractors are selected in order: same confusion group, same subject, then a distinct
- * cross-subject answer. The generator never repeats the correct answer or duplicates an option.
+ * Builds a four-option, one-answer question from the source-backed bank.
+ * Multi-select source answers are presented as complete answer combinations; distractors are
+ * complete combinations from other source questions with the same number of statements.
+ * Unverified source records are never used as answer keys or distractors.
  */
 export function buildHatQuestionOptions(
   question: HatQuestion,
   allQuestions: HatQuestion[]
 ): HatQuestionOption[] {
+  if (question.needsReview || !question.answer.trim()) return [];
+
   const correctAnswer = question.answer.trim();
-  const explicit = question.options?.filter(option => option.text.trim()) ?? [];
-  const explicitCorrect = explicit.filter(option => option.isCorrect && normalize(option.text) === normalize(correctAnswer));
-  const explicitWrong = explicit.filter(option => !option.isCorrect && normalize(option.text) !== normalize(correctAnswer));
-
-  // Preserve authored options only when they are genuinely four distinct options with one correct answer.
-  const authored = [...explicitCorrect.slice(0, 1), ...explicitWrong]
-    .filter((option, index, arr) => arr.findIndex(other => normalize(other.text) === normalize(option.text)) === index)
-    .slice(0, 4);
-  if (authored.length === 4 && authored.filter(option => option.isCorrect).length === 1) {
-    return authored.map((option, index) => ({ ...option, key: KEYS[index] }));
+  const correctKey = normalize(correctAnswer);
+  const authored = (question.options ?? [])
+    .filter(option => option.text.trim())
+    .filter((option, index, options) =>
+      options.findIndex(other => normalize(other.text) === normalize(option.text)) === index
+    );
+  const authoredCorrect = authored.filter(option => option.isCorrect && normalize(option.text) === correctKey);
+  const authoredWrong = authored.filter(option => !option.isCorrect && normalize(option.text) !== correctKey);
+  if (authoredCorrect.length === 1 && authoredWrong.length >= 3) {
+    const selected = [authoredCorrect[0], ...authoredWrong.slice(0, 3)];
+    return shuffleOptions(selected.map((option, index) => ({ ...option, key: KEYS[index] })), question.id);
   }
 
-  const otherAnswers = allQuestions
-    .filter(item => item.id !== question.id && item.answer.trim())
-    .filter(item => normalize(item.answer) !== normalize(correctAnswer))
-    .map(item => ({
-      answer: item.answer.trim(),
-      subject: item.subject,
-      confusionGroup: item.confusionGroup,
-      hatKeyword: item.hatKeyword,
-      stem: item.stem,
-    }));
+  const candidates = allQuestions.filter(item =>
+    item.id !== question.id &&
+    !item.needsReview &&
+    Boolean(item.answer.trim()) &&
+    item.examType === question.examType &&
+    normalize(item.answer) !== correctKey &&
+    (question.examType !== '多选' || answerParts(item) === answerParts(question))
+  );
 
-  const seen = new Set<string>([normalize(correctAnswer)]);
-  const distractors: { text: string; source: typeof otherAnswers[number] | null }[] = [];
-  const add = (text: string, source: typeof otherAnswers[number] | null) => {
-    const value = text.trim();
-    const key = normalize(value);
-    if (!value || seen.has(key) || distractors.length >= 3) return;
-    seen.add(key);
-    distractors.push({ text: value, source });
-  };
-
-  // Carefully prioritize plausible, source-backed confusions over generic filler.
+  // Prioritize near-miss distinctions grounded in the original bank, then widen the pool.
   const ranked = [
-    ...otherAnswers.filter(item => item.confusionGroup && item.confusionGroup === question.confusionGroup),
-    ...otherAnswers.filter(item => item.subject === question.subject && item.confusionGroup !== question.confusionGroup),
-    ...otherAnswers.filter(item => item.subject !== question.subject),
+    ...candidates.filter(item => item.confusionGroup && item.confusionGroup === question.confusionGroup),
+    ...candidates.filter(item => item.chapter === question.chapter && item.subject === question.subject),
+    ...candidates.filter(item => item.subject === question.subject && item.hatType === question.hatType),
+    ...candidates.filter(item => item.subject === question.subject),
+    ...candidates.filter(item => item.subject !== question.subject),
   ];
-  for (const item of ranked) add(item.answer, item);
-  const fallbackTraps = [
-    '坚持党的全面领导', '坚持以人民为中心', '解放和发展社会生产力',
-    '高质量发展', '实事求是', '群众路线', '独立自主',
-    '建设社会主义现代化强国', '全体人民共同富裕',
-    '马克思主义基本原理同中国具体实际相结合',
-    '公有制为主体、多种所有制经济共同发展', '人民代表大会制度',
-  ];
-  for (const answer of fallbackTraps) add(answer, null);
 
-  const options = [
-    { text: correctAnswer, isCorrect: true, source: null as typeof otherAnswers[number] | null },
-    ...distractors.map(item => ({ ...item, isCorrect: false })),
-  ];
-  // A very small/degenerate data subset still gets four unique choices, never duplicate choices.
-  const lastResort = ['以经济建设为中心', '坚持四项基本原则', '全面深化改革开放', '依法治国'];
-  for (const answer of lastResort) add(answer, null);
-  while (options.length < 4 && distractors.length > options.length - 1) {
-    const item = distractors[options.length - 1];
-    options.push({ text: item.text, isCorrect: false, source: item.source });
-  }
-  for (const answer of lastResort) {
-    if (options.length >= 4) break;
-    if (!seen.has(normalize(answer))) options.push({ text: answer, isCorrect: false, source: null });
-    seen.add(normalize(answer));
+  const seen = new Set<string>([correctKey]);
+  const distractors: HatQuestion[] = [];
+  for (const candidate of ranked) {
+    const key = normalize(candidate.answer);
+    if (!key || seen.has(key)) continue;
+    seen.add(key);
+    distractors.push(candidate);
+    if (distractors.length === 3) break;
   }
 
-  let seed = question.id.split('').reduce((acc, char) => acc + char.charCodeAt(0), 0);
-  const shuffled = [...options.slice(0, 4)];
+  // Do not invent filler options. If the source bank cannot supply three valid distractors,
+  // keep the question out of four-choice mode until it can be reviewed.
+  if (distractors.length < 3) return [];
+
+  const options: HatQuestionOption[] = [
+    { key: 'A', text: correctAnswer, isCorrect: true, trapExplanation: `【正确项】${question.trapAnalysis}` },
+    ...distractors.map(item => ({
+      key: 'A' as const,
+      text: item.answer,
+      isCorrect: false,
+      trapExplanation: question.examType === '多选'
+        ? `【组合辨析】这组表述来自原文另一道多选题（${item.chapter || item.subject}；考点：${item.hatKeyword}）。本题应逐项核对，不能把不同考点的正确表述拼成正确答案。`
+        : `【易混辨析】该答案对应原文另一考点“${item.hatKeyword}”（${item.chapter || item.subject}）；本题考查的是“${question.hatKeyword}”。`,
+    })),
+  ];
+  return shuffleOptions(options, question.id);
+}
+
+function shuffleOptions(options: HatQuestionOption[], id: string): HatQuestionOption[] {
+  let seed = id.split('').reduce((sum, char) => sum + char.charCodeAt(0), 0);
+  const shuffled = [...options];
   for (let i = shuffled.length - 1; i > 0; i--) {
     seed = (seed * 9301 + 49297) % 233280;
     const j = Math.floor((seed / 233280) * (i + 1));
     [shuffled[i], shuffled[j]] = [shuffled[j], shuffled[i]];
   }
-
-  return shuffled.map((item, index) => ({
+  return shuffled.map((option, index) => ({
+    ...option,
     key: KEYS[index],
-    text: item.text,
-    isCorrect: item.isCorrect,
-    trapExplanation: item.isCorrect
-      ? `【正确项】${question.trapAnalysis}`
-      : item.source
-        ? `【易混辨析】“${item.text}”对应的考点是“${item.source.hatKeyword}”；本题问的是“${question.hatKeyword}”。`
-        : `【干扰项】“${item.text}”是相近政治概念，需回到题干限定词“${question.hatKeyword}”判断；不要只凭熟悉感作答。`,
   }));
 }
