@@ -9,7 +9,7 @@ import { HatQuestion } from '../types';
 
 export const HAT_QUESTIONS: HatQuestion[] = [
   {
-    "id": "hat-1",
+    "id": "sx-01",
     "subject": "思修法治",
     "chapter": "绪论 担当复兴大任成就时代新人",
     "sourceNumber": 1,
@@ -57,7 +57,7 @@ export const HAT_QUESTIONS: HatQuestion[] = [
     "sourceSection": "多选 (P169)"
   },
   {
-    "id": "hat-4",
+    "id": "sx-02",
     "subject": "思修法治",
     "chapter": "第一章 领悟人生真谛把握人生方向",
     "sourceNumber": 4,
@@ -73,7 +73,7 @@ export const HAT_QUESTIONS: HatQuestion[] = [
     "sourceSection": "单选(P161-P162)"
   },
   {
-    "id": "hat-5",
+    "id": "sx-03",
     "subject": "思修法治",
     "chapter": "第一章 领悟人生真谛把握人生方向",
     "sourceNumber": 5,
@@ -121,7 +121,7 @@ export const HAT_QUESTIONS: HatQuestion[] = [
     "sourceSection": "单选(P161-P162)"
   },
   {
-    "id": "hat-8",
+    "id": "sx-07",
     "subject": "思修法治",
     "chapter": "第一章 领悟人生真谛把握人生方向",
     "sourceNumber": 10,
@@ -169,7 +169,7 @@ export const HAT_QUESTIONS: HatQuestion[] = [
     "sourceSection": "多选 (P169-171)"
   },
   {
-    "id": "hat-11",
+    "id": "sx-08",
     "subject": "思修法治",
     "chapter": "第二章 追求远大理想坚定崇高信念",
     "sourceNumber": 13,
@@ -233,7 +233,7 @@ export const HAT_QUESTIONS: HatQuestion[] = [
     "sourceSection": "多选 (P171-P172)"
   },
   {
-    "id": "hat-15",
+    "id": "sx-10",
     "subject": "思修法治",
     "chapter": "第三章 继承优良传统弘扬中国精神",
     "sourceNumber": 17,
@@ -281,7 +281,7 @@ export const HAT_QUESTIONS: HatQuestion[] = [
     "sourceSection": "单选(P163)"
   },
   {
-    "id": "hat-18",
+    "id": "sx-13",
     "subject": "思修法治",
     "chapter": "第三章 继承优良传统弘扬中国精神",
     "sourceNumber": 20,
@@ -297,7 +297,7 @@ export const HAT_QUESTIONS: HatQuestion[] = [
     "sourceSection": "单选(P163)"
   },
   {
-    "id": "hat-19",
+    "id": "sx-14",
     "subject": "思修法治",
     "chapter": "第三章 继承优良传统弘扬中国精神",
     "sourceNumber": 21,
@@ -441,7 +441,7 @@ export const HAT_QUESTIONS: HatQuestion[] = [
     "sourceSection": "单选(P163-P164)"
   },
   {
-    "id": "hat-28",
+    "id": "sx-17",
     "subject": "思修法治",
     "chapter": "第四章 明确价值要求践行价值准则",
     "sourceNumber": 27,
@@ -457,7 +457,7 @@ export const HAT_QUESTIONS: HatQuestion[] = [
     "sourceSection": "单选(P163-P164)"
   },
   {
-    "id": "hat-29",
+    "id": "sx-18",
     "subject": "思修法治",
     "chapter": "第四章 明确价值要求践行价值准则",
     "sourceNumber": 28,
@@ -553,7 +553,7 @@ export const HAT_QUESTIONS: HatQuestion[] = [
     "sourceSection": "多选 (P173-P175)"
   },
   {
-    "id": "hat-35",
+    "id": "sx-23",
     "subject": "思修法治",
     "chapter": "第五章 遵守道德规范锤炼道德品格",
     "sourceNumber": 29,
@@ -569,7 +569,7 @@ export const HAT_QUESTIONS: HatQuestion[] = [
     "sourceSection": "单选(P164-P166)"
   },
   {
-    "id": "hat-36",
+    "id": "sx-24",
     "subject": "思修法治",
     "chapter": "第五章 遵守道德规范锤炼道德品格",
     "sourceNumber": 30,
@@ -601,7 +601,7 @@ export const HAT_QUESTIONS: HatQuestion[] = [
     "sourceSection": "单选(P164-P166)"
   },
   {
-    "id": "hat-38",
+    "id": "sx-25",
     "subject": "思修法治",
     "chapter": "第五章 遵守道德规范锤炼道德品格",
     "sourceNumber": 33,
@@ -633,7 +633,7 @@ export const HAT_QUESTIONS: HatQuestion[] = [
     "sourceSection": "单选(P164-P166)"
   },
   {
-    "id": "hat-40",
+    "id": "sx-27",
     "subject": "思修法治",
     "chapter": "第五章 遵守道德规范锤炼道德品格",
     "sourceNumber": 37,
@@ -681,7 +681,7 @@ export const HAT_QUESTIONS: HatQuestion[] = [
     "sourceSection": "单选(P164-P166)"
   },
   {
-    "id": "hat-43",
+    "id": "sx-28",
     "subject": "思修法治",
     "chapter": "第五章 遵守道德规范锤炼道德品格",
     "sourceNumber": 40,
@@ -697,7 +697,7 @@ export const HAT_QUESTIONS: HatQuestion[] = [
     "sourceSection": "单选(P164-P166)"
   },
   {
-    "id": "hat-44",
+    "id": "sx-29",
     "subject": "思修法治",
     "chapter": "第五章 遵守道德规范锤炼道德品格",
     "sourceNumber": 43,
@@ -713,7 +713,7 @@ export const HAT_QUESTIONS: HatQuestion[] = [
     "sourceSection": "单选(P164-P166)"
   },
   {
-    "id": "hat-45",
+    "id": "sx-30",
     "subject": "思修法治",
     "chapter": "第五章 遵守道德规范锤炼道德品格",
     "sourceNumber": 46,
@@ -1049,7 +1049,7 @@ export const HAT_QUESTIONS: HatQuestion[] = [
     "sourceSection": "单选(P166-P168)"
   },
   {
-    "id": "hat-66",
+    "id": "sx-36",
     "subject": "思修法治",
     "chapter": "第六章 学习法治思想提升法治素养",
     "sourceNumber": 58,
@@ -1577,7 +1577,7 @@ export const HAT_QUESTIONS: HatQuestion[] = [
     "sourceSection": "多选 (P72)"
   },
   {
-    "id": "hat-99",
+    "id": "mzt-02",
     "subject": "毛中特",
     "chapter": "第一章 毛泽东思想及其历史地位",
     "sourceNumber": 3,
@@ -1625,7 +1625,7 @@ export const HAT_QUESTIONS: HatQuestion[] = [
     "sourceSection": "单选 (P65-P66)"
   },
   {
-    "id": "hat-102",
+    "id": "mzt-07",
     "subject": "毛中特",
     "chapter": "第一章 毛泽东思想及其历史地位",
     "sourceNumber": 6,
@@ -2201,7 +2201,7 @@ export const HAT_QUESTIONS: HatQuestion[] = [
     "sourceSection": "多选 (P73-P75)"
   },
   {
-    "id": "hat-138",
+    "id": "mzt-18",
     "subject": "毛中特",
     "chapter": "第三章 社会主义改造理论",
     "sourceNumber": 29,
@@ -3033,7 +3033,7 @@ export const HAT_QUESTIONS: HatQuestion[] = [
     "sourceSection": "多选（P80）"
   },
   {
-    "id": "hat-190",
+    "id": "mzt-32",
     "subject": "毛中特",
     "chapter": "第八章 科学发展观",
     "sourceNumber": 55,
@@ -3529,7 +3529,7 @@ export const HAT_QUESTIONS: HatQuestion[] = [
     "sourceSection": "单选 (P19-121)"
   },
   {
-    "id": "hat-221",
+    "id": "sg-27",
     "subject": "史纲",
     "chapter": "第三章 辛亥革命与君主专制制度的终结",
     "sourceNumber": 31,
@@ -4537,7 +4537,7 @@ export const HAT_QUESTIONS: HatQuestion[] = [
     "sourceSection": "多选（P143-147）"
   },
   {
-    "id": "hat-284",
+    "id": "sg-31",
     "subject": "史纲",
     "chapter": "第六章 中华民族的抗日战争",
     "sourceNumber": 71,
@@ -5401,7 +5401,7 @@ export const HAT_QUESTIONS: HatQuestion[] = [
     "sourceSection": "多选 (P152-153)"
   },
   {
-    "id": "hat-338",
+    "id": "my-01",
     "subject": "马原",
     "chapter": "导论",
     "sourceNumber": 1,
@@ -5833,7 +5833,7 @@ export const HAT_QUESTIONS: HatQuestion[] = [
     "sourceSection": "多选（P27-P35）"
   },
   {
-    "id": "hat-365",
+    "id": "my-15",
     "subject": "马原",
     "chapter": "第二章 实践与认识及其发展规律",
     "sourceNumber": 43,
@@ -6057,7 +6057,7 @@ export const HAT_QUESTIONS: HatQuestion[] = [
     "sourceSection": "单选 (P12-P16)"
   },
   {
-    "id": "hat-379",
+    "id": "my-19",
     "subject": "马原",
     "chapter": "第三章 人类社会及其发展规律",
     "sourceNumber": 76,
@@ -6073,7 +6073,7 @@ export const HAT_QUESTIONS: HatQuestion[] = [
     "sourceSection": "单选 (P12-P16)"
   },
   {
-    "id": "hat-380",
+    "id": "my-20",
     "subject": "马原",
     "chapter": "第三章 人类社会及其发展规律",
     "sourceNumber": 78,
@@ -6089,7 +6089,7 @@ export const HAT_QUESTIONS: HatQuestion[] = [
     "sourceSection": "单选 (P12-P16)"
   },
   {
-    "id": "hat-381",
+    "id": "my-21",
     "subject": "马原",
     "chapter": "第三章 人类社会及其发展规律",
     "sourceNumber": 80,
@@ -6921,7 +6921,7 @@ export const HAT_QUESTIONS: HatQuestion[] = [
     "sourceSection": "单选 (P16-P24)"
   },
   {
-    "id": "hat-433",
+    "id": "my-27",
     "subject": "马原",
     "chapter": "第四章 资本主义的本质及其规律",
     "sourceNumber": 160,
@@ -6969,7 +6969,7 @@ export const HAT_QUESTIONS: HatQuestion[] = [
     "sourceSection": "单选 (P16-P24)"
   },
   {
-    "id": "hat-436",
+    "id": "my-28",
     "subject": "马原",
     "chapter": "第四章 资本主义的本质及其规律",
     "sourceNumber": 163,
@@ -8025,7 +8025,7 @@ export const HAT_QUESTIONS: HatQuestion[] = [
     "sourceSection": "多选 (P55-P58)"
   },
   {
-    "id": "hat-502",
+    "id": "my-29",
     "subject": "马原",
     "chapter": "第六章 社会主义的发展及其规律",
     "sourceNumber": 196,
@@ -8217,7 +8217,7 @@ export const HAT_QUESTIONS: HatQuestion[] = [
     "sourceSection": "多选 (P58-P59)"
   },
   {
-    "id": "hat-514",
+    "id": "xsx-01",
     "subject": "新思想",
     "chapter": "导 论",
     "sourceNumber": 1,
@@ -8585,7 +8585,7 @@ export const HAT_QUESTIONS: HatQuestion[] = [
     "sourceSection": "多选 (P95-96)"
   },
   {
-    "id": "hat-537",
+    "id": "xsx-06",
     "subject": "新思想",
     "chapter": "第三章 坚持党的全面领导",
     "sourceNumber": 9,
@@ -8617,7 +8617,7 @@ export const HAT_QUESTIONS: HatQuestion[] = [
     "sourceSection": "单选 (P83)"
   },
   {
-    "id": "hat-539",
+    "id": "xsx-09",
     "subject": "新思想",
     "chapter": "第三章 坚持党的全面领导",
     "sourceNumber": 11,
@@ -8633,7 +8633,7 @@ export const HAT_QUESTIONS: HatQuestion[] = [
     "sourceSection": "单选 (P83)"
   },
   {
-    "id": "hat-540",
+    "id": "xsx-10",
     "subject": "新思想",
     "chapter": "第三章 坚持党的全面领导",
     "sourceNumber": 12,
@@ -9113,7 +9113,7 @@ export const HAT_QUESTIONS: HatQuestion[] = [
     "sourceSection": "单选 (P85-P86)"
   },
   {
-    "id": "hat-570",
+    "id": "xsx-13",
     "subject": "新思想",
     "chapter": "第六章 推动高质量发展",
     "sourceNumber": 33,
@@ -10297,7 +10297,7 @@ export const HAT_QUESTIONS: HatQuestion[] = [
     "sourceSection": "多选（P107-P108）"
   },
   {
-    "id": "hat-644",
+    "id": "xsx-22",
     "subject": "新思想",
     "chapter": "第十二章 建设社会主义生态文明",
     "sourceNumber": 68,
@@ -10313,7 +10313,7 @@ export const HAT_QUESTIONS: HatQuestion[] = [
     "sourceSection": "单选 (P90)"
   },
   {
-    "id": "hat-645",
+    "id": "xsx-23",
     "subject": "新思想",
     "chapter": "第十二章 建设社会主义生态文明",
     "sourceNumber": 69,
@@ -10505,7 +10505,7 @@ export const HAT_QUESTIONS: HatQuestion[] = [
     "sourceSection": "单选 (P91)"
   },
   {
-    "id": "hat-657",
+    "id": "xsx-25",
     "subject": "新思想",
     "chapter": "第十四章 建设巩固国防和强大人民军队",
     "sourceNumber": 77,
@@ -10713,7 +10713,7 @@ export const HAT_QUESTIONS: HatQuestion[] = [
     "sourceSection": "单选 (P92)"
   },
   {
-    "id": "hat-670",
+    "id": "xsx-26",
     "subject": "新思想",
     "chapter": "第十六章 中国特色大国外交和推动构建人类命运共同体",
     "sourceNumber": 84,
