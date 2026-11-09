@@ -1,6 +1,7 @@
 import { readFileSync } from 'node:fs';
 import { HAT_QUESTIONS } from '../src/data/hatQuestions';
 import { ESSAY_TEMPLATES } from '../src/data/essayTemplates';
+import { buildHatQuestionOptions } from '../src/services/quizGenerator';
 
 type Issue = { dataset: string; id: string; field: string; message: string };
 const issues: Issue[] = [];
@@ -148,6 +149,33 @@ const structuredNeedsReview = HAT_QUESTIONS.filter(q => q.needsReview).length;
 const structuredPlayable = HAT_QUESTIONS.filter(q => !q.needsReview && Boolean(q.answer?.trim())).length;
 if (structuredNeedsReview + structuredPlayable !== HAT_QUESTIONS.length) {
   issues.push({ dataset: '帽子题结构化数据', id: 'review-status', field: 'count', message: '待核验题与可练习题数量无法覆盖全部题目' });
+}
+const expectedStructuredBySubject: Record<string, number> = {
+  '思修法治': 95,
+  '毛中特': 98,
+  '史纲': 144,
+  '马原': 176,
+  '新思想': 171,
+};
+for (const [subject, expected] of Object.entries(expectedStructuredBySubject)) {
+  const actual = HAT_QUESTIONS.filter(q => q.subject === subject).length;
+  if (actual !== expected) {
+    issues.push({ dataset: '帽子题结构化数据', id: subject, field: 'questionCount', message: `应有 ${expected} 道，实际为 ${actual} 道` });
+  }
+}
+const normalizeOption = (value: string) => value.replace(/[\\s，。；;：:、（）()“”‘’]/g, '').toLocaleLowerCase();
+for (const question of HAT_QUESTIONS.filter(q => !q.needsReview && q.answer?.trim())) {
+  const options = buildHatQuestionOptions(question, HAT_QUESTIONS);
+  const uniqueOptions = new Set(options.map(option => normalizeOption(option.text)));
+  const correctCount = options.filter(option => option.isCorrect).length;
+  if (options.length !== 4 || uniqueOptions.size !== 4 || correctCount !== 1) {
+    issues.push({
+      dataset: '四选一自动组题',
+      id: question.id,
+      field: 'options',
+      message: `应生成4个不重复选项且只有1个正确答案；实际选项数 ${options.length}，唯一选项数 ${uniqueOptions.size}，正确项数 ${correctCount}`,
+    });
+  }
 }
 const sourceQuestionCount = Object.values(actualBySubject).reduce((sum, count) => sum + count, 0);
 const counts = {
