@@ -1,8 +1,6 @@
-/**
- * OCR 原文页面检索索引。识别结果可能含错字、漏字及版面顺序错误；只能用于定位，不能直接视为标准答案。
- * 所有 48 页均保留原页码，status 标注为待人工核验。
- */
-export type HatSourcePage = { sourcePage: number; sourceFile: string; status: 'OCR-待人工核验'; text: string };
+export type HatSourcePage = { sourcePage: number; sourceFile: string; status: string; text: string };
+
+// Complete OCR text for all 48 source PDF pages. OCR remains unverified and must not be treated as an answer key.
 export const HAT_SOURCE_PAGES: HatSourcePage[] = [
   {
     "sourcePage": 1,
