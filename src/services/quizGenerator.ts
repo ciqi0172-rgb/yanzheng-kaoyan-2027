@@ -1,87 +1,100 @@
 import { HatQuestion, HatQuestionOption } from '../types';
 
+const KEYS: HatQuestionOption['key'][] = ['A', 'B', 'C', 'D'];
+const normalize = (value: string) => value.replace(/[\s，。；：、（）()“”‘’]/g, '').toLocaleLowerCase();
+
 /**
- * Intelligent generator to ensure every single HatQuestion can be solved
- * as a high-quality 4-choice question with authentic Xiao 1000 trap options.
+ * Builds one-answer, four-option practice from the existing source-backed hat-question bank.
+ * Distractors are selected in order: same confusion group, same subject, then a distinct
+ * cross-subject answer. The generator never repeats the correct answer or duplicates an option.
  */
 export function buildHatQuestionOptions(
   question: HatQuestion,
   allQuestions: HatQuestion[]
 ): HatQuestionOption[] {
-  if (question.options && question.options.length === 4) {
-    return question.options;
+  const correctAnswer = question.answer.trim();
+  const explicit = question.options?.filter(option => option.text.trim()) ?? [];
+  const explicitCorrect = explicit.filter(option => option.isCorrect && normalize(option.text) === normalize(correctAnswer));
+  const explicitWrong = explicit.filter(option => !option.isCorrect && normalize(option.text) !== normalize(correctAnswer));
+
+  // Preserve authored options only when they are genuinely four distinct options with one correct answer.
+  const authored = [...explicitCorrect.slice(0, 1), ...explicitWrong]
+    .filter((option, index, arr) => arr.findIndex(other => normalize(other.text) === normalize(option.text)) === index)
+    .slice(0, 4);
+  if (authored.length === 4 && authored.filter(option => option.isCorrect).length === 1) {
+    return authored.map((option, index) => ({ ...option, key: KEYS[index] }));
   }
 
-  const correctAnswer = question.answer;
+  const otherAnswers = allQuestions
+    .filter(item => item.id !== question.id && item.answer.trim())
+    .filter(item => normalize(item.answer) !== normalize(correctAnswer))
+    .map(item => ({
+      answer: item.answer.trim(),
+      subject: item.subject,
+      confusionGroup: item.confusionGroup,
+      hatKeyword: item.hatKeyword,
+      stem: item.stem,
+    }));
 
-  // Find suitable distractors from the same subject or same confusion group
-  const sameConfusionGroup = allQuestions.filter(
-    (q) => q.id !== question.id && q.confusionGroup && q.confusionGroup === question.confusionGroup && q.answer !== correctAnswer
-  );
+  const seen = new Set<string>([normalize(correctAnswer)]);
+  const distractors: { text: string; source: typeof otherAnswers[number] | null }[] = [];
+  const add = (text: string, source: typeof otherAnswers[number] | null) => {
+    const value = text.trim();
+    const key = normalize(value);
+    if (!value || seen.has(key) || distractors.length >= 3) return;
+    seen.add(key);
+    distractors.push({ text: value, source });
+  };
 
-  const sameSubject = allQuestions.filter(
-    (q) => q.id !== question.id && q.subject === question.subject && q.answer !== correctAnswer
-  );
-
-  const pool = [...sameConfusionGroup, ...sameSubject];
-  const distinctAnswers = Array.from(new Set(pool.map((q) => q.answer)));
-
-  // If pool does not have enough distinct answers, supplement from standard political trap vocabulary
-  const fallbackTraps = [
-    '中国共产党的领导',
-    '解放和发展社会生产力',
-    '坚持以人民为中心',
-    '高质量发展',
-    '马克思主义基本原理与中国具体实际相结合',
-    '无产阶级领导权',
-    '人民代表大会制度',
-    '自我革命',
-    '科技自立自强',
-    '全体人民共同富裕',
-    '公有制为主体、多种所有制经济共同发展',
-    '建设社会主义现代化强国',
-  ].filter((ans) => ans !== correctAnswer);
-
-  const distractors: string[] = [];
-  for (const item of distinctAnswers) {
-    if (distractors.length >= 3) break;
-    if (item && !distractors.includes(item) && item !== correctAnswer) {
-      distractors.push(item);
-    }
-  }
-
-  for (const fallback of fallbackTraps) {
-    if (distractors.length >= 3) break;
-    if (!distractors.includes(fallback) && fallback !== correctAnswer) {
-      distractors.push(fallback);
-    }
-  }
-
-  // Combine and shuffle deterministically based on question.id
-  const combined = [
-    { text: correctAnswer, isCorrect: true },
-    { text: distractors[0] || '以经济建设为中心', isCorrect: false },
-    { text: distractors[1] || '坚持四项基本原则', isCorrect: false },
-    { text: distractors[2] || '全面深化改革开放', isCorrect: false },
+  // Carefully prioritize plausible, source-backed confusions over generic filler.
+  const ranked = [
+    ...otherAnswers.filter(item => item.confusionGroup && item.confusionGroup === question.confusionGroup),
+    ...otherAnswers.filter(item => item.subject === question.subject && item.confusionGroup !== question.confusionGroup),
+    ...otherAnswers.filter(item => item.subject !== question.subject),
   ];
+  for (const item of ranked) add(item.answer, item);
+  const fallbackTraps = [
+    '坚持党的全面领导', '坚持以人民为中心', '解放和发展社会生产力',
+    '高质量发展', '实事求是', '群众路线', '独立自主',
+    '建设社会主义现代化强国', '全体人民共同富裕',
+    '马克思主义基本原理同中国具体实际相结合',
+    '公有制为主体、多种所有制经济共同发展', '人民代表大会制度',
+  ];
+  for (const answer of fallbackTraps) add(answer, null);
 
-  // Pseudo-random shuffle based on char codes of id
+  const options = [
+    { text: correctAnswer, isCorrect: true, source: null as typeof otherAnswers[number] | null },
+    ...distractors.map(item => ({ ...item, isCorrect: false })),
+  ];
+  // A very small/degenerate data subset still gets four unique choices, never duplicate choices.
+  const lastResort = ['以经济建设为中心', '坚持四项基本原则', '全面深化改革开放', '依法治国'];
+  for (const answer of lastResort) add(answer, null);
+  while (options.length < 4 && distractors.length > options.length - 1) {
+    const item = distractors[options.length - 1];
+    options.push({ text: item.text, isCorrect: false, source: item.source });
+  }
+  for (const answer of lastResort) {
+    if (options.length >= 4) break;
+    if (!seen.has(normalize(answer))) options.push({ text: answer, isCorrect: false, source: null });
+    seen.add(normalize(answer));
+  }
+
   let seed = question.id.split('').reduce((acc, char) => acc + char.charCodeAt(0), 0);
-  const shuffled = [...combined];
+  const shuffled = [...options.slice(0, 4)];
   for (let i = shuffled.length - 1; i > 0; i--) {
     seed = (seed * 9301 + 49297) % 233280;
     const j = Math.floor((seed / 233280) * (i + 1));
     [shuffled[i], shuffled[j]] = [shuffled[j], shuffled[i]];
   }
 
-  const keys: ('A' | 'B' | 'C' | 'D')[] = ['A', 'B', 'C', 'D'];
-
-  return shuffled.map((item, idx) => ({
-    key: keys[idx],
+  return shuffled.map((item, index) => ({
+    key: KEYS[index],
     text: item.text,
     isCorrect: item.isCorrect,
     trapExplanation: item.isCorrect
-      ? '【正确项】' + question.trapAnalysis
-      : `【经典陷阱项】肖1000中常将“${item.text}”作为容易张冠李戴的偷换概念干扰项。`,
+      ? `【正确项】${question.trapAnalysis}`
+      : item.source
+        ? `【易混辨析】“${item.text}”对应的考点是“${item.source.hatKeyword}”；本题问的是“${question.hatKeyword}”。`
+        : `【干扰项】“${item.text}”是相近政治概念，需回到题干限定词“${question.hatKeyword}”判断；不要只凭熟悉感作答。`,
   }));
 }
