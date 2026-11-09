@@ -70,6 +70,18 @@ export function buildHatQuestionOptions(
     { id: 'task', terms: ['任务', '职责', '使命'] },
     { id: 'principle', terms: ['原则', '方针'] },
     { id: 'leadership', terms: ['领导', '主体', '核心力量'] },
+    { id: 'relation', terms: ['关系', '联系'] },
+    { id: 'cause', terms: ['原因', '根源', '成因'] },
+    { id: 'basis', terms: ['依据', '尺度', '标准'] },
+    { id: 'content', terms: ['内容', '组成', '构成'] },
+    { id: 'condition', terms: ['条件', '前提条件'] },
+    { id: 'method', terms: ['方法', '方式', '途径'] },
+    { id: 'position', terms: ['地位', '定位'] },
+    { id: 'route', terms: ['路线', '道路', '方针'] },
+    { id: 'classification', terms: ['分类', '类型', '划分'] },
+    { id: 'nature', terms: ['性质', '属性'] },
+    { id: 'manifestation', terms: ['表现', '体现'] },
+    { id: 'object', terms: ['对象', '客体'] },
   ];
   const getConceptFamilies = (item: { hatType?: string; hatKeyword?: string; stem?: string }) => {
     // Use the actual question wording and discriminant keyword as evidence.
