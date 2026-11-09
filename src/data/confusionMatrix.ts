@@ -238,13 +238,6 @@ export const CONFUSION_DATA: ConfusionGroup[] = [
         subject: '新思想/思修法治',
       },
       {
-        term: '我国的根本政治制度',
-        hatType: '根本政治制度',
-        targetAnswer: '人民代表大会制度',
-        trapWarning: '人民代表大会制度是我国的根本政治制度；中国共产党领导的多党合作和政治协商制度不是根本政治制度。',
-        subject: '新思想/思修法治',
-      },
-      {
         term: '我国的基本政治制度',
         hatType: '基本政治制度',
         targetAnswer: '中国共产党领导的多党合作和政治协商制度、民族区域自治制度、基层群众自治制度',
@@ -293,13 +286,6 @@ export const CONFUSION_DATA: ConfusionGroup[] = [
         targetAnswer: '发展',
         trapWarning: '“发展”是第一要务；全面建设社会主义现代化国家的首要任务是高质量发展。',
         subject: '毛中特/新思想',
-      },
-      {
-        term: '全面建设社会主义现代化国家的首要任务',
-        hatType: '首要任务',
-        targetAnswer: '高质量发展',
-        trapWarning: '不能把“首要任务”直接替换为“第一动力”或“第一资源”。',
-        subject: '新思想',
       },
       {
         term: '新发展理念的内容',
@@ -359,7 +345,6 @@ export const CONFUSION_DATA: ConfusionGroup[] = [
     category: '马原',
     description: '集中辨析层级偷换、逻辑方向颠倒和规律定位混淆。',
     items: [
-      { term: '唯物辩证法的实质和核心', hatType: '实质和核心', targetAnswer: '对立统一规律', trapWarning: '质量互变规律说明事物发展的状态和形式；否定之否定规律揭示事物发展的方向和道路。三大规律不可互换。', subject: '马原' },
       { term: '主要矛盾与矛盾的主要方面', hatType: '矛盾层级', targetAnswer: '主要矛盾看复杂事物中多种矛盾的主次；矛盾的主要方面看同一矛盾双方的主次', trapWarning: '前者问“多个矛盾中哪个主要”，后者问“一个矛盾的双方谁占主导”，不能把两个“主要”当成同一概念。', subject: '马原' },
       { term: '量变与质变的关系', hatType: '发展状态', targetAnswer: '量变是质变的必要准备，质变是量变的必然结果', trapWarning: '不能调换“必要准备”和“必然结果”；量变达到一定程度会引起质变，二者相互渗透。', subject: '马原' },
       { term: '社会存在与社会意识的关系', hatType: '决定与反作用', targetAnswer: '社会存在决定社会意识，社会意识具有相对独立性并反作用于社会存在', trapWarning: '“相对独立性”不等于“完全独立性”；社会意识的反作用不能替换社会存在的决定作用。', subject: '马原' },
@@ -376,7 +361,6 @@ export const CONFUSION_DATA: ConfusionGroup[] = [
     items: [
       { term: '中国新民主主义革命的开端', hatType: '革命开端', targetAnswer: '五四运动', trapWarning: '五四运动是新民主主义革命的开端；中国共产党成立标志着中国革命面貌焕然一新，二者历史定位不同。', subject: '史纲' },
       { term: '中国共产党成立的历史意义', hatType: '成立意义', targetAnswer: '中国革命有了坚强的领导力量，中国革命的面貌从此焕然一新', trapWarning: '不要把“新民主主义革命开端”直接当作党的成立标志；五四运动与中共一大承担不同历史定位。', subject: '史纲' },
-      { term: '党历史上生死攸关的转折点', hatType: '历史转折', targetAnswer: '遵义会议', trapWarning: '遵义会议在危急关头挽救了党、红军和中国革命；十一届三中全会是新中国成立以来党的历史上具有深远意义的伟大转折。', subject: '史纲' },
       { term: '新中国成立以来党的历史上具有深远意义的伟大转折', hatType: '伟大转折', targetAnswer: '党的十一届三中全会', trapWarning: '不要与遵义会议的“生死攸关的转折点”混为一谈；题干限定语决定答案。', subject: '史纲' },
       { term: '中国进入改革开放和社会主义现代化建设新时期的标志', hatType: '新时期标志', targetAnswer: '党的十一届三中全会', trapWarning: '注意题干中的“进入新时期”限定，不要与新中国成立、社会主义基本制度确立等阶段性标志混淆。', subject: '史纲' }
     ]
@@ -390,8 +374,6 @@ export const CONFUSION_DATA: ConfusionGroup[] = [
       { term: '社会主义核心价值观国家层面的价值目标', hatType: '国家价值目标', targetAnswer: '富强、民主、文明、和谐', trapWarning: '社会层面是自由、平等、公正、法治；公民个人层面是爱国、敬业、诚信、友善。', subject: '思修法治' },
       { term: '社会主义核心价值观社会层面的价值取向', hatType: '社会价值取向', targetAnswer: '自由、平等、公正、法治', trapWarning: '不要与国家层面的“富强、民主、文明、和谐”或个人层面的“爱国、敬业、诚信、友善”交叉混写。', subject: '思修法治' },
       { term: '社会主义核心价值观公民个人层面的价值准则', hatType: '个人价值准则', targetAnswer: '爱国、敬业、诚信、友善', trapWarning: '这是公民个人层面的价值准则，不是国家层面的价值目标，也不是社会层面的价值取向。', subject: '思修法治' },
-      { term: '社会主义法治最根本的保证', hatType: '根本保证', targetAnswer: '党的领导', trapWarning: '依法治国是党领导人民治理国家的基本方式；人民当家作主是社会主义民主政治的本质和核心，不能替代党的领导这一根本保证。', subject: '思修法治/新思想' },
-      { term: '社会主义民主政治的本质和核心', hatType: '本质和核心', targetAnswer: '人民当家作主', trapWarning: '不要把人民当家作主与党的领导、依法治国互相替换；三者分别对应领导、主体和治理方式等不同定位。', subject: '思修法治/新思想' }
     ]
   }
 ];
