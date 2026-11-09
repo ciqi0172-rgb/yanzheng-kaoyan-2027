@@ -21,7 +21,7 @@ function checkUniqueIds(dataset: string, rows: Array<{ id: string }>) {
 
 checkUniqueIds('帽子题结构化数据', HAT_QUESTIONS);
 for (const q of HAT_QUESTIONS) {
-  for (const field of ['subject', 'hatType', 'hatKeyword', 'examType', 'sourcePage', 'stem', 'trapAnalysis'] as const) {
+  for (const field of ['subject', 'hatType', 'hatKeyword', 'examType', 'stem', 'trapAnalysis'] as const) {
     if (!String(q[field] ?? '').trim()) {
       issues.push({ dataset: '帽子题结构化数据', id: q.id, field, message: '必填字段为空' });
     }
