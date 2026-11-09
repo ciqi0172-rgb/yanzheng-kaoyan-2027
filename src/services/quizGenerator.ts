@@ -47,37 +47,51 @@ export function buildHatQuestionOptions(
     return shuffleOptions(selected.map((option, index) => ({ ...option, key: KEYS[index] })), question.id);
   }
 
-  // For single-answer questions, use reviewed confusion-matrix concepts first.
-  // Matrix entries are short, explicit concept labels with a documented trap rationale.
+  // For single-answer questions, first identify the matching concept inside a reviewed group,
+  // then use its sibling concepts as possible distractors. The previous implementation
+  // incorrectly required every distractor's own term to appear in the stem, which meant
+  // the generator mostly found the correct answer again and missed the group's useful contrasts.
+  const normalizedStem = normalize(question.stem);
+  const normalizedQuestionHat = normalize(question.hatKeyword);
+  const normalizedQuestionType = normalize(question.hatType);
+  const subjectMatches = (subject: string) =>
+    subject.split('/').some(part => part.trim() === question.subject) ||
+    subject.includes(question.subject) || question.subject.includes(subject);
   const matrixCandidates = question.examType === '多选' ? [] : CONFUSION_DATA
-    .flatMap(group => group.items.map(item => ({
-      id: `matrix-${group.id}-${item.hatType}-${item.term}`,
-      answer: item.targetAnswer.trim(),
-      subject: item.subject,
-      hatKeyword: item.hatType,
-      chapter: group.title,
-      confusionGroup: group.category,
-      hatType: item.hatType,
-      matrixTerm: item.term,
-      matrixTrap: item.trapWarning,
-      source: 'matrix' as const,
-    })))
-    .filter(item => {
-      const normalizedStem = normalize(question.stem);
-      const normalizedTerm = normalize(item.matrixTerm);
-      const normalizedMatrixHat = normalize(item.hatType);
-      const normalizedQuestionHat = normalize(question.hatKeyword);
-      const exactConceptMatch = normalizedStem.includes(normalizedTerm) ||
-        (normalizedMatrixHat.length >= 4 && normalizedQuestionHat === normalizedMatrixHat &&
-          normalizedStem.includes(normalizedMatrixHat));
-      // Do not inject an unrelated matrix answer merely because its subject matches.
-      return exactConceptMatch &&
-        normalize(item.answer) !== correctKey &&
-        isOptionShaped(item.answer, correctAnswer) &&
-        item.answer.length >= Math.max(2, Math.floor(correctAnswer.length * 0.35)) &&
-        (item.subject.includes(question.subject) || question.subject.includes(item.subject) ||
-          item.subject.split('/').some(subject => subject === question.subject));
-    });
+    .flatMap(group => {
+      const anchors = group.items.filter(item => {
+        const termAliases = item.term.split(/[／/；;，,]/).map(alias => normalize(alias)).filter(alias => alias.length >= 3);
+        const termMatch = termAliases.some(alias => normalizedStem.includes(alias));
+        const hatMatch = normalize(item.hatType).length >= 4 &&
+          (normalizedQuestionHat === normalize(item.hatType) ||
+            normalizedQuestionType === normalize(item.hatType)) &&
+          normalizedStem.includes(normalize(item.hatType));
+        return termMatch || hatMatch;
+      });
+      if (!anchors.length) return [];
+      // Only sibling entries from the same curated group are eligible. A broad subject
+      // match alone is never enough to inject an option.
+      return group.items
+        .filter(item => !anchors.includes(item))
+        .filter(item => subjectMatches(item.subject))
+        .map(item => ({
+          id: `matrix-${group.id}-${item.hatType}-${item.term}`,
+          answer: item.targetAnswer.trim(),
+          subject: item.subject,
+          hatKeyword: item.hatType,
+          chapter: group.title,
+          confusionGroup: group.category,
+          hatType: item.hatType,
+          matrixTerm: item.term,
+          matrixTrap: item.trapWarning,
+          source: 'matrix' as const,
+        }));
+    })
+    .filter(item =>
+      normalize(item.answer) !== correctKey &&
+      isOptionShaped(item.answer, correctAnswer) &&
+      item.answer.length >= Math.max(2, Math.floor(correctAnswer.length * 0.35))
+    );
 
   const candidates = allQuestions.filter(item =>
     item.id !== question.id &&
