@@ -3,6 +3,7 @@ import { HAT_QUESTIONS } from '../data/hatQuestions';
 import { ESSAY_TEMPLATES } from '../data/essayTemplates';
 import { HAT_SOURCE_COVERAGE } from '../data/hatSourceCoverage';
 import { TEMPLATE_SOURCE_COVERAGE } from '../data/templateSourceCoverage';
+import { HAT_SOURCE_PAGES } from '../data/hatSourcePages';
 import { Search, BookOpen, ClipboardList, Library, Plus, Trash2, Download, CheckCircle2 } from 'lucide-react';
 
 type HubMode = 'search' | 'pending' | 'templates';
@@ -53,6 +54,8 @@ export const KnowledgeHubView: React.FC = () => {
       ].join(' ').toLowerCase().includes(q);
     });
   }, [templateQuery, templateNumber]);
+
+  const sourcePageResults = useMemo(() => { const q = submittedQuery.trim().toLowerCase(); if (!q) return []; return HAT_SOURCE_PAGES.filter(page => page.text.toLowerCase().includes(q) || String(page.sourcePage).includes(q)); }, [submittedQuery]);
 
   const selectedQuestion = HAT_QUESTIONS.find(item => item.id === selectedId);
   const selectedTemplate = ESSAY_TEMPLATES.find(item => item.id === selectedTemplateId);
@@ -114,7 +117,7 @@ export const KnowledgeHubView: React.FC = () => {
         <select className={inputClass} value={subject} onChange={e => setSubject(e.target.value)}>{['全部','马原','毛中特','新思想','史纲','思修法治'].map(s => <option key={s}>{s}</option>)}</select>
         <button className={buttonClass + ' bg-stone-900 text-white dark:bg-stone-100 dark:text-stone-900'} type="submit">搜索题库</button>
       </form>
-      <div className="text-xs text-stone-500">找到 {results.length} 条 · 可搜索题目原文、答案、易错解析和来源页码。</div>
+      <div className="text-xs text-stone-500">结构化题目 {results.length} 条 · 原文页面匹配 {sourcePageResults.length} 页。原文索引目前为逐页录入的起始批次，尚非完整 48 页。</div>
       <div className="grid grid-cols-1 lg:grid-cols-[minmax(0,1fr)_minmax(0,1.15fr)] gap-4">
         <div className="space-y-2 max-h-[680px] overflow-y-auto pr-1">
           {results.map(item => <button key={item.id} onClick={() => setSelectedId(item.id)} className={'w-full text-left rounded-xl border p-3 transition-colors ' + (selectedId === item.id ? 'border-rose-400 bg-rose-50 dark:bg-rose-950/30' : 'border-stone-200 dark:border-stone-800 hover:border-stone-400')}>
@@ -136,6 +139,15 @@ export const KnowledgeHubView: React.FC = () => {
           </div> : <div className="h-full min-h-48 flex flex-col items-center justify-center text-center text-stone-400"><Library size={28}/><p className="mt-2 text-sm">选择左侧知识点，查看完整题干、答案和辨析</p></div>}
         </div>
       </div>
+      {submittedQuery.trim() && <section className="rounded-xl border border-sky-200 dark:border-sky-900 p-4 space-y-3">
+        <h3 className="font-bold text-sm text-sky-800 dark:text-sky-300">原始 PDF 页面检索（摘录索引）</h3>
+        <p className="text-xs text-stone-500">以下为按原始 PDF 页面录入的文字摘录，可辅助定位；仍需回看 PDF 核对完整上下文。当前仅覆盖起始页面，不代表全书检索完整。</p>
+        {sourcePageResults.map(page => <article key={page.sourcePage} className="rounded-lg bg-stone-50 dark:bg-stone-950 p-3">
+          <div className="flex flex-wrap items-center gap-2 text-xs mb-2"><strong>PDF 第 {page.sourcePage} 页</strong><span className="rounded bg-amber-100 text-amber-800 px-2 py-0.5">{page.status}</span></div>
+          <p className="text-sm leading-6 whitespace-pre-wrap">{page.text}</p>
+        </article>)}
+        {!sourcePageResults.length && <p className="text-sm text-stone-500">当前摘录索引没有匹配。不能据此判断原 PDF 中不存在该知识点。</p>}
+      </section>}
     </section>}
 
     {mode === 'pending' && <section className={panel + ' p-4 sm:p-6 space-y-4'}>
