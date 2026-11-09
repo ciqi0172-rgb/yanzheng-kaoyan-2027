@@ -47,7 +47,7 @@ for (const group of CONFUSION_DATA) {
   }
 }
 function normalizeMatrixText(value: string) {
-  return value.replace(/[\\s，。；;：:、（）()“”‘’]/g, '').toLocaleLowerCase();
+  return value.replace(/[\s，。；;：:、（）()“”‘’]/g, '').toLocaleLowerCase();
 }
 
 for (const q of HAT_QUESTIONS) {
