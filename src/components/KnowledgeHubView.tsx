@@ -33,8 +33,10 @@ export const KnowledgeHubView: React.FC = () => {
           if (node.tagName === 'H3') { section = text; return; }
           if (node.tagName === 'P' && /^-?\s*\d+\s*-?$/.test(text)) return;
           if (node.tagName === 'LI' || node.tagName === 'P') {
-            const markedAnswers = Array.from(node.querySelectorAll('u, b, strong'));
-            const answer = (markedAnswers[markedAnswers.length - 1]?.textContent || '').replace(/\s+/g, ' ').trim();
+            // In the source HTML, <u> marks the answer; <b>/<strong> marks the tested keyword in the question.
+            // Never mistake a bold keyword for the answer.
+            const answerNode = node.querySelector('u');
+            const answer = (answerNode?.textContent || '').replace(/\s+/g, ' ').trim();
             const cleanText = text.replace(/\s+/g, ' ').trim();
             parsed.push({ id: parsed.length + 1, subject, chapter, section, text: cleanText, answer, kind: node.tagName === 'LI' ? '题目' : '原文' });
           }
@@ -80,7 +82,7 @@ export const KnowledgeHubView: React.FC = () => {
       {!loading && !loadError && <div className="text-xs text-stone-500">已读取 {items.length} 条原文条目 · 当前匹配 {results.length} 条</div>}
       {!loading && !loadError && results.map(item => <article key={item.id} className="rounded-xl border border-stone-200 bg-white p-4 shadow-sm dark:border-stone-800 dark:bg-stone-950">
         <div className="mb-2 flex flex-wrap items-center gap-2"><span className="rounded-full bg-rose-100 px-2 py-1 text-xs text-rose-800 dark:bg-rose-950 dark:text-rose-200">{item.subject}</span><span className="text-xs text-stone-500">{item.chapter}</span>{item.section && <span className="text-xs text-stone-500">{item.section}</span>}</div>
-        <p className="break-words text-[15px] leading-7 text-stone-800 dark:text-stone-200">{item.answer && item.text.includes(item.answer) ? item.text.split(item.answer).map((part, index, parts) => <React.Fragment key={index}>{part}{index < parts.length - 1 && <span className="font-bold text-red-600 dark:text-red-400">{item.answer}</span>}</React.Fragment>) : item.text}</p>{item.answer && <div className="mt-3 rounded-lg border border-red-200 bg-red-50 px-3 py-2 text-sm leading-6 text-red-700 dark:border-red-900 dark:bg-red-950/40 dark:text-red-300"><span className="mr-2 font-bold">答案</span><span className="font-bold text-red-600 dark:text-red-400">{item.answer}</span></div>}
+        <p className="break-words text-[15px] leading-7 text-stone-800 dark:text-stone-200">{item.answer && item.text.includes(item.answer) ? item.text.split(item.answer).map((part, index, parts) => <React.Fragment key={index}>{part}{index < parts.length - 1 && <span className="font-extrabold text-red-700 dark:text-red-400" style={{ color: '#dc2626' }}>{item.answer}</span>}</React.Fragment>) : item.text}</p>{item.answer && <div className="mt-3 rounded-lg border border-red-200 bg-red-50 px-3 py-2 text-sm leading-6 text-red-700 dark:border-red-900 dark:bg-red-950/40 dark:text-red-300"><span className="mr-2 font-bold">答案</span><span className="font-bold text-red-600 dark:text-red-400">{item.answer}</span></div>}
       </article>)}
       {!loading && !loadError && !results.length && <div className="rounded-xl border border-dashed border-stone-300 p-8 text-center text-sm text-stone-500">没有匹配结果，请尝试更短的关键词或调整科目、章节筛选。</div>}
     </section>
