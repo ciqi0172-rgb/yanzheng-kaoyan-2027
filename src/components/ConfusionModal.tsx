@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { CONFUSION_DATA } from './ConfusionView';
+import { CONFUSION_DATA } from '../data/confusionMatrix';
 import { X, Search, CheckCircle2, AlertTriangle, ArrowRight, BookOpen } from 'lucide-react';
 
 interface ConfusionModalProps {
