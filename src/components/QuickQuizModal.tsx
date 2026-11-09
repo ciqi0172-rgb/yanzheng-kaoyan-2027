@@ -36,7 +36,7 @@ export const QuickQuizModal: React.FC<QuickQuizModalProps> = ({
   // Initialize a random 10 questions when modal opens
   useEffect(() => {
     if (isOpen && questions.length > 0) {
-      const shuffled = [...questions].sort(() => 0.5 - Math.random());
+      const shuffled = questions.filter(question => !question.needsReview && question.answer.trim()).sort(() => 0.5 - Math.random());
       setQuizList(shuffled.slice(0, 10));
       setCurrentIndex(0);
       setUserAnswers({});
