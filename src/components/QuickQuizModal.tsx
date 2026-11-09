@@ -73,7 +73,7 @@ export const QuickQuizModal: React.FC<QuickQuizModalProps> = ({
   };
 
   const handleRestart = () => {
-    const shuffled = [...questions].sort(() => 0.5 - Math.random());
+    const shuffled = questions.filter(question => !question.needsReview && question.answer.trim()).sort(() => 0.5 - Math.random());
     setQuizList(shuffled.slice(0, 10));
     setCurrentIndex(0);
     setUserAnswers({});
