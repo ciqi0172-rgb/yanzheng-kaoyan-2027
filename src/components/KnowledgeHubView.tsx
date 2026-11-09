@@ -30,7 +30,7 @@ export const KnowledgeHubView: React.FC = () => {
           const answerNodes = Array.from(fragment.body.querySelectorAll('u'));
           const boldNodes = Array.from(fragment.body.querySelectorAll('b,strong'));
           const selectedAnswers = answerNodes.length ? answerNodes : (boldNodes.length ? [boldNodes[boldNodes.length - 1]] : []);
-          const answer = selectedAnswers.map(el => (el.textContent || '').replace(/\\s+/g, ' ').trim()).filter(Boolean).join('；');
+          const answer = selectedAnswers.map(el => (el.textContent || '').replace(/\s+/g, ' ').trim()).filter(Boolean).join('；');
           selectedAnswers.forEach(el => {
             const span = fragment.createElement('span');
             span.setAttribute('style', 'color:#dc2626;font-weight:800;text-decoration:underline;text-decoration-color:#dc2626');
@@ -38,7 +38,7 @@ export const KnowledgeHubView: React.FC = () => {
             el.replaceWith(span);
           });
           return {
-            text: (fragment.body.textContent || '').replace(/\\s+/g, ' ').trim(),
+            text: (fragment.body.textContent || '').replace(/\s+/g, ' ').trim(),
             textHtml: fragment.body.innerHTML,
             answer,
           };
@@ -46,24 +46,24 @@ export const KnowledgeHubView: React.FC = () => {
 
         const nodes = Array.from(doc.body.querySelectorAll('h1,h2,h3,li,p'));
         nodes.forEach(node => {
-          const text = (node.textContent || '').replace(/\\s+/g, ' ').trim();
+          const text = (node.textContent || '').replace(/\s+/g, ' ').trim();
           if (!text) return;
           if (node.tagName === 'H1') { subject = text; chapter = '导论'; section = ''; lastItem = null; return; }
           if (node.tagName === 'H2') { chapter = text; section = ''; lastItem = null; return; }
           if (node.tagName === 'H3') { section = text; return; }
 
           const isParagraph = node.tagName === 'P';
-          if (isParagraph && /^-?\\s*\\d+\\s*-?$/.test(text)) return;
+          if (isParagraph && /^-?\s*\d+\s*-?$/.test(text)) return;
           // PDF page headers repeat inside the source and must not become searchable records.
-          if (isParagraph && /^(?:27\\s*)?肖\\s*1000\\s*帽子题/.test(text)) return;
+          if (isParagraph && /^(?:27\s*)?肖\s*1000\s*帽子题/.test(text)) return;
           // Some page breaks express the question type as a paragraph instead of an h3.
-          if (isParagraph && /^(单选|多选|单项选择|多项选择|单选题|多选题)\\s*[（(]?\\s*P?\\d+/i.test(text)) {
+          if (isParagraph && /^(单选|多选|单项选择|多项选择|单选题|多选题)\s*[（(]?\s*P?\d+/i.test(text)) {
             section = text;
             return;
           }
 
           const isListQuestion = node.tagName === 'LI';
-          const isNumberedParagraph = isParagraph && /^\\s*\\d+\\s*[.、．]/.test(text);
+          const isNumberedParagraph = isParagraph && /^\s*\d+\s*[.、．]/.test(text);
           const rawHtml = (node as HTMLElement).innerHTML;
 
           if (isListQuestion || isNumberedParagraph) {
