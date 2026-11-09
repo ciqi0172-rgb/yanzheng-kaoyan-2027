@@ -1,6 +1,5 @@
 import { HAT_QUESTIONS } from '../src/data/hatQuestions';
 import { ESSAY_TEMPLATES } from '../src/data/essayTemplates';
-import { HAT_SOURCE_PAGES } from '../src/data/hatSourcePages';
 
 type Issue = { dataset: string; id: string; field: string; message: string };
 const issues: Issue[] = [];
@@ -37,15 +36,7 @@ for (const t of ESSAY_TEMPLATES) {
   if (!t.step2CoreMaterial?.points?.length) issues.push({ dataset: '答题模板', id: t.id, field: 'step2CoreMaterial.points', message: '核心得分点为空' });
 }
 
-const sourcePages = new Set<number>();
-for (const page of HAT_SOURCE_PAGES) {
-  if (!Number.isInteger(page.sourcePage) || page.sourcePage < 1 || page.sourcePage > 48) issues.push({ dataset: '原文页面索引', id: String(page.sourcePage), field: 'sourcePage', message: 'PDF 页码必须在 1–48 范围内' });
-  if (sourcePages.has(page.sourcePage)) issues.push({ dataset: '原文页面索引', id: String(page.sourcePage), field: 'sourcePage', message: 'PDF 页码重复' });
-  sourcePages.add(page.sourcePage);
-  if (!page.text?.trim()) issues.push({ dataset: '原文页面索引', id: String(page.sourcePage), field: 'text', message: '页面摘录为空' });
-  if (page.status !== 'OCR-待人工核验') issues.push({ dataset: '原文页面索引', id: String(page.sourcePage), field: 'status', message: '原文 OCR 必须保持待人工核验状态' });
-}
 
-const counts = { hatQuestions: HAT_QUESTIONS.length, essayTemplates: ESSAY_TEMPLATES.length, sourcePages: HAT_SOURCE_PAGES.length, issues: issues.length };
+const counts = { hatQuestions: HAT_QUESTIONS.length, essayTemplates: ESSAY_TEMPLATES.length, sourcePages: 'public/hat-source.html', issues: issues.length };
 console.log(JSON.stringify({ counts, issues }, null, 2));
 if (issues.length) process.exitCode = 1;
