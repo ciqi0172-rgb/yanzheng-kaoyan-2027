@@ -86,28 +86,30 @@ export function buildHatQuestionOptions(
     item.examType === question.examType &&
     normalize(item.answer) !== correctKey &&
     isOptionShaped(item.answer, correctAnswer) &&
+    // Reuse source answers only when the records share an explicit confusion group
+    // or precise hat keyword/type. Subject-only matches are not valid distractors.
+    ((Boolean(question.confusionGroup) && item.confusionGroup === question.confusionGroup) ||
+      (Boolean(question.hatKeyword) && item.hatKeyword === question.hatKeyword) ||
+      (Boolean(question.hatType) && item.hatType === question.hatType)) &&
     (question.examType !== '多选' || answerParts(item) === answerParts(question))
   ).map(item => ({ ...item, source: 'source' as const, matrixTerm: '', matrixTrap: '' }));
 
   type Candidate = (typeof candidates)[number] | (typeof matrixCandidates)[number];
 
-  // Prioritize near-miss distinctions grounded in the original bank, then widen the pool.
+  // Prefer matrix entries tied to the precise concept, then source answers with explicit overlap.
   const combinedCandidates: Candidate[] = [...matrixCandidates, ...candidates];
   const ranked = [
     ...combinedCandidates.filter(item => item.source === 'matrix' && item.subject === question.subject),
     ...combinedCandidates.filter(item => item.confusionGroup && item.confusionGroup === question.confusionGroup),
-    ...combinedCandidates.filter(item => item.chapter === question.chapter && item.subject === question.subject),
-    ...combinedCandidates.filter(item => item.subject === question.subject && item.hatType === question.hatType),
-    ...combinedCandidates.filter(item => item.subject === question.subject),
-    ...combinedCandidates.filter(item => item.subject !== question.subject),
+    ...combinedCandidates.filter(item => item.hatKeyword === question.hatKeyword),
+    ...combinedCandidates.filter(item => item.hatType === question.hatType),
   ].filter((item, index, items) => items.findIndex(other => other.id === item.id) === index)
   .sort((a, b) => {
     const priority = (item: Candidate) =>
       (item.source === 'matrix' && item.subject === question.subject ? 120 : 0) +
       (item.confusionGroup && item.confusionGroup === question.confusionGroup ? 100 : 0) +
-      (item.chapter === question.chapter && item.subject === question.subject ? 50 : 0) +
-      (item.subject === question.subject && item.hatType === question.hatType ? 25 : 0) +
-      (item.subject === question.subject ? 10 : 0);
+      (item.hatKeyword === question.hatKeyword ? 50 : 0) +
+      (item.hatType === question.hatType ? 25 : 0);
     const priorityDifference = priority(b) - priority(a);
     if (priorityDifference !== 0) return priorityDifference;
     return Math.abs(a.answer.trim().length - correctAnswer.length) -
