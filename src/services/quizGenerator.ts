@@ -62,13 +62,21 @@ export function buildHatQuestionOptions(
       matrixTrap: item.trapWarning,
       source: 'matrix' as const,
     })))
-    .filter(item =>
-      normalize(item.answer) !== correctKey &&
-      isOptionShaped(item.answer, correctAnswer) &&
-      item.answer.length >= Math.max(2, Math.floor(correctAnswer.length * 0.35)) &&
-      (item.subject.includes(question.subject) || question.subject.includes(item.subject) ||
-        item.subject.split('/').some(subject => subject === question.subject))
-    );
+    .filter(item => {
+      const normalizedStem = normalize(question.stem);
+      const normalizedTerm = normalize(item.matrixTerm);
+      const exactConceptMatch = normalizedStem.includes(normalizedTerm) ||
+        normalizedStem.includes(normalize(item.hatType)) ||
+        normalize(question.hatKeyword).includes(normalize(item.hatType)) ||
+        normalize(item.hatType).includes(normalize(question.hatKeyword));
+      // Do not inject an unrelated matrix answer merely because its subject matches.
+      return exactConceptMatch &&
+        normalize(item.answer) !== correctKey &&
+        isOptionShaped(item.answer, correctAnswer) &&
+        item.answer.length >= Math.max(2, Math.floor(correctAnswer.length * 0.35)) &&
+        (item.subject.includes(question.subject) || question.subject.includes(item.subject) ||
+          item.subject.split('/').some(subject => subject === question.subject));
+    });
 
   const candidates = allQuestions.filter(item =>
     item.id !== question.id &&
