@@ -84,6 +84,8 @@ export const HatQuestionsView: React.FC<HatQuestionsViewProps> = ({
   const filteredQuestions = useMemo(() => {
     return questions.filter((q) => {
       if (q.needsReview && drillMode !== 'grid') return false;
+      // Exam mode must never render a question with fewer than four validated options.
+      if (drillMode === 'exam' && buildHatQuestionOptions(q, questions).length !== 4) return false;
       if (selectedSubject !== '全部' && q.subject !== selectedSubject) {
         return false;
       }
