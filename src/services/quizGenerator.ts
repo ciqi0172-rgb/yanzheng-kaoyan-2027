@@ -7,6 +7,15 @@ const answerParts = (question: HatQuestion) =>
     ? question.answer.split(/[；;]/).map(part => normalize(part)).filter(Boolean).length
     : 1;
 
+// A distractor should look like an exam option, not a copied explanation paragraph.
+// Keep answers concise and reasonably close in length to the keyed answer.
+const isOptionShaped = (answer: string, correctAnswer: string) => {
+  const text = answer.trim();
+  if (!text || /[。！？!?]/.test(text)) return false;
+  const limit = Math.max(24, correctAnswer.trim().length * 1.8);
+  return text.length <= limit;
+};
+
 /**
  * Builds a four-option, one-answer question from the source-backed bank.
  * Multi-select source answers are presented as complete answer combinations; distractors are
@@ -27,7 +36,11 @@ export function buildHatQuestionOptions(
       options.findIndex(other => normalize(other.text) === normalize(option.text)) === index
     );
   const authoredCorrect = authored.filter(option => option.isCorrect && normalize(option.text) === correctKey);
-  const authoredWrong = authored.filter(option => !option.isCorrect && normalize(option.text) !== correctKey);
+  const authoredWrong = authored.filter(option =>
+    !option.isCorrect &&
+    normalize(option.text) !== correctKey &&
+    isOptionShaped(option.text, correctAnswer)
+  );
   if (authoredCorrect.length === 1 && authoredWrong.length >= 3) {
     const selected = [authoredCorrect[0], ...authoredWrong.slice(0, 3)];
     return shuffleOptions(selected.map((option, index) => ({ ...option, key: KEYS[index] })), question.id);
@@ -39,6 +52,7 @@ export function buildHatQuestionOptions(
     Boolean(item.answer.trim()) &&
     item.examType === question.examType &&
     normalize(item.answer) !== correctKey &&
+    isOptionShaped(item.answer, correctAnswer) &&
     (question.examType !== '多选' || answerParts(item) === answerParts(question))
   );
 
@@ -49,7 +63,17 @@ export function buildHatQuestionOptions(
     ...candidates.filter(item => item.subject === question.subject && item.hatType === question.hatType),
     ...candidates.filter(item => item.subject === question.subject),
     ...candidates.filter(item => item.subject !== question.subject),
-  ];
+  ].sort((a, b) => {
+    const priority = (item: HatQuestion) =>
+      (item.confusionGroup && item.confusionGroup === question.confusionGroup ? 100 : 0) +
+      (item.chapter === question.chapter && item.subject === question.subject ? 50 : 0) +
+      (item.subject === question.subject && item.hatType === question.hatType ? 25 : 0) +
+      (item.subject === question.subject ? 10 : 0);
+    const priorityDifference = priority(b) - priority(a);
+    if (priorityDifference !== 0) return priorityDifference;
+    return Math.abs(a.answer.trim().length - correctAnswer.length) -
+      Math.abs(b.answer.trim().length - correctAnswer.length);
+  });
 
   const seen = new Set<string>([correctKey]);
   const distractors: HatQuestion[] = [];
