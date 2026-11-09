@@ -2,7 +2,7 @@ import React, { useEffect, useMemo, useState } from 'react';
 import sourceHtml from '../data/hat-source.html?raw';
 import { Search, FileText, LoaderCircle } from 'lucide-react';
 
-type SourceItem = { id: number; subject: string; chapter: string; section: string; text: string; textHtml: string; answer: string; kind: string };
+type SourceItem = { id: number; subject: string; chapter: string; section: string; text: string; textHtml: string; sourceHtml: string; answer: string; kind: string };
 
 export const KnowledgeHubView: React.FC = () => {
   const [items, setItems] = useState<SourceItem[]>([]);
