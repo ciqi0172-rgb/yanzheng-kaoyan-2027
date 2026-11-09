@@ -756,7 +756,7 @@ export const HatQuestionsView: React.FC<HatQuestionsViewProps> = ({
                     ) : (
                       <button
                         onClick={() => {
-                          const targetIdx = filteredQuestions.findIndex((item) => item.id === q.id);
+                          const targetIdx = filteredQuestions.filter((item) => !item.needsReview).findIndex((item) => item.id === q.id);
                           if (targetIdx !== -1) {
                             setCardIndex(targetIdx);
                             setDrillMode('exam');
