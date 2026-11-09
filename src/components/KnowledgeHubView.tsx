@@ -31,7 +31,6 @@ export const KnowledgeHubView: React.FC = () => {
           const answerNodes = Array.from(fragment.body.querySelectorAll('u'));
           const boldNodes = Array.from(fragment.body.querySelectorAll('b,strong'));
           const redStyle = 'color:#dc2626;font-weight:800;text-decoration:underline;text-decoration-color:#dc2626';
-          const markAnswer = (html: string) => `<span class="answer-highlight" style="${redStyle}">${html}</span>`;
           let answer = '';
           if (answerNodes.length) {
             answer = answerNodes.map(el => (el.textContent || '').replace(/\s+/g, ' ').trim()).filter(Boolean).join('；');
