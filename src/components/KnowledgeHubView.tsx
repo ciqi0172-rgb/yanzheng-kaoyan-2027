@@ -83,16 +83,17 @@ export const KnowledgeHubView: React.FC = () => {
           // PDF page headers repeat inside the source and must not become searchable records.
           if (isParagraph && /^(?:27\s*)?肖\s*1000\s*帽子题/.test(text)) return;
           // Some page breaks express the question type as a paragraph instead of an h3.
-          if (isParagraph && /^(单选|多选|单项选择|多项选择|单选题|多选题)\s*[（(]?\s*P?\d+/i.test(text)) {
+          if ((node.tagName === 'P' || node.tagName === 'LI') && /^(单选|多选|单项选择|多项选择|单选题|多选题)\s*[（(]?\s*P?\d+/i.test(text)) {
             section = text;
+            lastItem = null;
             return;
           }
 
-          const isListQuestion = node.tagName === 'LI';
+          const isNumberedList = node.tagName === 'LI' && /^\s*\d+\s*[.、．]/.test(text);
           const isNumberedParagraph = isParagraph && /^\s*\d+\s*[.、．]/.test(text);
           const rawHtml = (node as HTMLElement).innerHTML;
 
-          if (isListQuestion || isNumberedParagraph) {
+          if (isNumberedList || isNumberedParagraph) {
             const built = buildItemContent(rawHtml);
             const item: SourceItem = {
               id: parsed.length + 1,
