@@ -65,10 +65,11 @@ export function buildHatQuestionOptions(
     .filter(item => {
       const normalizedStem = normalize(question.stem);
       const normalizedTerm = normalize(item.matrixTerm);
+      const normalizedMatrixHat = normalize(item.hatType);
+      const normalizedQuestionHat = normalize(question.hatKeyword);
       const exactConceptMatch = normalizedStem.includes(normalizedTerm) ||
-        normalizedStem.includes(normalize(item.hatType)) ||
-        normalize(question.hatKeyword).includes(normalize(item.hatType)) ||
-        normalize(item.hatType).includes(normalize(question.hatKeyword));
+        (normalizedMatrixHat.length >= 4 && normalizedQuestionHat === normalizedMatrixHat &&
+          normalizedStem.includes(normalizedMatrixHat));
       // Do not inject an unrelated matrix answer merely because its subject matches.
       return exactConceptMatch &&
         normalize(item.answer) !== correctKey &&
