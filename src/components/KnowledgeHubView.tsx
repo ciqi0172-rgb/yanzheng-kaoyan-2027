@@ -1,6 +1,6 @@
 import React, { useEffect, useMemo, useState } from 'react';
 import sourceHtml from '../data/hat-source.html?raw';
-import { Search, FileText, LoaderCircle } from 'lucide-react';
+import { Search, FileText, LoaderCircle, Eye, EyeOff } from 'lucide-react';
 
 type SourceItem = { id: number; subject: string; chapter: string; section: string; text: string; textHtml: string; sourceHtml: string; answer: string; kind: string; needsReview: boolean };
 
@@ -12,6 +12,7 @@ export const KnowledgeHubView: React.FC = () => {
   const [submittedQuery, setSubmittedQuery] = useState('');
   const [subjectFilter, setSubjectFilter] = useState('全部科目');
   const [chapterFilter, setChapterFilter] = useState('全部章节');
+  const [maskAnswers, setMaskAnswers] = useState(false);
 
   useEffect(() => {
     let alive = true;
@@ -30,11 +31,13 @@ export const KnowledgeHubView: React.FC = () => {
           const answerNodes = Array.from(fragment.body.querySelectorAll('u'));
           const boldNodes = Array.from(fragment.body.querySelectorAll('b,strong'));
           const redStyle = 'color:#dc2626;font-weight:800;text-decoration:underline;text-decoration-color:#dc2626';
+          const markAnswer = (html: string) => `<span class="answer-highlight" style="${redStyle}">${html}</span>`;
           let answer = '';
           if (answerNodes.length) {
             answer = answerNodes.map(el => (el.textContent || '').replace(/\s+/g, ' ').trim()).filter(Boolean).join('；');
             answerNodes.forEach(el => {
               const span = fragment.createElement('span');
+              span.setAttribute('class', 'answer-highlight');
               span.setAttribute('style', redStyle);
               span.innerHTML = el.innerHTML;
               el.replaceWith(span);
@@ -44,6 +47,7 @@ export const KnowledgeHubView: React.FC = () => {
             const selected = boldNodes[boldNodes.length - 1];
             answer = (selected.textContent || '').replace(/\s+/g, ' ').trim();
             const span = fragment.createElement('span');
+            span.setAttribute('class', 'answer-highlight');
             span.setAttribute('style', redStyle);
             span.innerHTML = selected.innerHTML;
             selected.replaceWith(span);
@@ -58,6 +62,7 @@ export const KnowledgeHubView: React.FC = () => {
             answer = (tail.textContent || '').replace(/\s+/g, ' ').trim().replace(/^(?:(?:是|为|包括|有)\s*(?:[：:]\s*)?|[：:]\s*)/, '').trim();
             if (answer) {
               const span = fragment.createElement('span');
+              span.setAttribute('class', 'answer-highlight');
               span.setAttribute('style', redStyle);
               span.appendChild(range.extractContents());
               range.insertNode(span);
@@ -178,7 +183,7 @@ export const KnowledgeHubView: React.FC = () => {
         <input value={query} onChange={e => setQuery(e.target.value)} placeholder="搜索帽子词、知识点、题干或答案" className="w-full rounded-xl border border-stone-200 bg-stone-50 px-3 py-3 text-sm outline-none focus:ring-2 focus:ring-rose-400 dark:border-stone-700 dark:bg-stone-800"/>
         <select value={subjectFilter} onChange={e => { setSubjectFilter(e.target.value); setChapterFilter('全部章节'); }} className="rounded-xl border border-stone-200 bg-stone-50 px-3 py-3 text-sm dark:border-stone-700 dark:bg-stone-800">{subjects.map(s => <option key={s}>{s}</option>)}</select>
         <select value={chapterFilter} onChange={e => setChapterFilter(e.target.value)} className="rounded-xl border border-stone-200 bg-stone-50 px-3 py-3 text-sm dark:border-stone-700 dark:bg-stone-800">{chapters.map(s => <option key={s}>{s}</option>)}</select>
-        <button type="submit" className="flex items-center justify-center gap-2 rounded-xl bg-stone-900 px-4 py-3 text-sm font-semibold text-white dark:bg-stone-100 dark:text-stone-900"><Search size={16}/>检索</button>
+        <div className="flex gap-2"><button type="submit" className="flex flex-1 items-center justify-center gap-2 rounded-xl bg-stone-900 px-4 py-3 text-sm font-semibold text-white dark:bg-stone-100 dark:text-stone-900"><Search size={16}/>检索</button><button type="button" onClick={() => setMaskAnswers(value => !value)} aria-pressed={maskAnswers} className={`flex items-center justify-center gap-1.5 rounded-xl border px-3 py-3 text-sm font-bold transition-colors ${maskAnswers ? 'border-lime-400 bg-lime-200 text-stone-900 shadow-inner' : 'border-stone-200 bg-white text-stone-700 hover:bg-lime-50 dark:border-stone-700 dark:bg-stone-800 dark:text-stone-200'}`}><EyeOff size={16}/>{maskAnswers ? '显示红字' : '一键遮挡红字'}</button></div>
       </form>
       {loading && <div className="flex items-center gap-2 py-8 text-sm text-stone-500"><LoaderCircle size={18} className="animate-spin"/>正在读取原始帽子题文件…</div>}
       {loadError && <div className="rounded-xl border border-red-200 bg-red-50 p-4 text-sm text-red-700">{loadError}。请检查内置原始题库文件是否存在。</div>}
@@ -186,9 +191,9 @@ export const KnowledgeHubView: React.FC = () => {
         <div>已建立 {items.filter(item => item.kind === '题目').length} 道题目索引 · {items.filter(item => item.kind === '题目' && item.needsReview).length} 条答案标记待核验 · 当前匹配 {results.length} 条</div>
         <div className="flex flex-wrap gap-2">{subjects.filter(s => s !== '全部科目').map(s => <span key={s} className="rounded-full bg-stone-100 px-2 py-1 dark:bg-stone-800">{s.replace('肖 1000 帽子题', '')} · {items.filter(item => item.kind === '题目' && item.subject === s).length} 题</span>)}</div>
       </div>}
-      {!loading && !loadError && results.map(item => <article key={item.id} className="rounded-xl border border-stone-200 bg-white p-4 shadow-sm dark:border-stone-800 dark:bg-stone-950">
+      <style>{`.answer-masked{color:transparent!important;text-decoration-color:transparent!important;background:linear-gradient(175deg,#eaff7a 0%,#d8ff4f 48%,#e6ff72 100%);border-radius:.22rem;box-shadow:0 1px 0 rgba(112,140,0,.18);-webkit-box-decoration-break:clone;box-decoration-break:clone;text-shadow:none!important;user-select:none}`}</style>\n      {!loading && !loadError && results.map(item => <article key={item.id} className="rounded-xl border border-stone-200 bg-white p-4 shadow-sm dark:border-stone-800 dark:bg-stone-950">
         <div className="mb-2 flex flex-wrap items-center gap-2"><span className="rounded-full bg-rose-100 px-2 py-1 text-xs text-rose-800 dark:bg-rose-950 dark:text-rose-200">{item.subject}</span><span className="text-xs text-stone-500">{item.chapter}</span>{item.section && <span className="text-xs text-stone-500">{item.section}</span>}{item.needsReview && <span className="rounded-full bg-amber-100 px-2 py-1 text-xs text-amber-800 dark:bg-amber-950 dark:text-amber-200">原文答案标记待核验</span>}</div>
-        <p className="break-words text-[15px] leading-7 text-stone-800 dark:text-stone-200" dangerouslySetInnerHTML={{ __html: item.textHtml }} />{item.answer && <div className="mt-3 rounded-lg border border-red-200 bg-red-50 px-3 py-2 text-sm leading-6 text-red-700 dark:border-red-900 dark:bg-red-950/40 dark:text-red-300"><span className="mr-2 font-bold">答案</span><span className="font-bold text-red-600 dark:text-red-400">{item.answer}</span></div>}
+        <p className="break-words text-[15px] leading-7 text-stone-800 dark:text-stone-200" dangerouslySetInnerHTML={{ __html: maskAnswers ? item.textHtml.replace(/class="answer-highlight"/g, 'class="answer-highlight answer-masked"') : item.textHtml }} />{item.answer && <div className="mt-3 rounded-lg border border-red-200 bg-red-50 px-3 py-2 text-sm leading-6 text-red-700 dark:border-red-900 dark:bg-red-950/40 dark:text-red-300"><span className="mr-2 font-bold">答案</span><span className={`font-bold text-red-600 dark:text-red-400 ${maskAnswers ? 'answer-masked' : ''}`}>{item.answer}</span></div>}
       </article>)}
       {!loading && !loadError && !results.length && <div className="rounded-xl border border-dashed border-stone-300 p-8 text-center text-sm text-stone-500">没有匹配结果，请尝试更短的关键词或调整科目、章节筛选。</div>}
     </section>
