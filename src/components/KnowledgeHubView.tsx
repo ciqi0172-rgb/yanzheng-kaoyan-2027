@@ -22,38 +22,99 @@ export const KnowledgeHubView: React.FC = () => {
         let subject = '未分类';
         let chapter = '未分类章节';
         let section = '';
-        doc.body.querySelectorAll('h1,h2,h3,li,p').forEach(node => {
-          const text = (node.textContent || '').replace(/\s+/g, ' ').trim();
+        let lastItem: SourceItem | null = null;
+
+        const buildItemContent = (rawHtml: string) => {
+          const fragment = new DOMParser().parseFromString('<!doctype html><html><body></body></html>', 'text/html');
+          fragment.body.innerHTML = rawHtml;
+          const answerNodes = Array.from(fragment.body.querySelectorAll('u'));
+          const boldNodes = Array.from(fragment.body.querySelectorAll('b,strong'));
+          const selectedAnswers = answerNodes.length ? answerNodes : (boldNodes.length ? [boldNodes[boldNodes.length - 1]] : []);
+          const answer = selectedAnswers.map(el => (el.textContent || '').replace(/\\s+/g, ' ').trim()).filter(Boolean).join('；');
+          selectedAnswers.forEach(el => {
+            const span = fragment.createElement('span');
+            span.setAttribute('style', 'color:#dc2626;font-weight:800;text-decoration:underline;text-decoration-color:#dc2626');
+            span.innerHTML = el.innerHTML;
+            el.replaceWith(span);
+          });
+          return {
+            text: (fragment.body.textContent || '').replace(/\\s+/g, ' ').trim(),
+            textHtml: fragment.body.innerHTML,
+            answer,
+          };
+        };
+
+        const nodes = Array.from(doc.body.querySelectorAll('h1,h2,h3,li,p'));
+        nodes.forEach(node => {
+          const text = (node.textContent || '').replace(/\\s+/g, ' ').trim();
           if (!text) return;
-          if (node.tagName === 'H1') { subject = text; chapter = '导论'; section = ''; return; }
-          if (node.tagName === 'H2') { chapter = text; section = ''; return; }
+          if (node.tagName === 'H1') { subject = text; chapter = '导论'; section = ''; lastItem = null; return; }
+          if (node.tagName === 'H2') { chapter = text; section = ''; lastItem = null; return; }
           if (node.tagName === 'H3') { section = text; return; }
-          if (node.tagName === 'P' && /^-?\s*\d+\s*-?$/.test(text)) return;
-          if (node.tagName === 'LI' || node.tagName === 'P') {
-            // 思修、毛中特、新思想通常用 <u> 标答案；史纲、马原的答案则用 <b>/<strong>，
-            // 同时题干关键词也加粗。因此：优先标红所有 <u>；没有 <u> 时，只标红最后一个加粗片段作为答案。
-            const answerNodes = Array.from(node.querySelectorAll('u'));
-            const boldNodes = Array.from(node.querySelectorAll('b,strong'));
-            const selectedAnswers = answerNodes.length ? answerNodes : (boldNodes.length ? [boldNodes[boldNodes.length - 1]] : []);
-            const answers = selectedAnswers.map(el => (el.textContent || '').replace(/\s+/g, ' ').trim()).filter(Boolean);
-            const answer = answers.join('；');
-            const cleanText = text.replace(/\s+/g, ' ').trim();
-            // Clone the original node, highlight answer markers, and leave question keywords unchanged.
-            const displayNode = node.cloneNode(true) as HTMLElement;
-            const underlineAnswers = Array.from(displayNode.querySelectorAll('u'));
-            const boldAnswers = Array.from(displayNode.querySelectorAll('b,strong'));
-            const nodesToHighlight = underlineAnswers.length ? underlineAnswers : (boldAnswers.length ? [boldAnswers[boldAnswers.length - 1]] : []);
-            nodesToHighlight.forEach(el => {
-              const span = doc.createElement('span');
-              span.setAttribute('style', 'color:#dc2626;font-weight:800;text-decoration:underline;text-decoration-color:#dc2626');
-              span.innerHTML = el.innerHTML;
-              el.replaceWith(span);
-            });
-            const textHtml = displayNode.innerHTML;
-            parsed.push({ id: parsed.length + 1, subject, chapter, section, text: cleanText, textHtml, answer, kind: node.tagName === 'LI' ? '题目' : '原文' });
+
+          const isParagraph = node.tagName === 'P';
+          if (isParagraph && /^-?\\s*\\d+\\s*-?$/.test(text)) return;
+          // PDF page headers repeat inside the source and must not become searchable records.
+          if (isParagraph && /^(?:27\\s*)?肖\\s*1000\\s*帽子题/.test(text)) return;
+          // Some page breaks express the question type as a paragraph instead of an h3.
+          if (isParagraph && /^(单选|多选|单项选择|多项选择|单选题|多选题)\\s*[（(]?\\s*P?\\d+/i.test(text)) {
+            section = text;
+            return;
           }
+
+          const isListQuestion = node.tagName === 'LI';
+          const isNumberedParagraph = isParagraph && /^\\s*\\d+\\s*[.、．]/.test(text);
+          const rawHtml = (node as HTMLElement).innerHTML;
+
+          if (isListQuestion || isNumberedParagraph) {
+            const built = buildItemContent(rawHtml);
+            const item: SourceItem = {
+              id: parsed.length + 1,
+              subject,
+              chapter,
+              section,
+              text: built.text,
+              textHtml: built.textHtml,
+              sourceHtml: rawHtml,
+              answer: built.answer,
+              kind: '题目',
+            };
+            parsed.push(item);
+            lastItem = item;
+            return;
+          }
+
+          // Answers sometimes continue in a plain paragraph after a PDF page break.
+          // Merge that fragment into the previous question instead of displaying it as a fake question.
+          if (isParagraph && lastItem && lastItem.subject === subject && lastItem.chapter === chapter && lastItem.section === section && lastItem.kind === '题目') {
+            lastItem.sourceHtml += ' ' + rawHtml;
+            const built = buildItemContent(lastItem.sourceHtml);
+            lastItem.text = built.text;
+            lastItem.textHtml = built.textHtml;
+            lastItem.answer = built.answer;
+            return;
+          }
+
+          // Preserve otherwise-unclassified source text so searching never silently drops content.
+          const built = buildItemContent(rawHtml);
+          const item: SourceItem = {
+            id: parsed.length + 1,
+            subject,
+            chapter,
+            section,
+            text: built.text,
+            textHtml: built.textHtml,
+            sourceHtml: rawHtml,
+            answer: built.answer,
+            kind: '原文',
+          };
+          parsed.push(item);
+          lastItem = item;
         });
+
         if (!alive) return;
+        // Re-number after continuation paragraphs have been merged.
+        parsed.forEach((item, index) => { item.id = index + 1; });
         setItems(parsed);
         setLoading(false);
       })
