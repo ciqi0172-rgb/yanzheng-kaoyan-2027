@@ -55,7 +55,7 @@ export const KnowledgeHubView: React.FC = () => {
             range.setStartAfter(cue);
             if (fragment.body.lastChild) range.setEndAfter(fragment.body.lastChild);
             const tail = range.cloneContents();
-            answer = (tail.textContent || '').replace(/\s+/g, ' ').trim().replace(/^(?:(?:是|为|包括|有)\s*)?[：:]\s*/, '').trim();
+            answer = (tail.textContent || '').replace(/\s+/g, ' ').trim().replace(/^(?:(?:是|为|包括|有)\s*(?:[：:]\s*)?|[：:]\s*)/, '').trim();
             if (answer) {
               const span = fragment.createElement('span');
               span.setAttribute('style', redStyle);
@@ -181,7 +181,10 @@ export const KnowledgeHubView: React.FC = () => {
       </form>
       {loading && <div className="flex items-center gap-2 py-8 text-sm text-stone-500"><LoaderCircle size={18} className="animate-spin"/>正在读取原始帽子题文件…</div>}
       {loadError && <div className="rounded-xl border border-red-200 bg-red-50 p-4 text-sm text-red-700">{loadError}。请检查内置原始题库文件是否存在。</div>}
-      {!loading && !loadError && <div className="text-xs leading-6 text-stone-500">已建立 {items.filter(item => item.kind === '题目').length} 道题目索引 · {items.filter(item => item.kind === '题目' && item.needsReview).length} 条答案标记待核验 · 当前匹配 {results.length} 条</div>}
+      {!loading && !loadError && <div className="space-y-2 text-xs leading-6 text-stone-500">
+        <div>已建立 {items.filter(item => item.kind === '题目').length} 道题目索引 · {items.filter(item => item.kind === '题目' && item.needsReview).length} 条答案标记待核验 · 当前匹配 {results.length} 条</div>
+        <div className="flex flex-wrap gap-2">{subjects.filter(s => s !== '全部科目').map(s => <span key={s} className="rounded-full bg-stone-100 px-2 py-1 dark:bg-stone-800">{s.replace('肖 1000 帽子题', '')} · {items.filter(item => item.kind === '题目' && item.subject === s).length} 题</span>)}</div>
+      </div>}
       {!loading && !loadError && results.map(item => <article key={item.id} className="rounded-xl border border-stone-200 bg-white p-4 shadow-sm dark:border-stone-800 dark:bg-stone-950">
         <div className="mb-2 flex flex-wrap items-center gap-2"><span className="rounded-full bg-rose-100 px-2 py-1 text-xs text-rose-800 dark:bg-rose-950 dark:text-rose-200">{item.subject}</span><span className="text-xs text-stone-500">{item.chapter}</span>{item.section && <span className="text-xs text-stone-500">{item.section}</span>}{item.needsReview && <span className="rounded-full bg-amber-100 px-2 py-1 text-xs text-amber-800 dark:bg-amber-950 dark:text-amber-200">原文答案标记待核验</span>}</div>
         <p className="break-words text-[15px] leading-7 text-stone-800 dark:text-stone-200" dangerouslySetInnerHTML={{ __html: item.textHtml }} />{item.answer && <div className="mt-3 rounded-lg border border-red-200 bg-red-50 px-3 py-2 text-sm leading-6 text-red-700 dark:border-red-900 dark:bg-red-950/40 dark:text-red-300"><span className="mr-2 font-bold">答案</span><span className="font-bold text-red-600 dark:text-red-400">{item.answer}</span></div>}
