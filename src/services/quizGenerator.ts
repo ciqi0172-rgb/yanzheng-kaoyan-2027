@@ -1,4 +1,5 @@
 import { HatQuestion, HatQuestionOption } from '../types';
+import { CONFUSION_DATA } from '../data/confusionMatrix';
 
 const KEYS: HatQuestionOption['key'][] = ['A', 'B', 'C', 'D'];
 const normalize = (value: string) => value.replace(/[\s，。；;：:、（）()“”‘’]/g, '').toLocaleLowerCase();
@@ -46,6 +47,29 @@ export function buildHatQuestionOptions(
     return shuffleOptions(selected.map((option, index) => ({ ...option, key: KEYS[index] })), question.id);
   }
 
+  // For single-answer questions, use reviewed confusion-matrix concepts first.
+  // Matrix entries are short, explicit concept labels with a documented trap rationale.
+  const matrixCandidates = question.examType === '多选' ? [] : CONFUSION_DATA
+    .flatMap(group => group.items.map(item => ({
+      id: `matrix-${group.id}-${item.hatType}-${item.term}`,
+      answer: item.targetAnswer.trim(),
+      subject: item.subject,
+      hatKeyword: item.hatType,
+      chapter: group.title,
+      confusionGroup: group.category,
+      hatType: item.hatType,
+      matrixTerm: item.term,
+      matrixTrap: item.trapWarning,
+      source: 'matrix' as const,
+    })))
+    .filter(item =>
+      normalize(item.answer) !== correctKey &&
+      isOptionShaped(item.answer, correctAnswer) &&
+      item.answer.length >= Math.max(2, Math.floor(correctAnswer.length * 0.35)) &&
+      (item.subject.includes(question.subject) || question.subject.includes(item.subject) ||
+        item.subject.split('/').some(subject => subject === question.subject))
+    );
+
   const candidates = allQuestions.filter(item =>
     item.id !== question.id &&
     !item.needsReview &&
@@ -54,17 +78,23 @@ export function buildHatQuestionOptions(
     normalize(item.answer) !== correctKey &&
     isOptionShaped(item.answer, correctAnswer) &&
     (question.examType !== '多选' || answerParts(item) === answerParts(question))
-  );
+  ).map(item => ({ ...item, source: 'source' as const, matrixTerm: '', matrixTrap: '' }));
+
+  type Candidate = (typeof candidates)[number] | (typeof matrixCandidates)[number];
 
   // Prioritize near-miss distinctions grounded in the original bank, then widen the pool.
+  const combinedCandidates: Candidate[] = [...matrixCandidates, ...candidates];
   const ranked = [
-    ...candidates.filter(item => item.confusionGroup && item.confusionGroup === question.confusionGroup),
-    ...candidates.filter(item => item.chapter === question.chapter && item.subject === question.subject),
-    ...candidates.filter(item => item.subject === question.subject && item.hatType === question.hatType),
-    ...candidates.filter(item => item.subject === question.subject),
-    ...candidates.filter(item => item.subject !== question.subject),
-  ].sort((a, b) => {
-    const priority = (item: HatQuestion) =>
+    ...combinedCandidates.filter(item => item.source === 'matrix' && item.subject === question.subject),
+    ...combinedCandidates.filter(item => item.confusionGroup && item.confusionGroup === question.confusionGroup),
+    ...combinedCandidates.filter(item => item.chapter === question.chapter && item.subject === question.subject),
+    ...combinedCandidates.filter(item => item.subject === question.subject && item.hatType === question.hatType),
+    ...combinedCandidates.filter(item => item.subject === question.subject),
+    ...combinedCandidates.filter(item => item.subject !== question.subject),
+  ].filter((item, index, items) => items.findIndex(other => other.id === item.id) === index)
+  .sort((a, b) => {
+    const priority = (item: Candidate) =>
+      (item.source === 'matrix' && item.subject === question.subject ? 120 : 0) +
       (item.confusionGroup && item.confusionGroup === question.confusionGroup ? 100 : 0) +
       (item.chapter === question.chapter && item.subject === question.subject ? 50 : 0) +
       (item.subject === question.subject && item.hatType === question.hatType ? 25 : 0) +
@@ -76,7 +106,7 @@ export function buildHatQuestionOptions(
   });
 
   const seen = new Set<string>([correctKey]);
-  const distractors: HatQuestion[] = [];
+  const distractors: Candidate[] = [];
   for (const candidate of ranked) {
     const key = normalize(candidate.answer);
     if (!key || seen.has(key)) continue;
@@ -95,9 +125,11 @@ export function buildHatQuestionOptions(
       key: 'A' as const,
       text: item.answer,
       isCorrect: false,
-      trapExplanation: question.examType === '多选'
-        ? `【组合辨析】这组表述来自原文另一道多选题（${item.chapter || item.subject}；考点：${item.hatKeyword}）。本题应逐项核对，不能把不同考点的正确表述拼成正确答案。`
-        : `【易混辨析】该答案对应原文另一考点“${item.hatKeyword}”（${item.chapter || item.subject}）；本题考查的是“${question.hatKeyword}”。`,
+      trapExplanation: item.source === 'matrix'
+        ? `【混淆矩阵】“${item.matrixTerm}”对应“${item.hatKeyword}”。${item.matrixTrap}`
+        : question.examType === '多选'
+          ? `【组合辨析】这组表述来自原文另一道多选题（${item.chapter || item.subject}；考点：${item.hatKeyword}）。本题应逐项核对，不能把不同考点的正确表述拼成正确答案。`
+          : `【易混辨析】该答案对应原文另一考点“${item.hatKeyword}”（${item.chapter || item.subject}）；本题考查的是“${question.hatKeyword}”。`,
     })),
   ];
   return shuffleOptions(options, question.id);
