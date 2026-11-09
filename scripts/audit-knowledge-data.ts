@@ -196,11 +196,16 @@ for (const [subject, expected] of Object.entries(expectedStructuredBySubject)) {
 const normalizeOption = (value: string) => value.replace(/[\s，。；;：:、（）()“”‘’]/g, '').toLocaleLowerCase();
 let fourChoiceReadyQuestions = 0;
 let questionsMissingQualityDistractors = 0;
+const fourChoiceReadyBySubject: Record<string, number> = {};
+const missingDistractorsBySubject: Record<string, number> = {};
 for (const question of HAT_QUESTIONS.filter(q => !q.needsReview && q.answer?.trim())) {
+  fourChoiceReadyBySubject[question.subject] ??= 0;
+  missingDistractorsBySubject[question.subject] ??= 0;
   const options = buildHatQuestionOptions(question, HAT_QUESTIONS);
   if (options.length === 0) {
     // Quality gate: do not force long or mismatched filler just to reach four options.
     questionsMissingQualityDistractors += 1;
+    missingDistractorsBySubject[question.subject] += 1;
     continue;
   }
   const uniqueOptions = new Set(options.map(option => normalizeOption(option.text)));
@@ -214,6 +219,7 @@ for (const question of HAT_QUESTIONS.filter(q => !q.needsReview && q.answer?.tri
     });
   } else {
     fourChoiceReadyQuestions += 1;
+    fourChoiceReadyBySubject[question.subject] += 1;
   }
 }
 if (questionsMissingQualityDistractors > 0) {
@@ -235,7 +241,9 @@ const counts = {
   confusionMatrixGroups: CONFUSION_DATA.length,
   confusionMatrixItems: CONFUSION_DATA.reduce((sum, group) => sum + group.items.length, 0),
   fourChoiceReadyQuestions,
+  fourChoiceReadyBySubject,
   questionsMissingQualityDistractors,
+  missingDistractorsBySubject,
   essayTemplates: ESSAY_TEMPLATES.length,
   sourceFile: 'src/data/hat-source.html',
   issues: issues.length,
