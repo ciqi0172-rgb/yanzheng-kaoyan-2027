@@ -163,7 +163,7 @@ for (const [subject, expected] of Object.entries(expectedStructuredBySubject)) {
     issues.push({ dataset: '帽子题结构化数据', id: subject, field: 'questionCount', message: `应有 ${expected} 道，实际为 ${actual} 道` });
   }
 }
-const normalizeOption = (value: string) => value.replace(/[\\s，。；;：:、（）()“”‘’]/g, '').toLocaleLowerCase();
+const normalizeOption = (value: string) => value.replace(/[\s，。；;：:、（）()“”‘’]/g, '').toLocaleLowerCase();
 for (const question of HAT_QUESTIONS.filter(q => !q.needsReview && q.answer?.trim())) {
   const options = buildHatQuestionOptions(question, HAT_QUESTIONS);
   const uniqueOptions = new Set(options.map(option => normalizeOption(option.text)));
