@@ -340,6 +340,47 @@ export const CONFUSION_DATA: ConfusionGroup[] = [
         subject: '马原',
       },
     ],
+  },
+  {
+    id: 'ma-yuan-bian-zheng',
+    title: '【马原】矛盾与规律易混关系',
+    category: '马原',
+    description: '集中辨析层级偷换、逻辑方向颠倒和规律定位混淆。',
+    items: [
+      { term: '唯物辩证法的实质和核心', hatType: '实质和核心', targetAnswer: '对立统一规律', trapWarning: '质量互变规律说明事物发展的状态和形式；否定之否定规律揭示事物发展的方向和道路。三大规律不可互换。', subject: '马原' },
+      { term: '主要矛盾与矛盾的主要方面', hatType: '矛盾层级', targetAnswer: '主要矛盾看复杂事物中多种矛盾的主次；矛盾的主要方面看同一矛盾双方的主次', trapWarning: '前者问“多个矛盾中哪个主要”，后者问“一个矛盾的双方谁占主导”，不能把两个“主要”当成同一概念。', subject: '马原' },
+      { term: '量变与质变的关系', hatType: '发展状态', targetAnswer: '量变是质变的必要准备，质变是量变的必然结果', trapWarning: '不能调换“必要准备”和“必然结果”；量变达到一定程度会引起质变，二者相互渗透。', subject: '马原' },
+      { term: '社会存在与社会意识的关系', hatType: '决定与反作用', targetAnswer: '社会存在决定社会意识，社会意识具有相对独立性并反作用于社会存在', trapWarning: '“相对独立性”不等于“完全独立性”；社会意识的反作用不能替换社会存在的决定作用。', subject: '马原' },
+      { term: '生产力与生产关系的关系', hatType: '决定与反作用', targetAnswer: '生产力决定生产关系，生产关系对生产力具有能动的反作用', trapWarning: '不能颠倒决定方向；生产关系适合生产力状况时促进生产力发展，不适合时会阻碍其发展。', subject: '马原' },
+      { term: '感性认识与理性认识', hatType: '认识阶段', targetAnswer: '感性认识是认识的初级阶段，理性认识是认识的高级阶段', trapWarning: '感性认识侧重现象和外部联系，理性认识侧重本质和内部联系；二者相互依赖、相互渗透。', subject: '马原' },
+      { term: '实践与认识的关系', hatType: '来源与反作用', targetAnswer: '实践是认识的基础，认识对实践具有能动反作用', trapWarning: '实践是认识的来源、动力、检验真理的标准和目的；不能把认识的反作用夸大成认识决定实践。', subject: '马原' }
+    ]
+  },
+  {
+    id: 'shi-gang-shijian',
+    title: '【史纲】革命阶段与历史节点辨析',
+    category: '史纲',
+    description: '区分开端、成立、转折和进入新时期等不同历史定位。',
+    items: [
+      { term: '中国新民主主义革命的开端', hatType: '革命开端', targetAnswer: '五四运动', trapWarning: '五四运动是新民主主义革命的开端；中国共产党成立标志着中国革命面貌焕然一新，二者历史定位不同。', subject: '史纲' },
+      { term: '中国共产党成立的历史意义', hatType: '成立意义', targetAnswer: '中国革命有了坚强的领导力量，中国革命的面貌从此焕然一新', trapWarning: '不要把“新民主主义革命开端”直接当作党的成立标志；五四运动与中共一大承担不同历史定位。', subject: '史纲' },
+      { term: '党历史上生死攸关的转折点', hatType: '历史转折', targetAnswer: '遵义会议', trapWarning: '遵义会议在危急关头挽救了党、红军和中国革命；十一届三中全会是新中国成立以来党的历史上具有深远意义的伟大转折。', subject: '史纲' },
+      { term: '新中国成立以来党的历史上具有深远意义的伟大转折', hatType: '伟大转折', targetAnswer: '党的十一届三中全会', trapWarning: '不要与遵义会议的“生死攸关的转折点”混为一谈；题干限定语决定答案。', subject: '史纲' },
+      { term: '中国进入改革开放和社会主义现代化建设新时期的标志', hatType: '新时期标志', targetAnswer: '党的十一届三中全会', trapWarning: '注意题干中的“进入新时期”限定，不要与新中国成立、社会主义基本制度确立等阶段性标志混淆。', subject: '史纲' }
+    ]
+  },
+  {
+    id: 'si-xiu-fazhi',
+    title: '【思修法治】核心价值观与法治定位',
+    category: '思修法治',
+    description: '把国家、社会、公民个人三个层面的价值要求分开，并辨析法治建设中的不同定位。',
+    items: [
+      { term: '社会主义核心价值观国家层面的价值目标', hatType: '国家价值目标', targetAnswer: '富强、民主、文明、和谐', trapWarning: '社会层面是自由、平等、公正、法治；公民个人层面是爱国、敬业、诚信、友善。', subject: '思修法治' },
+      { term: '社会主义核心价值观社会层面的价值取向', hatType: '社会价值取向', targetAnswer: '自由、平等、公正、法治', trapWarning: '不要与国家层面的“富强、民主、文明、和谐”或个人层面的“爱国、敬业、诚信、友善”交叉混写。', subject: '思修法治' },
+      { term: '社会主义核心价值观公民个人层面的价值准则', hatType: '个人价值准则', targetAnswer: '爱国、敬业、诚信、友善', trapWarning: '这是公民个人层面的价值准则，不是国家层面的价值目标，也不是社会层面的价值取向。', subject: '思修法治' },
+      { term: '社会主义法治最根本的保证', hatType: '根本保证', targetAnswer: '党的领导', trapWarning: '依法治国是党领导人民治理国家的基本方式；人民当家作主是社会主义民主政治的本质和核心，不能替代党的领导这一根本保证。', subject: '思修法治/新思想' },
+      { term: '社会主义民主政治的本质和核心', hatType: '本质和核心', targetAnswer: '人民当家作主', trapWarning: '不要把人民当家作主与党的领导、依法治国互相替换；三者分别对应领导、主体和治理方式等不同定位。', subject: '思修法治/新思想' }
+    ]
   }
 ];
 
