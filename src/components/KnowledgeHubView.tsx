@@ -1,4 +1,5 @@
 import React, { useEffect, useMemo, useState } from 'react';
+import sourceHtml from '../data/hat-source.html?raw';
 import { Search, FileText, LoaderCircle } from 'lucide-react';
 
 type SourceItem = { id: number; subject: string; chapter: string; section: string; text: string; textHtml: string; answer: string; kind: string };
@@ -14,11 +15,7 @@ export const KnowledgeHubView: React.FC = () => {
 
   useEffect(() => {
     let alive = true;
-    fetch(`${import.meta.env.BASE_URL}hat-source.html`)
-      .then(response => {
-        if (!response.ok) throw new Error(`读取原文件失败（HTTP ${response.status}）`);
-        return response.text();
-      })
+    Promise.resolve(sourceHtml)
       .then(html => {
         const doc = new DOMParser().parseFromString(html, 'text/html');
         const parsed: SourceItem[] = [];
@@ -93,7 +90,7 @@ export const KnowledgeHubView: React.FC = () => {
         <button type="submit" className="flex items-center justify-center gap-2 rounded-xl bg-stone-900 px-4 py-3 text-sm font-semibold text-white dark:bg-stone-100 dark:text-stone-900"><Search size={16}/>检索</button>
       </form>
       {loading && <div className="flex items-center gap-2 py-8 text-sm text-stone-500"><LoaderCircle size={18} className="animate-spin"/>正在读取原始帽子题文件…</div>}
-      {loadError && <div className="rounded-xl border border-red-200 bg-red-50 p-4 text-sm text-red-700">{loadError}。请检查部署文件 public/hat-source.html 是否存在。</div>}
+      {loadError && <div className="rounded-xl border border-red-200 bg-red-50 p-4 text-sm text-red-700">{loadError}。请检查内置原始题库文件是否存在。</div>}
       {!loading && !loadError && <div className="text-xs text-stone-500">已读取 {items.length} 条原文条目 · 当前匹配 {results.length} 条</div>}
       {!loading && !loadError && results.map(item => <article key={item.id} className="rounded-xl border border-stone-200 bg-white p-4 shadow-sm dark:border-stone-800 dark:bg-stone-950">
         <div className="mb-2 flex flex-wrap items-center gap-2"><span className="rounded-full bg-rose-100 px-2 py-1 text-xs text-rose-800 dark:bg-rose-950 dark:text-rose-200">{item.subject}</span><span className="text-xs text-stone-500">{item.chapter}</span>{item.section && <span className="text-xs text-stone-500">{item.section}</span>}</div>
