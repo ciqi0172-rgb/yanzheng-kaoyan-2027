@@ -231,8 +231,8 @@ export function buildHatQuestionOptions(
         : item.source === 'trap'
           ? `【原题陷阱语料】该表述来自本题原始解析中明确提及的易混表述。请结合题干限定词判断，原解析：${item.matrixTrap}`
           : question.examType === '多选'
-          ? `【组合辨析】这组表述来自原文另一道多选题（${item.chapter || item.subject}；考点：${item.hatKeyword}）。本题应逐项核对，不能把不同考点的正确表述拼成正确答案。`
-          : `【易混辨析】该答案对应原文另一考点“${item.hatKeyword}”（${item.chapter || item.subject}）；本题考查的是“${question.hatKeyword}”。`,
+          ? `【组合辨析】候选内容来自原题 ${item.id}（${item.sourcePage || '原页码未标注'}；${item.chapter || item.subject}；考点：${item.hatKeyword}）。它在原题中可能是正确表述，但不代表适用于本题；请逐项核对。`
+          : `【易混辨析】候选内容来自原题 ${item.id}（${item.sourcePage || '原页码未标注'}；${item.chapter || item.subject}；考点：${item.hatKeyword}）。它在原题中可能正确，但是否适用于本题必须依据本题题干判断；本题考查“${question.hatKeyword}”。`,
     })),
   ];
   return shuffleOptions(options, question.id);
