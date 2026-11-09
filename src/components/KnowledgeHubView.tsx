@@ -1,41 +1,85 @@
-import React, { useMemo, useState } from 'react';
-import { HAT_SOURCE_PAGES } from '../data/hatSourcePages';
-import { Search, FileText } from 'lucide-react';
+import React, { useEffect, useMemo, useState } from 'react';
+import { Search, FileText, LoaderCircle } from 'lucide-react';
+
+type SourceItem = { id: number; subject: string; chapter: string; section: string; text: string; kind: string };
 
 export const KnowledgeHubView: React.FC = () => {
+  const [items, setItems] = useState<SourceItem[]>([]);
+  const [loading, setLoading] = useState(true);
+  const [loadError, setLoadError] = useState('');
   const [query, setQuery] = useState('');
   const [submittedQuery, setSubmittedQuery] = useState('');
-  const [pageFilter, setPageFilter] = useState('全部');
+  const [subjectFilter, setSubjectFilter] = useState('全部科目');
+  const [chapterFilter, setChapterFilter] = useState('全部章节');
 
+  useEffect(() => {
+    let alive = true;
+    fetch(`${import.meta.env.BASE_URL}hat-source.html`)
+      .then(response => {
+        if (!response.ok) throw new Error(`读取原文件失败（HTTP ${response.status}）`);
+        return response.text();
+      })
+      .then(html => {
+        const doc = new DOMParser().parseFromString(html, 'text/html');
+        const parsed: SourceItem[] = [];
+        let subject = '未分类';
+        let chapter = '未分类章节';
+        let section = '';
+        doc.body.querySelectorAll('h1,h2,h3,li,p').forEach(node => {
+          const text = (node.textContent || '').replace(/\\s+/g, ' ').trim();
+          if (!text) return;
+          if (node.tagName === 'H1') { subject = text; chapter = '导论'; section = ''; return; }
+          if (node.tagName === 'H2') { chapter = text; section = ''; return; }
+          if (node.tagName === 'H3') { section = text; return; }
+          if (node.tagName === 'P' && /^-?\\s*\\d+\\s*-?$/.test(text)) return;
+          if (node.tagName === 'LI' || node.tagName === 'P') {
+            parsed.push({ id: parsed.length + 1, subject, chapter, section, text, kind: node.tagName === 'LI' ? '题目' : '原文' });
+          }
+        });
+        if (!alive) return;
+        setItems(parsed);
+        setLoading(false);
+      })
+      .catch(error => {
+        if (!alive) return;
+        setLoadError(error instanceof Error ? error.message : '原文件加载失败');
+        setLoading(false);
+      });
+    return () => { alive = false; };
+  }, []);
+
+  const subjects = useMemo(() => ['全部科目', ...Array.from(new Set(items.map(x => x.subject)))], [items]);
+  const chapters = useMemo(() => ['全部章节', ...Array.from(new Set(items.filter(x => subjectFilter === '全部科目' || x.subject === subjectFilter).map(x => x.chapter)))], [items, subjectFilter]);
   const results = useMemo(() => {
-    const q = submittedQuery.trim().toLowerCase();
-    return HAT_SOURCE_PAGES.filter(page => {
-      if (pageFilter !== '全部' && page.sourcePage !== Number(pageFilter)) return false;
-      return !q || page.text.toLowerCase().includes(q) || String(page.sourcePage) === q;
-    });
-  }, [submittedQuery, pageFilter]);
+    const q = submittedQuery.trim().toLocaleLowerCase();
+    return items.filter(item =>
+      (subjectFilter === '全部科目' || item.subject === subjectFilter) &&
+      (chapterFilter === '全部章节' || item.chapter === chapterFilter) &&
+      (!q || item.text.toLocaleLowerCase().includes(q) || item.subject.toLocaleLowerCase().includes(q) || item.chapter.toLocaleLowerCase().includes(q) || item.section.toLocaleLowerCase().includes(q))
+    );
+  }, [items, submittedQuery, subjectFilter, chapterFilter]);
 
   return <main className="mx-auto max-w-5xl space-y-5 p-4 sm:p-6">
     <header className="rounded-2xl border border-stone-200 bg-white p-5 dark:border-stone-800 dark:bg-stone-900">
-      <div className="flex items-center gap-2 text-rose-600 dark:text-rose-400"><FileText size={20}/><span className="text-xs font-bold tracking-wide">原始 PDF · OCR 全文索引</span></div>
-      <h1 className="mt-2 text-2xl font-black text-stone-900 dark:text-stone-100">帽子题 OCR 原文检索</h1>
-      <p className="mt-2 text-sm leading-6 text-stone-600 dark:text-stone-300">仅检索《27肖1000帽子题 思修_2027版.pdf》的 48 页 OCR 文字。不混入旧结构化题库或答题模板，不自动补写答案。</p>
-      <div className="mt-3 rounded-xl border border-amber-200 bg-amber-50 p-3 text-sm text-amber-900 dark:border-amber-900 dark:bg-amber-950/30 dark:text-amber-200">识别状态：OCR 待核验。OCR 可能存在错字、漏字和版面顺序错乱；搜索结果用于定位原文，不能直接视为标准答案。</div>
+      <div className="flex items-center gap-2 text-rose-600 dark:text-rose-400"><FileText size={20}/><span className="text-xs font-bold tracking-wide">用户提供的原始 HTML · 原文索引</span></div>
+      <h1 className="mt-2 text-2xl font-black text-stone-900 dark:text-stone-100">帽子题原文检索库</h1>
+      <p className="mt-2 text-sm leading-6 text-stone-600 dark:text-stone-300">直接读取你提供的《肖 1000 帽子题》HTML 文件，按原文件中的科目、章节和题目检索。不再使用之前那份粗糙的 OCR 数据，也不混入旧题库或模板。</p>
     </header>
     <section className="space-y-4 rounded-2xl border border-stone-200 bg-white p-4 dark:border-stone-800 dark:bg-stone-900 sm:p-6">
-      <form onSubmit={e => { e.preventDefault(); setSubmittedQuery(query); }} className="grid grid-cols-1 gap-2 sm:grid-cols-[1fr_150px_auto]">
-        <input value={query} onChange={e => setQuery(e.target.value)} placeholder="输入帽子词、知识点、题干关键词或页码" className="w-full rounded-xl border border-stone-200 bg-stone-50 px-3 py-3 text-sm outline-none focus:ring-2 focus:ring-rose-400 dark:border-stone-700 dark:bg-stone-800"/>
-        <select value={pageFilter} onChange={e => setPageFilter(e.target.value)} className="rounded-xl border border-stone-200 bg-stone-50 px-3 py-3 text-sm dark:border-stone-700 dark:bg-stone-800">
-          <option>全部</option>{HAT_SOURCE_PAGES.map(p => <option key={p.sourcePage} value={String(p.sourcePage)}>PDF 第 {p.sourcePage} 页</option>)}
-        </select>
-        <button type="submit" className="flex items-center justify-center gap-2 rounded-xl bg-stone-900 px-4 py-3 text-sm font-semibold text-white dark:bg-stone-100 dark:text-stone-900"><Search size={16}/>检索 OCR</button>
+      <form onSubmit={e => { e.preventDefault(); setSubmittedQuery(query); }} className="grid grid-cols-1 gap-2 sm:grid-cols-[1fr_180px_180px_auto]">
+        <input value={query} onChange={e => setQuery(e.target.value)} placeholder="搜索帽子词、知识点、题干或答案" className="w-full rounded-xl border border-stone-200 bg-stone-50 px-3 py-3 text-sm outline-none focus:ring-2 focus:ring-rose-400 dark:border-stone-700 dark:bg-stone-800"/>
+        <select value={subjectFilter} onChange={e => { setSubjectFilter(e.target.value); setChapterFilter('全部章节'); }} className="rounded-xl border border-stone-200 bg-stone-50 px-3 py-3 text-sm dark:border-stone-700 dark:bg-stone-800">{subjects.map(s => <option key={s}>{s}</option>)}</select>
+        <select value={chapterFilter} onChange={e => setChapterFilter(e.target.value)} className="rounded-xl border border-stone-200 bg-stone-50 px-3 py-3 text-sm dark:border-stone-700 dark:bg-stone-800">{chapters.map(s => <option key={s}>{s}</option>)}</select>
+        <button type="submit" className="flex items-center justify-center gap-2 rounded-xl bg-stone-900 px-4 py-3 text-sm font-semibold text-white dark:bg-stone-100 dark:text-stone-900"><Search size={16}/>检索</button>
       </form>
-      <div className="text-xs text-stone-500">已导入 {HAT_SOURCE_PAGES.length}/48 页 · 当前匹配 {results.length} 页</div>
-      {results.map(page => <article key={page.sourcePage} className="rounded-xl border border-stone-200 p-4 dark:border-stone-800">
-        <div className="mb-3 flex flex-wrap items-center gap-2"><h2 className="font-bold text-stone-900 dark:text-stone-100">PDF 第 {page.sourcePage} 页</h2><span className="rounded-full bg-amber-100 px-2 py-1 text-xs text-amber-800 dark:bg-amber-950 dark:text-amber-200">{page.status || 'OCR-待人工核验'}</span></div>
-        <p className="whitespace-pre-wrap break-words text-sm leading-7 text-stone-700 dark:text-stone-300">{page.text}</p>
+      {loading && <div className="flex items-center gap-2 py-8 text-sm text-stone-500"><LoaderCircle size={18} className="animate-spin"/>正在读取原始帽子题文件…</div>}
+      {loadError && <div className="rounded-xl border border-red-200 bg-red-50 p-4 text-sm text-red-700">{loadError}。请检查部署文件 public/hat-source.html 是否存在。</div>}
+      {!loading && !loadError && <div className="text-xs text-stone-500">已读取 {items.length} 条原文条目 · 当前匹配 {results.length} 条</div>}
+      {!loading && !loadError && results.map(item => <article key={item.id} className="rounded-xl border border-stone-200 p-4 dark:border-stone-800">
+        <div className="mb-2 flex flex-wrap items-center gap-2"><span className="rounded-full bg-rose-100 px-2 py-1 text-xs text-rose-800 dark:bg-rose-950 dark:text-rose-200">{item.subject}</span><span className="text-xs text-stone-500">{item.chapter}</span>{item.section && <span className="text-xs text-stone-500">{item.section}</span>}</div>
+        <p className="whitespace-pre-wrap break-words text-sm leading-7 text-stone-800 dark:text-stone-200">{item.text}</p>
       </article>)}
-      {!results.length && <div className="rounded-xl border border-dashed border-stone-300 p-8 text-center text-sm text-stone-500">没有匹配到 OCR 原文。请尝试其他关键词，或按页码查看。没有匹配不代表原 PDF 不包含该知识点。</div>}
+      {!loading && !loadError && !results.length && <div className="rounded-xl border border-dashed border-stone-300 p-8 text-center text-sm text-stone-500">没有匹配结果，请尝试更短的关键词或调整科目、章节筛选。</div>}
     </section>
   </main>;
 };
