@@ -20,11 +20,16 @@ export const ConfusionModal: React.FC<ConfusionModalProps> = ({
 
   const currentGroup = CONFUSION_DATA.find((g) => g.id === activeGroup) || CONFUSION_DATA[0];
 
-  const filteredItems = currentGroup.items.filter(
+  const searchPool = searchQuery.trim()
+    ? CONFUSION_DATA.flatMap((group) => group.items)
+    : currentGroup.items;
+  const filteredItems = searchPool.filter(
     (item) =>
       item.term.includes(searchQuery) ||
       item.targetAnswer.includes(searchQuery) ||
-      item.hatType.includes(searchQuery)
+      item.hatType.includes(searchQuery) ||
+      item.trapWarning.includes(searchQuery) ||
+      item.subject.includes(searchQuery)
   );
 
   return (
