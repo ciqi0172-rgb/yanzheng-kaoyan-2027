@@ -164,8 +164,15 @@ for (const [subject, expected] of Object.entries(expectedStructuredBySubject)) {
   }
 }
 const normalizeOption = (value: string) => value.replace(/[\s，。；;：:、（）()“”‘’]/g, '').toLocaleLowerCase();
+let fourChoiceReadyQuestions = 0;
+let questionsMissingQualityDistractors = 0;
 for (const question of HAT_QUESTIONS.filter(q => !q.needsReview && q.answer?.trim())) {
   const options = buildHatQuestionOptions(question, HAT_QUESTIONS);
+  if (options.length === 0) {
+    // Quality gate: do not force long or mismatched filler just to reach four options.
+    questionsMissingQualityDistractors += 1;
+    continue;
+  }
   const uniqueOptions = new Set(options.map(option => normalizeOption(option.text)));
   const correctCount = options.filter(option => option.isCorrect).length;
   if (options.length !== 4 || uniqueOptions.size !== 4 || correctCount !== 1) {
@@ -175,7 +182,16 @@ for (const question of HAT_QUESTIONS.filter(q => !q.needsReview && q.answer?.tri
       field: 'options',
       message: `应生成4个不重复选项且只有1个正确答案；实际选项数 ${options.length}，唯一选项数 ${uniqueOptions.size}，正确项数 ${correctCount}`,
     });
+  } else {
+    fourChoiceReadyQuestions += 1;
   }
+}
+if (questionsMissingQualityDistractors > 0) {
+  warnings.push({
+    dataset: '四选一自动组题',
+    id: 'quality-gate',
+    message: `${questionsMissingQualityDistractors} 道题暂时缺少足够短且合格的干扰项，暂不强行凑满四项；需补充经核验的混淆矩阵后再开放四选一。`,
+  });
 }
 const sourceQuestionCount = Object.values(actualBySubject).reduce((sum, count) => sum + count, 0);
 const counts = {
@@ -186,6 +202,8 @@ const counts = {
   structuredHatQuestions: HAT_QUESTIONS.length,
   structuredPlayableQuestions: structuredPlayable,
   structuredNeedsReviewQuestions: structuredNeedsReview,
+  fourChoiceReadyQuestions,
+  questionsMissingQualityDistractors,
   essayTemplates: ESSAY_TEMPLATES.length,
   sourceFile: 'src/data/hat-source.html',
   issues: issues.length,
