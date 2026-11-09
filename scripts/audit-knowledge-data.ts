@@ -2,6 +2,7 @@ import { readFileSync } from 'node:fs';
 import { HAT_QUESTIONS } from '../src/data/hatQuestions';
 import { ESSAY_TEMPLATES } from '../src/data/essayTemplates';
 import { buildHatQuestionOptions } from '../src/services/quizGenerator';
+import { CONFUSION_DATA } from '../src/data/confusionMatrix';
 
 type Issue = { dataset: string; id: string; field: string; message: string };
 const issues: Issue[] = [];
@@ -20,6 +21,35 @@ function checkUniqueIds(dataset: string, rows: Array<{ id: string }>) {
 }
 
 checkUniqueIds('帽子题结构化数据', HAT_QUESTIONS);
+
+// The confusion matrix is shared by search UI and distractor generation; audit it as data.
+const confusionGroupIds = new Set<string>();
+const confusionPairs = new Set<string>();
+for (const group of CONFUSION_DATA) {
+  if (!group.id?.trim() || confusionGroupIds.has(group.id)) {
+    issues.push({ dataset: '混淆矩阵', id: group.id || '(missing id)', field: 'id', message: '分组 id 缺失或重复' });
+  }
+  confusionGroupIds.add(group.id);
+  if (!group.title?.trim() || !group.description?.trim() || !group.items.length) {
+    issues.push({ dataset: '混淆矩阵', id: group.id, field: 'group', message: '分组标题、说明或条目为空' });
+  }
+  for (const [index, item] of group.items.entries()) {
+    for (const field of ['term', 'hatType', 'targetAnswer', 'trapWarning', 'subject'] as const) {
+      if (!String(item[field] ?? '').trim()) {
+        issues.push({ dataset: '混淆矩阵', id: `${group.id}#${index + 1}`, field, message: '混淆矩阵条目字段为空' });
+      }
+    }
+    const pair = normalizeMatrixText(item.term) + '|' + normalizeMatrixText(item.targetAnswer);
+    if (confusionPairs.has(pair)) {
+      warnings.push({ dataset: '混淆矩阵', id: `${group.id}#${index + 1}`, message: '存在题干与答案完全相同的重复对照项，请检查是否有必要重复收录' });
+    }
+    confusionPairs.add(pair);
+  }
+}
+function normalizeMatrixText(value: string) {
+  return value.replace(/[\\s，。；;：:、（）()“”‘’]/g, '').toLocaleLowerCase();
+}
+
 for (const q of HAT_QUESTIONS) {
   for (const field of ['subject', 'hatType', 'hatKeyword', 'examType', 'stem', 'trapAnalysis'] as const) {
     if (!String(q[field] ?? '').trim()) {
@@ -202,6 +232,8 @@ const counts = {
   structuredHatQuestions: HAT_QUESTIONS.length,
   structuredPlayableQuestions: structuredPlayable,
   structuredNeedsReviewQuestions: structuredNeedsReview,
+  confusionMatrixGroups: CONFUSION_DATA.length,
+  confusionMatrixItems: CONFUSION_DATA.reduce((sum, group) => sum + group.items.length, 0),
   fourChoiceReadyQuestions,
   questionsMissingQualityDistractors,
   essayTemplates: ESSAY_TEMPLATES.length,
