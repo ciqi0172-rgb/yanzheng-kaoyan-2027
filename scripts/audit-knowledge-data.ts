@@ -52,7 +52,7 @@ const expectedBySubject: Record<string, number> = {
 const actualBySubject: Record<string, number> = {};
 const sourceQuestionsWithoutFormatting: Array<{ subject: string; text: string }> = [];
 let currentSubject = '未分类';
-const tokenPattern = /<(h1|h2|h3|li|p)\\b[^>]*>([\\s\\S]*?)<\\/\\1>/gi;
+const tokenPattern = /<(h1|h2|h3|li|p)\b[^>]*>([\s\S]*?)<\/\1>/gi;
 let match: RegExpExecArray | null;
 while ((match = tokenPattern.exec(sourceHtml)) !== null) {
   const tag = match[1].toLowerCase();
@@ -65,7 +65,7 @@ while ((match = tokenPattern.exec(sourceHtml)) !== null) {
     .replace(/&gt;/gi, '>')
     .replace(/&quot;/gi, '"')
     .replace(/&#39;|&apos;/gi, "'")
-    .replace(/\\s+/g, ' ')
+    .replace(/\s+/g, ' ')
     .trim();
   if (tag === 'h1') {
     currentSubject = text;
@@ -73,10 +73,10 @@ while ((match = tokenPattern.exec(sourceHtml)) !== null) {
     continue;
   }
   if (tag !== 'li' && tag !== 'p') continue;
-  if (!text || /^-?\\s*\\d+\\s*-?$/.test(text) || /^(?:27\\s*)?肖\\s*1000\\s*帽子题/.test(text)) continue;
-  if (!/^\\d+\\s*[.、．]/.test(text)) continue;
+  if (!text || /^-?\s*\d+\s*-?$/.test(text) || /^(?:27\s*)?肖\s*1000\s*帽子题/.test(text)) continue;
+  if (!/^\d+\s*[.、．]/.test(text)) continue;
   actualBySubject[currentSubject] = (actualBySubject[currentSubject] ?? 0) + 1;
-  if (!/<u\\b|<b\\b|<strong\\b/i.test(raw)) {
+  if (!/<u\b|<b\b|<strong\b/i.test(raw)) {
     sourceQuestionsWithoutFormatting.push({ subject: currentSubject, text: text.slice(0, 90) });
   }
 }
