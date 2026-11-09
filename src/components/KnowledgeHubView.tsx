@@ -1,6 +1,7 @@
 import React, { useEffect, useMemo, useState } from 'react';
 import { HAT_QUESTIONS } from '../data/hatQuestions';
 import { ESSAY_TEMPLATES } from '../data/essayTemplates';
+import { HAT_SOURCE_COVERAGE } from '../data/hatSourceCoverage';
 import { Search, BookOpen, ClipboardList, Library, Plus, Trash2, Download, CheckCircle2 } from 'lucide-react';
 
 type HubMode = 'search' | 'pending' | 'templates';
@@ -60,7 +61,7 @@ export const KnowledgeHubView: React.FC = () => {
     const q = query.trim();
     setSubmittedQuery(q);
     setSelectedId(null);
-    if (q && !HAT_QUESTIONS.some(item => [item.id, item.subject, item.hatType, item.hatKeyword, item.examType, item.sourcePage, item.stem, item.answer, item.trapAnalysis, item.confusionGroup || ''].join(' ').toLowerCase().includes(q.toLowerCase()))) {
+    if (q && !HAT_QUESTIONS.some(item => (subject === '全部' || item.subject === subject) && [item.id, item.subject, item.hatType, item.hatKeyword, item.examType, item.sourcePage, item.stem, item.answer, item.trapAnalysis, item.confusionGroup || ''].join(' ').toLowerCase().includes(q.toLowerCase()))) {
       setPending(old => old.some(item => item.query.toLowerCase() === q.toLowerCase() && item.status === '待补全') ? old : [
         { id: 'pending-' + Date.now(), query: q, note: '由知识点检索自动记录：当前帽子题库未找到匹配内容，请核对原始资料后补充。', createdAt: new Date().toLocaleString(), status: '待补全' }, ...old
       ]);
@@ -93,9 +94,10 @@ export const KnowledgeHubView: React.FC = () => {
         <div>
           <div className="text-xs font-bold tracking-wide text-rose-600 dark:text-rose-400">独立新增模块 · 不修改原有自检遮盖</div>
           <h1 className="mt-1 text-2xl font-black text-stone-900 dark:text-stone-100">知识点检索与答题模板库</h1>
-          <p className="mt-2 text-sm text-stone-500 dark:text-stone-400">基于现有题库和大题模板检索；检索不到的关键词会进入待补全清单，不会自动编造答案。</p>
+          <p className="mt-2 text-sm text-stone-500 dark:text-stone-400">结构化题库与原始资料核对状态分开管理；检索不到的关键词会进入待补全清单，不会自动编造答案。</p>
         </div>
-        <div className="text-sm text-stone-500">帽子题 {HAT_QUESTIONS.length} 条 · 大题模板 {ESSAY_TEMPLATES.length} 条</div>
+        <div className="text-sm text-stone-500">结构化帽子题 {HAT_QUESTIONS.length} 条 · 大题模板 {ESSAY_TEMPLATES.length} 条</div>
+      <div className="mt-3 rounded-xl border border-amber-200 bg-amber-50 dark:bg-amber-950/20 dark:border-amber-900 p-3 text-sm text-amber-900 dark:text-amber-200"><strong>原始资料核验进度：</strong>《{HAT_SOURCE_COVERAGE.sourceFile}》共 {HAT_SOURCE_COVERAGE.totalPages} 页，已建立 {HAT_SOURCE_COVERAGE.extractedPages} 页 OCR 底稿；人工核验 {HAT_SOURCE_COVERAGE.verifiedPages} 页，{HAT_SOURCE_COVERAGE.pendingManualVerificationPages.length} 页仍待逐页核对。OCR 仅供检索定位，不能直接视为标准答案。</div>
       </div>
       <div className="mt-5 grid grid-cols-1 sm:grid-cols-3 gap-2">
         <button onClick={() => setMode('search')} className={buttonClass + ' flex items-center justify-center gap-2 ' + (mode === 'search' ? 'bg-rose-600 text-white' : 'bg-stone-100 dark:bg-stone-800 text-stone-700 dark:text-stone-200')}><Search size={16}/>知识点检索</button>
