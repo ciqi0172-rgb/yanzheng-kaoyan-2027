@@ -57,35 +57,57 @@ export function buildHatQuestionOptions(
   const subjectMatches = (subject: string) =>
     subject.split('/').some(part => part.trim() === question.subject) ||
     subject.includes(question.subject) || question.subject.includes(subject);
-  const matrixCandidates = question.examType === '多选' ? [] : CONFUSION_DATA
-    .flatMap(group => {
-      const anchors = group.items.filter(item => {
-        const termAliases = item.term.split(/[／/；;，,]/).map(alias => normalize(alias)).filter(alias => alias.length >= 3);
-        const termMatch = termAliases.some(alias => normalizedStem.includes(alias));
-        const hatMatch = normalize(item.hatType).length >= 4 &&
-          (normalizedQuestionHat === normalize(item.hatType) ||
-            normalizedQuestionType === normalize(item.hatType)) &&
-          normalizedStem.includes(normalize(item.hatType));
-        return termMatch || hatMatch;
-      });
-      if (!anchors.length) return [];
-      // Only sibling entries from the same curated group are eligible. A broad subject
-      // match alone is never enough to inject an option.
-      return group.items
-        .filter(item => !anchors.includes(item))
-        .filter(item => subjectMatches(item.subject))
-        .map(item => ({
-          id: `matrix-${group.id}-${item.hatType}-${item.term}`,
-          answer: item.targetAnswer.trim(),
-          subject: item.subject,
-          hatKeyword: item.hatType,
-          chapter: group.title,
-          confusionGroup: group.category,
-          hatType: item.hatType,
-          matrixTerm: item.term,
-          matrixTrap: item.trapWarning,
-          source: 'matrix' as const,
-        }));
+  const conceptFamilies: Array<{ id: string; terms: string[] }> = [
+    { id: 'root', terms: ['根本', '最根本'] },
+    { id: 'priority', terms: ['首要', '第一'] },
+    { id: 'core', terms: ['核心', '本质', '实质和核心'] },
+    { id: 'history', terms: ['标志', '转折', '开端', '萌芽'] },
+    { id: 'guarantee', terms: ['保证', '保障'] },
+    { id: 'purpose', terms: ['目的', '归宿', '出发点', '落脚点'] },
+  ];
+  const matrixRows = CONFUSION_DATA.flatMap(group => group.items.map(item => ({
+    id: `matrix-${group.id}-${item.hatType}-${item.term}`,
+    answer: item.targetAnswer.trim(),
+    subject: item.subject,
+    hatKeyword: item.hatType,
+    chapter: group.title,
+    confusionGroup: group.category,
+    hatType: item.hatType,
+    matrixTerm: item.term,
+    matrixTrap: item.trapWarning,
+    source: 'matrix' as const,
+    groupId: group.id,
+  })));
+  const matrixAnchors = question.examType === '多选' ? [] : matrixRows.filter(item => {
+    const groupItem = CONFUSION_DATA
+      .find(group => group.id === item.groupId)?.items
+      .find(candidate => candidate.term === item.matrixTerm && candidate.hatType === item.hatType);
+    if (!groupItem) return false;
+    const aliases = groupItem.term.split(/[／/；;，,]/).map(alias => normalize(alias)).filter(alias => alias.length >= 3);
+    const termMatch = aliases.some(alias => normalizedStem.includes(alias));
+    const hatMatch = normalize(groupItem.hatType).length >= 4 &&
+      (normalizedQuestionHat === normalize(groupItem.hatType) ||
+        normalizedQuestionType === normalize(groupItem.hatType)) &&
+      normalizedStem.includes(normalize(groupItem.hatType));
+    return termMatch || hatMatch;
+  });
+  const anchorFamilies = new Set(matrixAnchors.flatMap(anchor => {
+    const normalizedHat = normalize(anchor.hatType);
+    return conceptFamilies
+      .filter(family => family.terms.some(term => normalizedHat.includes(normalize(term))))
+      .map(family => family.id);
+  }));
+  const matrixCandidates = matrixAnchors.length === 0 ? [] : matrixRows
+    .filter(item => !matrixAnchors.some(anchor => anchor.id === item.id))
+    .filter(item => subjectMatches(item.subject))
+    .filter(item => {
+      const normalizedHat = normalize(item.hatType);
+      const candidateFamilies = conceptFamilies
+        .filter(family => family.terms.some(term => normalizedHat.includes(normalize(term))))
+        .map(family => family.id);
+      // Across-group retrieval is allowed only for a shared, explicit exam-concept family
+      // (e.g. 根本动力 vs 根本力量), never for subject overlap alone.
+      return candidateFamilies.some(family => anchorFamilies.has(family));
     })
     .filter(item =>
       normalize(item.answer) !== correctKey &&
