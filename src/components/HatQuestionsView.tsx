@@ -80,12 +80,20 @@ export const HatQuestionsView: React.FC<HatQuestionsViewProps> = ({
   const [userScratchpad, setUserScratchpad] = useState<string>('');
   const [copiedId, setCopiedId] = useState<string | null>(null);
 
+  // Compute four-choice readiness once per dataset version, not once per filter predicate.
+  const fourChoiceReadyIds = useMemo(() => new Set(
+    questions
+      .filter(q => !q.needsReview && q.answer.trim())
+      .filter(q => buildHatQuestionOptions(q, questions).length === 4)
+      .map(q => q.id)
+  ), [questions]);
+
   // Filtered Questions
   const filteredQuestions = useMemo(() => {
     return questions.filter((q) => {
       if (q.needsReview && drillMode !== 'grid') return false;
       // Exam mode must never render a question with fewer than four validated options.
-      if (drillMode === 'exam' && buildHatQuestionOptions(q, questions).length !== 4) return false;
+      if (drillMode === 'exam' && !fourChoiceReadyIds.has(q.id)) return false;
       if (selectedSubject !== '全部' && q.subject !== selectedSubject) {
         return false;
       }
@@ -112,7 +120,7 @@ export const HatQuestionsView: React.FC<HatQuestionsViewProps> = ({
       }
       return true;
     });
-  }, [questions, selectedSubject, selectedHat, onlyRedMarked, onlyDueReview, searchQuery, reviews, drillMode]);
+  }, [questions, selectedSubject, selectedHat, onlyRedMarked, onlyDueReview, searchQuery, reviews, drillMode, fourChoiceReadyIds]);
 
   const activeQuestion: HatQuestion | undefined = filteredQuestions[cardIndex];
 
@@ -194,7 +202,7 @@ export const HatQuestionsView: React.FC<HatQuestionsViewProps> = ({
                 肖1000 帽子题全真题库
               </span>
               <span className="text-xs text-stone-500 dark:text-stone-400">
-                原文全量收录 · 共 <strong className="text-stone-800 dark:text-stone-200">{questions.length}</strong> 道 · 可练 <strong className="text-emerald-700 dark:text-emerald-300">{questions.filter(q => !q.needsReview && q.answer.trim() && buildHatQuestionOptions(q, questions).length === 4).length}</strong> 道 · 待核验 <strong className="text-amber-700 dark:text-amber-300">{questions.filter(q => q.needsReview || !q.answer.trim()).length}</strong> 道
+                原文全量收录 · 共 <strong className="text-stone-800 dark:text-stone-200">{questions.length}</strong> 道 · 可练 <strong className="text-emerald-700 dark:text-emerald-300">{fourChoiceReadyIds.size}</strong> 道 · 待核验 <strong className="text-amber-700 dark:text-amber-300">{questions.filter(q => q.needsReview || !q.answer.trim()).length}</strong> 道
               </span>
             </div>
             <h1 className="text-xl sm:text-2xl font-black text-stone-900 dark:text-stone-100 tracking-tight">
