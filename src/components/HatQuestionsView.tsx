@@ -194,14 +194,14 @@ export const HatQuestionsView: React.FC<HatQuestionsViewProps> = ({
                 肖1000 帽子题全真题库
               </span>
               <span className="text-xs text-stone-500 dark:text-stone-400">
-                原文全量收录 · 共 <strong className="text-stone-800 dark:text-stone-200">{questions.length}</strong> 道 · 可练 <strong className="text-emerald-700 dark:text-emerald-300">{questions.filter(q => !q.needsReview && q.answer.trim()).length}</strong> 道 · 待核验 <strong className="text-amber-700 dark:text-amber-300">{questions.filter(q => q.needsReview || !q.answer.trim()).length}</strong> 道
+                原文全量收录 · 共 <strong className="text-stone-800 dark:text-stone-200">{questions.length}</strong> 道 · 可练 <strong className="text-emerald-700 dark:text-emerald-300">{questions.filter(q => !q.needsReview && q.answer.trim() && buildHatQuestionOptions(q, questions).length === 4).length}</strong> 道 · 待核验 <strong className="text-amber-700 dark:text-amber-300">{questions.filter(q => q.needsReview || !q.answer.trim()).length}</strong> 道
               </span>
             </div>
             <h1 className="text-xl sm:text-2xl font-black text-stone-900 dark:text-stone-100 tracking-tight">
               政治“帽子题”全真实战刷题与陷阱突破
             </h1>
             <p className="text-xs text-stone-600 dark:text-stone-400 mt-0.5">
-              题干精设4项严密选择，深度还原肖1000易混干扰项。已核验答案的题目进入四选一练习；原文答案标记不完整的题目保留在清单中，核验前不参与出题。
+              四选一只展示能生成4个不重复选项且答案唯一的题目；暂时缺少合格干扰项的题目不会强行凑项，仍可在清单与回忆模式中复习。
             </p>
           </div>
 
