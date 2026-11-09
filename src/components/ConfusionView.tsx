@@ -211,7 +211,7 @@ export const CONFUSION_DATA: ConfusionGroup[] = [
         subject: '史纲',
       },
     ],
-  },,
+  },
   {
     id: 'zhidu',
     title: '【制度】根本制度/根本政治制度/基本政治制度',
