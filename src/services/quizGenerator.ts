@@ -148,7 +148,7 @@ export function buildHatQuestionOptions(
         ...Array.from(trapText.matchAll(/[“「『"]([^”」』"]{2,32})[”」』"]/g), match => match[1]),
         ...Array.from(trapText.matchAll(/混淆([^。；;！!]{2,36})/g), match => splitTrapTerms(match[1])).flat(),
         ...Array.from(trapText.matchAll(/(?:误选为|错选为|切勿选成|切勿选为|不要误选为|不能替换为|不应选为)([^。；;！!，,]{2,30})/g), match => splitTrapTerms(match[1])).flat(),
-        ...Array.from(trapText.matchAll(/(?:则是|对应的是|专属对应[:：]?)([^。；;！!]{2,28})/g), match => match[1].trim()),
+        ...Array.from(trapText.matchAll(/(?:则是|对应的是|专属对应[:：]?)([^。；;！!]{2,28})/g), match => match[1].split(/[，,；;]/)[0].trim()),
       ]
     : [];
   const trapCandidates = question.examType === '多选' || !hasExplicitTrapSignal
