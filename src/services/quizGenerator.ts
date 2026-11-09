@@ -61,10 +61,23 @@ export function buildHatQuestionOptions(
     { id: 'root', terms: ['根本', '最根本'] },
     { id: 'priority', terms: ['首要', '第一'] },
     { id: 'core', terms: ['核心', '本质', '实质和核心'] },
-    { id: 'history', terms: ['标志', '转折', '开端', '萌芽'] },
+    { id: 'history', terms: ['标志', '转折', '开端', '萌芽', '试金石'] },
     { id: 'guarantee', terms: ['保证', '保障'] },
     { id: 'purpose', terms: ['目的', '归宿', '出发点', '落脚点'] },
+    { id: 'foundation', terms: ['基础', '前提'] },
+    { id: 'feature', terms: ['特征', '特点', '属性'] },
+    { id: 'role', terms: ['作用', '意义', '功能'] },
+    { id: 'task', terms: ['任务', '职责', '使命'] },
+    { id: 'principle', terms: ['原则', '方针'] },
+    { id: 'leadership', terms: ['领导', '主体', '核心力量'] },
   ];
+  const getConceptFamilies = (item: { hatType?: string; hatKeyword?: string; stem?: string }) => {
+    const text = normalize([item.hatType, item.hatKeyword, item.stem].filter(Boolean).join(' '));
+    return conceptFamilies.filter(family =>
+      family.terms.some(term => text.includes(normalize(term)))
+    ).map(family => family.id);
+  };
+  const questionFamilies = new Set(getConceptFamilies(question));
   const matrixRows = CONFUSION_DATA.flatMap(group => group.items.map(item => ({
     id: `matrix-${group.id}-${item.hatType}-${item.term}`,
     answer: item.targetAnswer.trim(),
@@ -154,7 +167,11 @@ export function buildHatQuestionOptions(
     // or precise hat keyword/type. Subject-only matches are not valid distractors.
     ((Boolean(question.confusionGroup) && item.confusionGroup === question.confusionGroup) ||
       (normalize(question.hatKeyword).length >= 4 && item.hatKeyword === question.hatKeyword) ||
-      (normalize(question.hatType).length >= 4 && item.hatType === question.hatType)) &&
+      (normalize(question.hatType).length >= 4 && item.hatType === question.hatType) ||
+      // A controlled same-subject concept-family match expands coverage without pulling
+      // arbitrary answers from unrelated chapters or subjects.
+      (item.subject === question.subject &&
+        getConceptFamilies(item).some(family => questionFamilies.has(family)))) &&
     (question.examType !== '多选' || answerParts(item) === answerParts(question))
   ).map(item => ({ ...item, source: 'source' as const, matrixTerm: '', matrixTrap: '' }));
 
@@ -175,7 +192,9 @@ export function buildHatQuestionOptions(
       (item.source === 'matrix' && item.subject === question.subject ? 120 : 0) +
       (item.confusionGroup && item.confusionGroup === question.confusionGroup ? 100 : 0) +
       (normalize(question.hatKeyword).length >= 4 && item.hatKeyword === question.hatKeyword ? 50 : 0) +
-      (normalize(question.hatType).length >= 4 && item.hatType === question.hatType ? 25 : 0);
+      (normalize(question.hatType).length >= 4 && item.hatType === question.hatType ? 25 : 0) +
+      (item.subject === question.subject && getConceptFamilies(item).some(family => questionFamilies.has(family)) ? 20 : 0) +
+      (item.chapter === question.chapter ? 10 : 0);
     const priorityDifference = priority(b) - priority(a);
     if (priorityDifference !== 0) return priorityDifference;
     return Math.abs(a.answer.trim().length - correctAnswer.length) -
