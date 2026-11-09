@@ -192,7 +192,7 @@ export const HatQuestionsView: React.FC<HatQuestionsViewProps> = ({
                 肖1000 帽子题全真题库
               </span>
               <span className="text-xs text-stone-500 dark:text-stone-400">
-                原文全量收录 · 共 <strong className="text-stone-800 dark:text-stone-200">{questions.length}</strong> 道，含答案待核验题
+                原文全量收录 · 共 <strong className="text-stone-800 dark:text-stone-200">{questions.length}</strong> 道 · 可练 <strong className="text-emerald-700 dark:text-emerald-300">{questions.filter(q => !q.needsReview && q.answer.trim()).length}</strong> 道 · 待核验 <strong className="text-amber-700 dark:text-amber-300">{questions.filter(q => q.needsReview || !q.answer.trim()).length}</strong> 道
               </span>
             </div>
             <h1 className="text-xl sm:text-2xl font-black text-stone-900 dark:text-stone-100 tracking-tight">
@@ -427,7 +427,7 @@ export const HatQuestionsView: React.FC<HatQuestionsViewProps> = ({
                       【{activeQuestion.hatKeyword}】
                     </span>
                     <span className="text-[11px] font-semibold text-rose-600 dark:text-rose-400">
-                      考研标准{activeQuestion.examType}
+                      {activeQuestion.examType === '多选' ? '四选一·多选组合' : '四选一·单选'}
                     </span>
                   </div>
 
