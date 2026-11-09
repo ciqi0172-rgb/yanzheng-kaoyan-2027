@@ -115,6 +115,34 @@ export function buildHatQuestionOptions(
       item.answer.length >= Math.max(2, Math.floor(correctAnswer.length * 0.35))
     );
 
+  // Reuse concepts explicitly named in the original question's own trap explanation.
+  // These are higher-value candidates than arbitrary answers because the source material
+  // already identifies them as likely confusions or mistaken substitutions.
+  const trapCandidates = question.examType === '多选' ||
+    !/(误选|错选|混淆|切勿|不要与|不要把|不能与|不可偷换|混成|张冠李戴|误认为|容易误选|不能替换|不应选|不等于)/.test(question.trapAnalysis)
+    ? []
+    : Array.from(question.trapAnalysis.matchAll(/[“「『"]([^”」』"]{2,24})[”」』"]/g))
+      .map(match => match[1].trim())
+      .filter((term, index, terms) =>
+        terms.findIndex(other => normalize(other) === normalize(term)) === index &&
+        normalize(term) !== correctKey &&
+        !/[。！？!?；;]/.test(term) &&
+        isOptionShaped(term, correctAnswer) &&
+        term.length >= Math.max(2, Math.floor(correctAnswer.length * 0.35))
+      )
+      .map(term => ({
+        id: `trap-${question.id}-${normalize(term)}`,
+        answer: term,
+        subject: question.subject,
+        hatKeyword: question.hatKeyword,
+        chapter: question.chapter,
+        confusionGroup: question.confusionGroup,
+        hatType: question.hatType,
+        matrixTerm: '原题解析明确提及的易混表述',
+        matrixTrap: question.trapAnalysis,
+        source: 'trap' as const,
+      }));
+
   const candidates = allQuestions.filter(item =>
     item.id !== question.id &&
     !item.needsReview &&
@@ -130,11 +158,12 @@ export function buildHatQuestionOptions(
     (question.examType !== '多选' || answerParts(item) === answerParts(question))
   ).map(item => ({ ...item, source: 'source' as const, matrixTerm: '', matrixTrap: '' }));
 
-  type Candidate = (typeof candidates)[number] | (typeof matrixCandidates)[number];
+  type Candidate = (typeof candidates)[number] | (typeof matrixCandidates)[number] | (typeof trapCandidates)[number];
 
-  // Prefer matrix entries tied to the precise concept, then source answers with explicit overlap.
-  const combinedCandidates: Candidate[] = [...matrixCandidates, ...candidates];
+  // Prefer source-authored trap phrases, then curated matrix entries, then related source answers.
+  const combinedCandidates: Candidate[] = [...trapCandidates, ...matrixCandidates, ...candidates];
   const ranked = [
+    ...combinedCandidates.filter(item => item.source === 'trap'),
     ...combinedCandidates.filter(item => item.source === 'matrix' && item.subject === question.subject),
     ...combinedCandidates.filter(item => item.confusionGroup && item.confusionGroup === question.confusionGroup),
     ...combinedCandidates.filter(item => normalize(question.hatKeyword).length >= 4 && item.hatKeyword === question.hatKeyword),
@@ -142,6 +171,7 @@ export function buildHatQuestionOptions(
   ].filter((item, index, items) => items.findIndex(other => other.id === item.id) === index)
   .sort((a, b) => {
     const priority = (item: Candidate) =>
+      (item.source === 'trap' ? 140 : 0) +
       (item.source === 'matrix' && item.subject === question.subject ? 120 : 0) +
       (item.confusionGroup && item.confusionGroup === question.confusionGroup ? 100 : 0) +
       (normalize(question.hatKeyword).length >= 4 && item.hatKeyword === question.hatKeyword ? 50 : 0) +
@@ -174,7 +204,9 @@ export function buildHatQuestionOptions(
       isCorrect: false,
       trapExplanation: item.source === 'matrix'
         ? `【混淆矩阵】“${item.matrixTerm}”对应“${item.hatKeyword}”。${item.matrixTrap}`
-        : question.examType === '多选'
+        : item.source === 'trap'
+          ? `【原题陷阱语料】该表述来自本题原始解析中明确提及的易混表述。请结合题干限定词判断，原解析：${item.matrixTrap}`
+          : question.examType === '多选'
           ? `【组合辨析】这组表述来自原文另一道多选题（${item.chapter || item.subject}；考点：${item.hatKeyword}）。本题应逐项核对，不能把不同考点的正确表述拼成正确答案。`
           : `【易混辨析】该答案对应原文另一考点“${item.hatKeyword}”（${item.chapter || item.subject}）；本题考查的是“${question.hatKeyword}”。`,
     })),
