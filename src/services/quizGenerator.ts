@@ -134,15 +134,32 @@ export function buildHatQuestionOptions(
   // Reuse concepts explicitly named in the original question's own trap explanation.
   // These are higher-value candidates than arbitrary answers because the source material
   // already identifies them as likely confusions or mistaken substitutions.
-  const trapCandidates = question.examType === '多选' ||
-    !/(误选|错选|混淆|切勿|不要与|不要把|不能与|不可偷换|混成|张冠李戴|误认为|容易误选|不能替换|不应选|不等于)/.test(question.trapAnalysis)
+  const trapText = question.trapAnalysis;
+  const hasExplicitTrapSignal =
+    /(误选|错选|混淆|切勿|张冠李戴|互调|互换|不能替换|不应选|不等于|容易误选|混成|错置)/.test(trapText);
+  const splitTrapTerms = (value: string) =>
+    value.replace(/[“「『”」』"]/g, '')
+      .replace(/(?:注意|牢记|切勿|不要|不能|不应).*/g, '')
+      .split(/与|和|或|及|、|\/|，|,/)
+      .map(term => term.trim())
+      .filter(Boolean);
+  const extractedTrapTerms = hasExplicitTrapSignal
+    ? [
+        ...Array.from(trapText.matchAll(/[“「『"]([^”」』"]{2,32})[”」』"]/g), match => match[1]),
+        ...Array.from(trapText.matchAll(/混淆([^。；;！!]{2,36})/g), match => splitTrapTerms(match[1])).flat(),
+        ...Array.from(trapText.matchAll(/(?:误选为|错选为|切勿选成|切勿选为|不要误选为|不能替换为|不应选为)([^。；;！!，,]{2,30})/g), match => splitTrapTerms(match[1])).flat(),
+        ...Array.from(trapText.matchAll(/(?:则是|对应的是|专属对应[:：]?)([^。；;！!]{2,28})/g), match => match[1].trim()),
+      ]
+    : [];
+  const trapCandidates = question.examType === '多选' || !hasExplicitTrapSignal
     ? []
-    : Array.from(question.trapAnalysis.matchAll(/[“「『"]([^”」』"]{2,24})[”」』"]/g))
-      .map(match => match[1].trim())
+    : extractedTrapTerms
+      .map(term => term.replace(/[“「『”」』"]/g, '').trim())
       .filter((term, index, terms) =>
         terms.findIndex(other => normalize(other) === normalize(term)) === index &&
         normalize(term) !== correctKey &&
         !/[。！？!?；;]/.test(term) &&
+        !normalize(question.stem).includes(normalize(term)) &&
         isOptionShaped(term, correctAnswer) &&
         term.length >= Math.max(2, Math.floor(correctAnswer.length * 0.35))
       )
