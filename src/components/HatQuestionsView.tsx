@@ -718,9 +718,28 @@ export const HatQuestionsView: React.FC<HatQuestionsViewProps> = ({
       {/* MODE 3: GRID LIST OF ALL QUESTIONS */}
       {(drillMode === 'grid' || drillMode === 'pending') && (
         <div className="space-y-4">
+          {drillMode === 'pending' && (
+            <div className="grid grid-cols-1 sm:grid-cols-3 gap-3">
+              <div className="rounded-xl border border-amber-200 bg-amber-50 dark:bg-amber-950/30 dark:border-amber-800 p-3">
+                <div className="text-[11px] text-amber-700 dark:text-amber-300">答案待核验</div>
+                <div className="text-xl font-black text-amber-900 dark:text-amber-100">{questions.filter(q => q.needsReview || !q.answer.trim()).length}</div>
+                <div className="text-[10px] text-amber-700 dark:text-amber-300">先回原始资料确认答案</div>
+              </div>
+              <div className="rounded-xl border border-orange-200 bg-orange-50 dark:bg-orange-950/30 dark:border-orange-800 p-3">
+                <div className="text-[11px] text-orange-700 dark:text-orange-300">答案已在库、待补干扰项</div>
+                <div className="text-xl font-black text-orange-900 dark:text-orange-100">{questions.filter(q => !q.needsReview && q.answer.trim() && !fourChoiceReadyIds.has(q.id)).length}</div>
+                <div className="text-[10px] text-orange-700 dark:text-orange-300">保留原题，暂不强行凑选项</div>
+              </div>
+              <div className="rounded-xl border border-stone-200 bg-stone-50 dark:bg-stone-800/50 dark:border-stone-700 p-3">
+                <div className="text-[11px] text-stone-600 dark:text-stone-300">当前筛选待处理</div>
+                <div className="text-xl font-black text-stone-900 dark:text-stone-100">{filteredQuestions.length}</div>
+                <div className="text-[10px] text-stone-500">受科目、帽子类型、搜索条件影响</div>
+              </div>
+            </div>
+          )}
           <div className="flex items-center justify-between text-xs text-stone-500">
-            <span>{drillMode === 'pending' ? `待处理 ${filteredQuestions.length} 道：缺干扰项或答案待核验` : `找到 ${filteredQuestions.length} 道原文题目（含待核验记录）`}</span>
-            <span>仅答案已核验的题目可启动四选一模考</span>
+            <span>{drillMode === 'pending' ? `待处理 ${filteredQuestions.length} 道：按“答案待核验 / 待补干扰项”分别标记` : `找到 ${filteredQuestions.length} 道原文题目（含待核验记录）`}</span>
+            <span>仅答案已核验且选项合格的题目可启动四选一模考</span>
           </div>
 
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
@@ -757,9 +776,9 @@ export const HatQuestionsView: React.FC<HatQuestionsViewProps> = ({
                       {q.stem}
                     </h3>
 
-                    <div className={`p-2.5 rounded-lg border mb-2 ${q.needsReview ? 'bg-amber-50 dark:bg-amber-950/30 border-amber-300' : 'bg-emerald-50 dark:bg-emerald-950/40 border-emerald-200'}`}>
-                      <span className={`text-[10px] block ${q.needsReview ? 'text-amber-700 dark:text-amber-300' : 'text-emerald-600'}`}>{q.needsReview ? '原文答案标记待核验：' : '原文标准答案：'}</span>
-                      <span className={`text-xs font-black ${q.needsReview ? 'text-amber-900 dark:text-amber-200' : 'text-emerald-900 dark:text-emerald-200'}`}>
+                    <div className={`p-2.5 rounded-lg border mb-2 ${q.needsReview || !q.answer.trim() ? 'bg-amber-50 dark:bg-amber-950/30 border-amber-300' : 'bg-emerald-50 dark:bg-emerald-950/40 border-emerald-200'}`}>
+                      <span className={`text-[10px] block ${q.needsReview || !q.answer.trim() ? 'text-amber-700 dark:text-amber-300' : 'text-emerald-600'}`}>{q.needsReview || !q.answer.trim() ? '原文答案待核验：' : '原文标准答案：'}</span>
+                      <span className={`text-xs font-black ${q.needsReview || !q.answer.trim() ? 'text-amber-900 dark:text-amber-200' : 'text-emerald-900 dark:text-emerald-200'}`}>
                         {q.answer || '原文未标出可确认答案，暂不生成选项'}
                       </span>
                     </div>
@@ -774,8 +793,8 @@ export const HatQuestionsView: React.FC<HatQuestionsViewProps> = ({
                       {review ? `已做 ${review.totalAttempts} 次 · 阶段 ${review.level}` : '未做题'}
                     </span>
 
-                    {q.needsReview ? (
-                      <span className="text-amber-700 dark:text-amber-300 font-bold">答案待核验</span>
+                    {q.needsReview || !q.answer.trim() ? (
+                      <span className="text-amber-700 dark:text-amber-300 font-bold">答案待核验 · 暂不组题</span>
                     ) : !fourChoiceReadyIds.has(q.id) ? (
                       <span className="text-amber-700 dark:text-amber-300 font-bold">待补干扰项 · 已暂存</span>
                     ) : (
