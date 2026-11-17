@@ -5,6 +5,7 @@ interface ConfusionItem {
   targetAnswer: string;
   trapWarning: string;
   subject: string;
+  sourceQuestionId?: string;
 }
 
 interface ConfusionGroup {
@@ -408,6 +409,36 @@ export const CONFUSION_DATA: ConfusionGroup[] = [
       { term: '党执政兴国的第一要务', hatType: '第一要务', targetAnswer: '发展', trapWarning: '不要与全面建设社会主义现代化国家的首要任务“高质量发展”混淆。', subject: '新思想' },
       { term: '决定党和国家前途命运的根本力量', hatType: '根本力量', targetAnswer: '人民', trapWarning: '人民是决定党和国家前途命运的根本力量；改革是推进中国式现代化的根本动力。', subject: '新思想' },
       { term: '推进中国式现代化的根本动力', hatType: '根本动力', targetAnswer: '改革', trapWarning: '改革强调动力机制，不要与人民这一根本力量混淆。', subject: '新思想' }
+    ]
+  },,
+
+  {
+    id: 'source-grounded-high-value-2027',
+    title: '【原题回收】高辨析价值帽子题（带原题来源）',
+    category: '原题回收',
+    description: '根据现有帽子题原文与答案整理。优先供四选一生成器寻找同科目、同概念层级的干扰项；来源 ID 可追溯回原题。多选答案仅用于提取单个概念，不直接整段拼成长选项。',
+    items: [
+      { term: '对人的认识，核心在于认识', hatType: '核心', targetAnswer: '人的本质', trapWarning: '原题 sx-02。容易误选“人的属性”或“人的社会关系”；人的本质是一切社会关系的总和。', subject: '思修法治', sourceQuestionId: 'sx-02' },
+      { term: '人生观的核心和灵魂', hatType: '核心', targetAnswer: '人生目的', trapWarning: '原题 sx-03。人生目的决定人生道路、人生态度和人生价值选择；不要误选人生价值。', subject: '思修法治', sourceQuestionId: 'sx-03' },
+      { term: '信念的特征', hatType: '特征', targetAnswer: '支撑性、执着性、多样性', trapWarning: '原题 sx-08。与理想的超越性、实践性、时代性相区别。', subject: '思修法治', sourceQuestionId: 'sx-08' },
+      { term: '时代精神的核心', hatType: '核心', targetAnswer: '改革创新', trapWarning: '原题 sx-14。与以爱国主义为核心的民族精神相区别。', subject: '思修法治', sourceQuestionId: 'sx-14' },
+      { term: '社会主义核心价值观的根本特性', hatType: '根本特性', targetAnswer: '人民性', trapWarning: '原题 sx-17。题干问根本特性时不要与先进性集中体现的表述混淆。', subject: '思修法治', sourceQuestionId: 'sx-17' },
+      { term: '全面依法治国的根本保证', hatType: '根本保证', targetAnswer: '党的领导', trapWarning: '原题 hat-62。与社会主义法治的本质属性“人民性”区分。', subject: '思修法治', sourceQuestionId: 'hat-62' },
+      { term: '毛泽东思想初步形成的标志', hatType: '初步形成标志', targetAnswer: '提出并深入阐述农村包围城市、武装夺取政权的思想', trapWarning: '原题 hat-100。与萌芽标志、成熟标志区分；不要把不同发展阶段的标志互换。', subject: '毛中特', sourceQuestionId: 'hat-100' },
+      { term: '新民主主义革命理论的核心问题', hatType: '核心问题', targetAnswer: '无产阶级领导权', trapWarning: '原题 hat-113。核心问题是领导权；革命的中心内容等其他概念需按题干限定辨别。', subject: '毛中特', sourceQuestionId: 'hat-113' },
+      { term: '建国初期土地改革基本完成后的国内主要矛盾', hatType: '主要矛盾', targetAnswer: '工人阶级和资产阶级的矛盾', trapWarning: '原题 hat-139。必须锁定“建国初期、土地改革基本完成后”的历史阶段，不能与其他阶段主要矛盾混淆。', subject: '毛中特/史纲', sourceQuestionId: 'hat-139' },
+      { term: '探索中国社会主义建设道路的良好开端', hatType: '良好开端', targetAnswer: '《论十大关系》', trapWarning: '原题 hat-160。与中共八大、十一届三中全会等历史节点区分。', subject: '毛中特', sourceQuestionId: 'hat-160' },
+      { term: '中华民族从近代深重危机走向伟大复兴的历史转折点', hatType: '历史转折点', targetAnswer: '抗日战争的胜利', trapWarning: '原题 hat-278。注意题干限定的是民族复兴历程中的历史转折点。', subject: '史纲', sourceQuestionId: 'hat-278' },
+      { term: '中共八大提出的当时党和人民的根本任务', hatType: '根本任务', targetAnswer: '在新的生产关系下保护和发展生产力', trapWarning: '原题 hat-313。与社会主义的根本任务等不同层级表述区分。', subject: '史纲', sourceQuestionId: 'hat-313' },
+      { term: '《实践是检验真理的唯一标准》引发的思想解放运动的作用', hatType: '思想先导', targetAnswer: '成为正本清源、拨乱反正和改革开放的思想先导', trapWarning: '原题 hat-321。题干问该运动的历史作用，不要误答为文章发表的时间或会议标志。', subject: '史纲', sourceQuestionId: 'hat-321' },
+      { term: '马克思主义理论区别于其他理论的根本特征', hatType: '根本特征', targetAnswer: '实践性', trapWarning: '原题 my-15。注意区分马克思主义的人民性这一本质属性与实践性这一根本特征。', subject: '马原', sourceQuestionId: 'my-15' },
+      { term: '政治上层建筑的核心', hatType: '核心', targetAnswer: '国家政权', trapWarning: '原题 my-21。与经济基础、意识形态等概念区分。', subject: '马原', sourceQuestionId: 'my-21' },
+      { term: '资本主义生产过程的主要方面', hatType: '主要方面', targetAnswer: '价值增殖过程', trapWarning: '原题 hat-408。资本主义生产过程是劳动过程和价值增殖过程的统一，其中主要方面是价值增殖过程。', subject: '马原', sourceQuestionId: 'hat-408' },
+      { term: '剩余价值产生的唯一源泉', hatType: '唯一源泉', targetAnswer: '雇佣劳动者的剩余劳动', trapWarning: '原题 hat-415。不能把机器、原材料或一般劳动过程中的具体劳动直接替代为剩余价值的唯一源泉。', subject: '马原', sourceQuestionId: 'hat-415' },
+      { term: '剩余价值率反映的关系', hatType: '反映', targetAnswer: '资本家对雇佣工人的剥削程度', trapWarning: '原题 hat-416。与利润率区分；剩余价值率反映剥削程度。', subject: '马原', sourceQuestionId: 'hat-416' },
+      { term: '各个资本家追求超额剩余价值的结果', hatType: '结果', targetAnswer: '整个资本家阶级普遍获得相对剩余价值；全社会劳动生产率的提高', trapWarning: '原题 hat-450。区分个别资本家获得超额剩余价值与资本家阶级普遍获得相对剩余价值。', subject: '马原', sourceQuestionId: 'hat-450' },
+      { term: '新质生产力的核心标志', hatType: '核心标志', targetAnswer: '全要素生产率大幅提升', trapWarning: '原题 xsx-13。与新质生产力的显著特点“创新”及催生因素相区别。', subject: '新思想', sourceQuestionId: 'xsx-13' },
+      { term: '教育的根本任务', hatType: '根本任务', targetAnswer: '立德树人', trapWarning: '原题 hat-586。不要与科技、人才领域的战略任务混淆。', subject: '新思想', sourceQuestionId: 'hat-586' }
     ]
   },
 ];
