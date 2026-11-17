@@ -410,7 +410,7 @@ export const CONFUSION_DATA: ConfusionGroup[] = [
       { term: '决定党和国家前途命运的根本力量', hatType: '根本力量', targetAnswer: '人民', trapWarning: '人民是决定党和国家前途命运的根本力量；改革是推进中国式现代化的根本动力。', subject: '新思想' },
       { term: '推进中国式现代化的根本动力', hatType: '根本动力', targetAnswer: '改革', trapWarning: '改革强调动力机制，不要与人民这一根本力量混淆。', subject: '新思想' }
     ]
-  },,
+  },
 
   {
     id: 'source-grounded-high-value-2027',
