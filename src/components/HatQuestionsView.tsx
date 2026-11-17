@@ -776,12 +776,21 @@ export const HatQuestionsView: React.FC<HatQuestionsViewProps> = ({
 
                     {q.needsReview ? (
                       <span className="text-amber-700 dark:text-amber-300 font-bold">答案待核验</span>
+                    ) : !fourChoiceReadyIds.has(q.id) ? (
+                      <span className="text-amber-700 dark:text-amber-300 font-bold">待补干扰项 · 已暂存</span>
                     ) : (
                       <button
                         onClick={() => {
-                          const targetIdx = filteredQuestions.filter((item) => !item.needsReview).findIndex((item) => item.id === q.id);
-                          if (targetIdx !== -1) {
-                            setCardIndex(targetIdx);
+                          const examIdx = questions
+                            .filter(item => !item.needsReview && fourChoiceReadyIds.has(item.id))
+                            .filter(item => selectedSubject === '全部' || item.subject === selectedSubject)
+                            .filter(item => selectedHat === '全部' || item.hatType === selectedHat)
+                            .filter(item => !onlyRedMarked || reviews[item.id]?.isMarkedRed)
+                            .filter(item => !onlyDueReview || Boolean(reviews[item.id] && reviews[item.id].nextReviewAt <= Date.now()))
+                            .filter(item => !searchQuery.trim() || [item.stem, item.answer, item.hatKeyword, item.trapAnalysis].some(value => value.toLowerCase().includes(searchQuery.toLowerCase().trim())))
+                            .findIndex(item => item.id === q.id);
+                          if (examIdx !== -1) {
+                            setCardIndex(examIdx);
                             setDrillMode('exam');
                             setSelectedOptionKey(null);
                             setHasAnswered(false);
