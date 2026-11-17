@@ -166,7 +166,8 @@ if (sourceQuestionsWithoutFormatting.length) {
   });
 }
 
-const expectedStructuredCount = 684;
+// 684 original source questions plus 12 clearly labeled textbook-aligned supplements.
+const expectedStructuredCount = 696;
 if (HAT_QUESTIONS.length !== expectedStructuredCount) {
   issues.push({
     dataset: '帽子题结构化数据',
@@ -184,7 +185,7 @@ const expectedStructuredBySubject: Record<string, number> = {
   '思修法治': 95,
   '毛中特': 98,
   '史纲': 144,
-  '马原': 176,
+  '马原': 188,
   '新思想': 171,
 };
 for (const [subject, expected] of Object.entries(expectedStructuredBySubject)) {
@@ -226,7 +227,7 @@ if (questionsMissingQualityDistractors > 0) {
   warnings.push({
     dataset: '四选一自动组题',
     id: 'quality-gate',
-    message: `${questionsMissingQualityDistractors} 道题暂时缺少足够短且合格的干扰项，暂不强行凑满四项；需补充经核验的混淆矩阵后再开放四选一。`,
+    message: `${questionsMissingQualityDistractors} 道题已保留在待补队列中，暂时缺少足够短且合格的干扰项；后续集中补充并核验，不丢弃、不强行凑项。`,
   });
 }
 const sourceQuestionCount = Object.values(actualBySubject).reduce((sum, count) => sum + count, 0);
