@@ -72,7 +72,7 @@ export const HatQuestionsView: React.FC<HatQuestionsViewProps> = ({
   const [onlyDueReview, setOnlyDueReview] = useState<boolean>(false);
 
   // Drill Mode: 'exam' (Real 4-choice question) vs 'recall' (Blank/Active recall) vs 'grid' (All questions)
-  const [drillMode, setDrillMode] = useState<'exam' | 'recall' | 'grid'>('exam');
+  const [drillMode, setDrillMode] = useState<'exam' | 'recall' | 'grid' | 'pending'>('exam');
   const [cardIndex, setCardIndex] = useState<number>(0);
   const [selectedOptionKey, setSelectedOptionKey] = useState<string | null>(null);
   const [hasAnswered, setHasAnswered] = useState<boolean>(false);
@@ -91,9 +91,14 @@ export const HatQuestionsView: React.FC<HatQuestionsViewProps> = ({
   // Filtered Questions
   const filteredQuestions = useMemo(() => {
     return questions.filter((q) => {
-      if (q.needsReview && drillMode !== 'grid') return false;
+      // Pending queue is a durable, visible collection of every record not yet eligible for four-choice practice.
+      // Records needing answer verification are kept here too, clearly labeled by reason, never silently dropped.
+      if (drillMode === 'pending' && fourChoiceReadyIds.has(q.id)) return false;
+      if (drillMode === 'pending' && q.needsReview === false && q.answer.trim() && fourChoiceReadyIds.has(q.id)) return false;
+      if (q.needsReview && drillMode !== 'grid' && drillMode !== 'pending') return false;
       // Exam mode must never render a question with fewer than four validated options.
       if (drillMode === 'exam' && !fourChoiceReadyIds.has(q.id)) return false;
+      if (drillMode === 'recall' && !q.answer.trim()) return false;
       if (selectedSubject !== '全部' && q.subject !== selectedSubject) {
         return false;
       }
@@ -209,7 +214,7 @@ export const HatQuestionsView: React.FC<HatQuestionsViewProps> = ({
               政治“帽子题”全真实战刷题与陷阱突破
             </h1>
             <p className="text-xs text-stone-600 dark:text-stone-400 mt-0.5">
-              四选一只展示能生成4个不重复选项且答案唯一的题目；暂时缺少合格干扰项的题目不会强行凑项，仍可在清单与回忆模式中复习。
+              四选一只展示选项完整且答案唯一的题目；任何暂时无法进入实战的题目都会自动进入“待补题目”清单，标明原因，后续集中补齐，不会丢失。
             </p>
           </div>
 
@@ -246,6 +251,14 @@ export const HatQuestionsView: React.FC<HatQuestionsViewProps> = ({
               >
                 <Eye className="w-3.5 h-3.5" />
                 <span>口述盲填/翻牌</span>
+              </button>
+
+              <button
+                onClick={() => setDrillMode('pending')}
+                className={`flex items-center gap-1 px-3 py-1.5 rounded-lg font-medium transition-all ${drillMode === 'pending' ? 'bg-amber-600 text-white font-bold shadow-xs' : 'text-stone-600 dark:text-stone-400'}`}
+              >
+                <AlertTriangle className="w-3.5 h-3.5" />
+                <span>待补题目（{questions.filter(q => !fourChoiceReadyIds.has(q.id)).length}）</span>
               </button>
 
               <button
@@ -703,10 +716,10 @@ export const HatQuestionsView: React.FC<HatQuestionsViewProps> = ({
       )}
 
       {/* MODE 3: GRID LIST OF ALL QUESTIONS */}
-      {drillMode === 'grid' && (
+      {(drillMode === 'grid' || drillMode === 'pending') && (
         <div className="space-y-4">
           <div className="flex items-center justify-between text-xs text-stone-500">
-            <span>找到 {filteredQuestions.length} 道原文题目（含待核验记录）</span>
+            <span>{drillMode === 'pending' ? `待处理 ${filteredQuestions.length} 道：缺干扰项或答案待核验` : `找到 ${filteredQuestions.length} 道原文题目（含待核验记录）`}</span>
             <span>仅答案已核验的题目可启动四选一模考</span>
           </div>
 
