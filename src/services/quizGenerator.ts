@@ -119,13 +119,20 @@ export function buildHatQuestionOptions(
       normalizedStem.includes(normalize(groupItem.hatType));
     return termMatch || hatMatch;
   });
-  const anchorFamilies = new Set(matrixAnchors.flatMap(anchor => {
-    const normalizedHat = normalize(anchor.hatType);
-    return conceptFamilies
-      .filter(family => family.terms.some(term => normalizedHat.includes(normalize(term))))
-      .map(family => family.id);
-  }));
-  const matrixCandidates = matrixAnchors.length === 0 ? [] : matrixRows
+  const anchorFamilies = new Set([
+    ...questionFamilies,
+    ...matrixAnchors.flatMap(anchor => {
+      const normalizedHat = normalize(anchor.hatType);
+      return conceptFamilies
+        .filter(family => family.terms.some(term => normalizedHat.includes(normalize(term))))
+        .map(family => family.id);
+    }),
+  ]);
+  // Even when a question has no exact matrix anchor, its own explicit wording can
+  // identify a concept family (e.g. “核心” or “根本”). Use same-subject matrix
+  // entries from that family as carefully bounded distractors instead of excluding
+  // the question solely because no exact anchor was found.
+  const matrixCandidates = matrixRows
     .filter(item => !matrixAnchors.some(anchor => anchor.id === item.id))
     .filter(item => subjectMatches(item.subject))
     .filter(item => {
