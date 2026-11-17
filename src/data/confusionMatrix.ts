@@ -375,5 +375,39 @@ export const CONFUSION_DATA: ConfusionGroup[] = [
       { term: '社会主义核心价值观社会层面的价值取向', hatType: '社会价值取向', targetAnswer: '自由、平等、公正、法治', trapWarning: '不要与国家层面的“富强、民主、文明、和谐”或个人层面的“爱国、敬业、诚信、友善”交叉混写。', subject: '思修法治' },
       { term: '社会主义核心价值观公民个人层面的价值准则', hatType: '个人价值准则', targetAnswer: '爱国、敬业、诚信、友善', trapWarning: '这是公民个人层面的价值准则，不是国家层面的价值目标，也不是社会层面的价值取向。', subject: '思修法治' },
     ]
-  }
+  },
+
+  {
+    id: 'core-expansion-2027',
+    title: '【核心补充】马原、史纲、毛中特与思修高频易混点',
+    category: '核心补充',
+    description: '用于扩充四选一干扰项的受控来源。只提供可明确辨析的考点答案，不以无关内容凑选项。',
+    items: [
+      { term: '物质的唯一特性', hatType: '唯一特性', targetAnswer: '客观实在性', trapWarning: '物质的唯一特性是客观实在性；运动是物质的根本属性和存在方式。', subject: '马原' },
+      { term: '唯物辩证法的实质和核心', hatType: '实质和核心', targetAnswer: '对立统一规律', trapWarning: '对立统一规律揭示事物发展的源泉和动力；不要与质量互变规律混淆。', subject: '马原' },
+      { term: '检验认识真理性的唯一标准', hatType: '唯一标准', targetAnswer: '实践', trapWarning: '理论、权威和多数人的意见都不能替代实践作为检验真理的唯一标准。', subject: '马原' },
+      { term: '商品价值量的决定因素', hatType: '决定因素', targetAnswer: '社会必要劳动时间', trapWarning: '不是个别劳动时间；个别劳动生产率影响个别劳动时间，但不改变商品价值量的决定标准。', subject: '马原' },
+      { term: '资本主义生产过程的二重性', hatType: '二重性', targetAnswer: '劳动过程和价值增殖过程的统一', trapWarning: '资本主义生产过程既是劳动过程，也是价值增殖过程。', subject: '马原' },
+      { term: '剩余价值的唯一源泉', hatType: '唯一源泉', targetAnswer: '雇佣工人的剩余劳动', trapWarning: '机器和原材料转移已有价值，不能创造新价值；剩余价值源于雇佣工人的剩余劳动。', subject: '马原' },
+      { term: '新民主主义革命的开端', hatType: '开端标志', targetAnswer: '五四运动', trapWarning: '五四运动是新民主主义革命的开端；中国共产党成立使中国革命面貌焕然一新。', subject: '史纲' },
+      { term: '中国共产党成立的标志', hatType: '成立标志', targetAnswer: '中共一大的召开', trapWarning: '五四运动是新民主主义革命的开端，中共一大标志着中国共产党正式成立。', subject: '史纲' },
+      { term: '党历史上生死攸关的转折点', hatType: '生死攸关的转折点', targetAnswer: '遵义会议', trapWarning: '不要与十一届三中全会这一新中国成立以来具有深远意义的伟大转折混淆。', subject: '史纲' },
+      { term: '新中国成立以来党的历史上具有深远意义的伟大转折', hatType: '伟大转折', targetAnswer: '党的十一届三中全会', trapWarning: '遵义会议与十一届三中全会的历史定位不同，要看题干限定。', subject: '史纲' },
+      { term: '社会主义基本制度在中国确立的标志', hatType: '确立标志', targetAnswer: '社会主义改造基本完成', trapWarning: '中华人民共和国成立标志着新民主主义革命取得基本胜利；社会主义改造基本完成标志着社会主义基本制度确立。', subject: '毛中特/史纲' },
+      { term: '新民主主义革命的总路线', hatType: '总路线', targetAnswer: '无产阶级领导的、人民大众的、反对帝国主义、封建主义和官僚资本主义的革命', trapWarning: '总路线要同时抓住领导阶级、革命主体、革命对象三个要素。', subject: '毛中特' },
+      { term: '中国革命的首要对象', hatType: '首要对象', targetAnswer: '帝国主义', trapWarning: '帝国主义是中国人民最凶恶的敌人；封建主义是反动统治的基础。', subject: '毛中特' },
+      { term: '社会主义初级阶段的基本路线的核心内容', hatType: '核心内容', targetAnswer: '以经济建设为中心、坚持四项基本原则、坚持改革开放', trapWarning: '“一个中心、两个基本点”要完整对应，不能只写经济建设。', subject: '毛中特' },
+      { term: '科学发展观的第一要义', hatType: '第一要义', targetAnswer: '发展', trapWarning: '科学发展观第一要义是发展，核心是以人为本，基本要求是全面协调可持续，根本方法是统筹兼顾。', subject: '毛中特' },
+      { term: '社会主义核心价值观国家层面的价值目标', hatType: '国家价值目标', targetAnswer: '富强、民主、文明、和谐', trapWarning: '社会层面是自由、平等、公正、法治；个人层面是爱国、敬业、诚信、友善。', subject: '思修法治' },
+      { term: '社会主义核心价值观社会层面的价值取向', hatType: '社会价值取向', targetAnswer: '自由、平等、公正、法治', trapWarning: '不要与国家层面的价值目标或公民个人层面的价值准则互换。', subject: '思修法治' },
+      { term: '社会主义核心价值观公民个人层面的价值准则', hatType: '个人价值准则', targetAnswer: '爱国、敬业、诚信、友善', trapWarning: '这是公民个人层面的价值准则，不是国家层面的价值目标。', subject: '思修法治' },
+      { term: '社会主义法治的本质属性', hatType: '本质属性', targetAnswer: '人民性', trapWarning: '人民性是社会主义法治的本质属性；人民当家作主是社会主义民主政治的本质和核心。', subject: '思修法治' },
+      { term: '中国特色社会主义最本质的特征', hatType: '最本质特征', targetAnswer: '中国共产党的领导', trapWarning: '不要与社会主义制度的根本制度定位或人民当家作主混淆。', subject: '新思想' },
+      { term: '全面建设社会主义现代化国家的首要任务', hatType: '首要任务', targetAnswer: '高质量发展', trapWarning: '创新是引领发展的第一动力；高质量发展是全面建设社会主义现代化国家的首要任务。', subject: '新思想' },
+      { term: '引领发展的第一动力', hatType: '第一动力', targetAnswer: '创新', trapWarning: '人才是第一资源，发展是党执政兴国的第一要务，创新是引领发展的第一动力。', subject: '新思想' },
+      { term: '党执政兴国的第一要务', hatType: '第一要务', targetAnswer: '发展', trapWarning: '不要与全面建设社会主义现代化国家的首要任务“高质量发展”混淆。', subject: '新思想' },
+      { term: '决定党和国家前途命运的根本力量', hatType: '根本力量', targetAnswer: '人民', trapWarning: '人民是决定党和国家前途命运的根本力量；改革是推进中国式现代化的根本动力。', subject: '新思想' },
+      { term: '推进中国式现代化的根本动力', hatType: '根本动力', targetAnswer: '改革', trapWarning: '改革强调动力机制，不要与人民这一根本力量混淆。', subject: '新思想' }
+    ]
+  },
 ];
