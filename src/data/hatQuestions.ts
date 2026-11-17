@@ -10951,7 +10951,7 @@ export const HAT_QUESTIONS: HatQuestion[] = [
     "confusionGroup": "新思想-第七章 全面从严治党-首要任务",
     "needsReview": false,
     "sourceSection": "多选 (P112)"
-  }
+  },
   {
     "id": "hat-685",
     "subject": "马原",
