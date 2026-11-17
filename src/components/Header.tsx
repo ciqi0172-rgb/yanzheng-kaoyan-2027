@@ -3,6 +3,7 @@ import {
   Sparkles, 
   Layers, 
   BookOpen, 
+  Target,
   CheckSquare, 
   SplitSquareVertical,
   Brain, 
@@ -13,7 +14,7 @@ import {
   Flame
 } from 'lucide-react';
 
-export type TabKey = 'flashcard' | 'exam' | 'essay' | 'confusion' | 'ebbinghaus' | 'roadmap' | 'knowledge';
+export type TabKey = 'flashcard' | 'exam' | 'essay' | 'confusion' | 'ebbinghaus' | 'roadmap' | 'knowledge' | 'marxism';
 
 interface HeaderProps {
   activeTab: TabKey;
@@ -47,6 +48,7 @@ export const Header: React.FC<HeaderProps> = ({
     },
     { key: 'roadmap', label: '三阶段冲刺路径', icon: <Compass className="w-4 h-4" /> },
     { key: 'knowledge', label: '知识库与模板', icon: <BookOpen className="w-4 h-4" /> },
+    { key: 'marxism', label: '马原核心刷题', icon: <Target className="w-4 h-4" /> },
   ];
 
   return (
