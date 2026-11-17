@@ -162,6 +162,7 @@ export default function App() {
 
         {/* New standalone knowledge search, pending records, and answer templates. Existing masking code is untouched. */}
         {activeTab === 'knowledge' && <KnowledgeHubView />}
+        {activeTab === 'marxism' && <iframe title="马原核心精选题库" src={`${import.meta.env.BASE_URL}ma-yuan-quiz.html`} className="w-full rounded-xl border-0 bg-white shadow-sm" style={{ height: 'calc(100vh - 190px)', minHeight: '720px' }} />}
       </main>
 
       {/* Footer */}
