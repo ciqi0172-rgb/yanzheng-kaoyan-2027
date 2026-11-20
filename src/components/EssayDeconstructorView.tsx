@@ -167,6 +167,34 @@ export const EssayDeconstructorView: React.FC<EssayDeconstructorViewProps> = ({
   const [isDrillSubmitted, setIsDrillSubmitted] = useState<boolean>(false);
   const [hasCopied, setHasCopied] = useState<boolean>(false);
 
+  const buildTemplateScenario = (tpl: EssayTemplate): string => {
+    const theme = tpl.theme;
+    if (/感性认识与理性认识|调查研究|认识运动/.test(theme)) return '某县推进乡村振兴时，工作人员先走访农户，记录不同村庄的产业条件、就业需求和公共服务短板；随后把访谈记录与统计数据分类比较，发现各村的主要问题并不相同，最终形成分村施策的方案。';
+    if (/矛盾的普遍性与特殊性|共性与个性|因地制宜|试点/.test(theme)) return '三个县都在发展乡村产业：山区县发展生态种植，历史文化资源丰富的县开发传统工艺，交通便利的县建设农产品加工基地。上级部门先总结试点经验，再根据各县条件调整方案，而不是要求所有地方照搬同一种做法。';
+    if (/问题导向|矛盾的普遍性|矛盾的客观性/.test(theme)) return '某市老旧小区改造中，居民反映停车、消防通道、加装电梯和公共空间使用等问题。工作组逐项调查、听取不同群体意见，区分轻重缓急，协调相关部门先解决影响安全和基本生活的突出矛盾。';
+    if (/真理的绝对性与相对性|守正创新|理论创新/.test(theme)) return '某研究团队坚持经过实践检验的基本原理，同时根据新数据和新实验结果修正原有模型，并在后续实践中继续检验。团队既没有把已有结论当作永远不能调整的教条，也没有因为出现新情况就全盘否定过去的认识。';
+    if (/实践与认识的辩证关系/.test(theme)) return '某医院试行新的分诊流程，先收集患者等候时间和医护人员反馈，再分析数据、调整流程；试运行效果得到验证后，医院把方案推广到其他科室，并继续根据实践效果改进。';
+    if (/人民群众|群众路线|人民立场/.test(theme)) return '某社区准备改造公共空间，工作人员先征求居民对老人休息、儿童活动和停车的意见，再组织居民代表讨论方案，并邀请群众参与监督。项目完成后，社区根据居民反馈继续调整设施布局。';
+    if (/主观能动性与客观规律性|尊重规律/.test(theme)) return '某地发展农业时，既没有因旱情就放弃生产，也没有不顾水资源条件盲目扩大种植面积，而是依据降水、土壤和灌溉能力调整作物结构，并组织农技人员指导农户。';
+    if (/科学技术|人工智能|大数据|科技/.test(theme)) return '某制造企业引入人工智能质检系统，提高了缺陷识别效率，同时制定数据安全、岗位培训和人工复核制度，避免把技术准确率当作唯一目标，并确保技术应用服务于劳动者和社会需要。';
+    if (/生态|人与自然|绿色发展/.test(theme)) return '某地过去依赖高耗能产业带动增长，随后出现水体污染和能源消耗过高的问题。当地逐步淘汰落后设备、修复生态环境、发展循环利用产业，并建立持续监测和问责机制。';
+    if (/两个结合|中华优秀传统文化|文化自信|文化主体性/.test(theme)) return '某地保护传统村落时，既修缮历史建筑、整理地方文献，也邀请青年设计师和非遗传承人开发当代展览与体验活动，让传统文化进入现代生活，而不是简单复刻旧形式。';
+    if (/高质量发展|中国式现代化/.test(theme)) return '某省不再只以经济增速评价发展，而是同时考察产业创新、就业质量、公共服务、资源消耗和生态保护，并通过技术改造、扩大就业和改善民生提升发展质量。';
+    if (/历史意义|遵义会议|革命/.test(theme)) return '在革命遭遇严重挫折、军事行动陷入危急的情况下，党内召开重要会议，纠正此前军事和组织路线上的错误，重新形成正确领导，革命局势由此发生关键转折。';
+    if (/旧民主主义革命|历史任务|失败原因/.test(theme)) return '近代中国一场革命运动动员了社会力量并冲击旧制度，但最终未能改变半殖民地半封建社会性质，也没有完成民族独立、人民解放的历史任务。研究者进一步从领导力量、指导思想和革命纲领等方面分析其局限。';
+    if (/人生价值|自我价值|社会价值/.test(theme)) return '一名基层医务工作者长期在偏远地区服务，帮助当地居民改善健康状况，同时在工作中提升专业能力。当地基层医疗条件逐步改善，也有更多年轻人加入服务队伍。';
+    if (/多边主义|人类命运共同体|全球治理|一带一路|全球倡议/.test(theme)) return '面对气候变化、公共卫生和地区冲突等跨国挑战，多国代表在国际会议上存在分歧，但仍通过平等协商、共享信息和协调行动寻找共同方案，并开展发展合作。';
+    if (/职业选择|职业道德/.test(theme)) return '一名毕业生在选择工作时，综合考虑自己的专业能力、个人发展和社会需求，了解到基层公共服务岗位急需人才后，主动参加相关岗位招聘，并持续提升职业技能。';
+    return '某地或某单位在推进相关工作时，发现既有做法无法完全解决当前问题。工作人员先调查实际情况、收集不同方面的反馈，再比较原因和条件，调整实施方案，并根据后续效果继续改进。材料中的具体做法和结果需要结合题目所考查的“' + theme + '”进行解释。';
+  };
+
+  const buildTemplatePrompt = (tpl: EssayTemplate): string => {
+    if (/为什么|原因|依据|基础/.test(tpl.triggerConditions)) return '结合材料，运用“' + tpl.theme + '”相关原理，分析材料中的做法为什么成立或必要。';
+    if (/意义|作用|价值/.test(tpl.triggerConditions + tpl.theme)) return '结合材料，运用“' + tpl.theme + '”相关知识，分析这一做法的意义和作用。';
+    if (/如何|怎样|怎么做|要求|启示/.test(tpl.triggerConditions)) return '结合材料，运用“' + tpl.theme + '”相关原理，说明应当怎样认识和处理材料中的问题。';
+    return '结合材料，运用“' + tpl.theme + '”相关原理，分析材料体现的理论依据，并说明材料事实与原理之间的联系。';
+  };
+
   // Keep the five high-quality sample drills, and generate a complete template-based practice
   // for every remaining template. Generated items are explicitly labelled as training scenarios,
   // never presented as verbatim official exam materials.
@@ -188,8 +216,8 @@ export const EssayDeconstructorView: React.FC<EssayDeconstructorViewProps> = ({
       questionNumber: tpl.questionNumber,
       subject: tpl.subject,
       theme: tpl.theme,
-      materialBackground: `【模板迁移训练情境｜非原卷逐字材料】\n本题依据资料中的题干触发条件与核心采分点整理，用于练习“题眼识别—理论定性—分层作答”。\n\n题干特征：${tpl.triggerConditions}\n\n作答提示：请先从题干提取关键词，再判断对应原理，不要只背结尾万能句。`,
-      questionPrompt: tpl.triggerConditions,
+      materialBackground: `【材料情境｜模板迁移训练，非原卷逐字材料】\n${buildTemplateScenario(tpl)}`,
+      questionPrompt: buildTemplatePrompt(tpl),
       step1Options: [
         {
           key: 'A',
