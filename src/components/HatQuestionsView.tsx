@@ -172,7 +172,13 @@ export const HatQuestionsView: React.FC<HatQuestionsViewProps> = ({
     setHasAnswered(true);
 
     if (isCorrect) {
-      recordReviewAttempt(activeQuestion.id, 'hat', 'easy');
+      const updatedReview = recordReviewAttempt(activeQuestion.id, 'hat', 'easy');
+      // During the wrong-review battle, keep the current item in this session's queue.
+      // The shared Ebbinghaus rule may auto-unmark after 3 consecutive correct answers;
+      // restore the mark here so the filtered list does not shift under the user's click.
+      if (isWrongReviewMode && !updatedReview.isMarkedRed) {
+        toggleMarkRed(activeQuestion.id, 'hat');
+      }
     } else {
       recordReviewAttempt(activeQuestion.id, 'hat', 'forgot');
     }
