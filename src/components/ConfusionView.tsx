@@ -2,10 +2,11 @@ import React, { useState } from 'react';
 import { Search, CheckCircle2, AlertTriangle, ArrowRight, BookOpen, SplitSquareVertical, Sparkles } from 'lucide-react';
 
 import { CONFUSION_DATA } from '../data/confusionMatrix';
+import { HAT_QUESTIONS } from '../data/hatQuestions';
 
 
 interface ConfusionViewProps {
-  onJumpToHatSearch: (term: string) => void;
+  onJumpToHatSearch: (term: string, questionId?: string) => void;
 }
 
 export const ConfusionView: React.FC<ConfusionViewProps> = ({ onJumpToHatSearch }) => {
@@ -90,7 +91,11 @@ export const ConfusionView: React.FC<ConfusionViewProps> = ({ onJumpToHatSearch 
 
       {/* Grid of Comparison Cards */}
       <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-        {filteredItems.map((item, idx) => (
+        {filteredItems.map((item, idx) => {
+          const matchedQuestion = (item.sourceQuestionId ? HAT_QUESTIONS.find((q) => q.id === item.sourceQuestionId) : undefined)
+            || HAT_QUESTIONS.find((q) => q.answer.trim() === item.targetAnswer.trim() && (q.subject === item.subject || item.subject.includes(q.subject)))
+            || HAT_QUESTIONS.find((q) => q.stem.includes(item.term) || item.term.includes(q.stem));
+          return (
           <div
             key={idx}
             className="p-5 rounded-2xl border border-stone-200 dark:border-stone-800 bg-white dark:bg-stone-900 hover:shadow-md transition-all flex flex-col justify-between"
@@ -125,15 +130,17 @@ export const ConfusionView: React.FC<ConfusionViewProps> = ({ onJumpToHatSearch 
 
             <div className="mt-4 pt-3 border-t border-stone-100 dark:border-stone-800 flex justify-end">
               <button
-                onClick={() => onJumpToHatSearch(item.targetAnswer)}
-                className="text-xs font-bold text-amber-700 dark:text-amber-400 hover:underline flex items-center gap-1"
+                onClick={() => onJumpToHatSearch(item.targetAnswer, matchedQuestion?.id)}
+                disabled={!matchedQuestion}
+                className={`text-xs font-bold flex items-center gap-1 ${matchedQuestion ? 'text-amber-700 dark:text-amber-400 hover:underline' : 'text-stone-400 cursor-not-allowed'}`}
               >
-                <span>在题库中专项练习此题</span>
+                <span>{matchedQuestion ? '直达对应原题' : '暂未关联对应题目'}</span>
                 <ArrowRight className="w-3.5 h-3.5" />
               </button>
             </div>
           </div>
-        ))}
+          );
+        })}
       </div>
 
       {filteredItems.length === 0 && (
