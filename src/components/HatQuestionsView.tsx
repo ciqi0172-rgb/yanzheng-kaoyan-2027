@@ -73,7 +73,7 @@ export const HatQuestionsView: React.FC<HatQuestionsViewProps> = ({
   const [selectedHat, setSelectedHat] = useState<HatKeywordType>('全部');
   const [searchQuery, setSearchQuery] = useState<string>(initialSearch);
   const [onlyRedMarked, setOnlyRedMarked] = useState<boolean>(startWrongReview);
-  const getQuizReview = (id: string) => reviews[getReviewKey(id, 'hat-quiz')] || reviews[id];
+  const getQuizReview = (id: string) => reviews[getReviewKey(id, 'hat-quiz')];
   const [isWrongReviewMode, setIsWrongReviewMode] = useState<boolean>(startWrongReview);
   // Freeze the wrong-review queue when the session starts. Review status changes after an answer
   // must not mutate the array currently indexed by cardIndex, or the user can be jumped to another item.
