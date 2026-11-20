@@ -38,6 +38,7 @@ interface HatQuestionsViewProps {
   onOpenConfusionModal: () => void;
   initialSearch?: string;
   startWrongReview?: boolean;
+  targetQuestionId?: string;
 }
 
 const SUBJECT_LIST: SubjectType[] = ['全部', '马原', '毛中特', '新思想', '史纲', '思修法治'];
@@ -66,6 +67,7 @@ export const HatQuestionsView: React.FC<HatQuestionsViewProps> = ({
   onOpenConfusionModal,
   initialSearch = '',
   startWrongReview = false,
+  targetQuestionId,
 }) => {
   const [selectedSubject, setSelectedSubject] = useState<SubjectType>('全部');
   const [selectedHat, setSelectedHat] = useState<HatKeywordType>('全部');
@@ -101,6 +103,7 @@ export const HatQuestionsView: React.FC<HatQuestionsViewProps> = ({
   // Filtered Questions
   const filteredQuestions = useMemo(() => {
     return questions.filter((q) => {
+      if (targetQuestionId && q.id !== targetQuestionId) return false;
       // Pending queue is a durable, visible collection of every record not yet eligible for four-choice practice.
       // Records needing answer verification are kept here too, clearly labeled by reason, never silently dropped.
       if (drillMode === 'pending' && fourChoiceReadyIds.has(q.id)) return false;
@@ -138,7 +141,7 @@ export const HatQuestionsView: React.FC<HatQuestionsViewProps> = ({
       }
       return true;
     });
-  }, [questions, selectedSubject, selectedHat, onlyRedMarked, onlyDueReview, searchQuery, reviews, drillMode, fourChoiceReadyIds, isWrongReviewMode, wrongReviewQueueIds]);
+  }, [questions, selectedSubject, selectedHat, onlyRedMarked, onlyDueReview, searchQuery, reviews, drillMode, fourChoiceReadyIds, isWrongReviewMode, wrongReviewQueueIds, targetQuestionId]);
 
   const activeQuestion: HatQuestion | undefined = filteredQuestions[cardIndex];
 
