@@ -29,6 +29,7 @@ export default function App() {
 
   // Cross-component jump search filter
   const [hatSearchQuery, setHatSearchQuery] = useState<string>('');
+  const [startWrongReview, setStartWrongReview] = useState<boolean>(false);
 
   // Dark mode
   const [darkMode, setDarkMode] = useState<boolean>(() => {
@@ -82,6 +83,8 @@ export default function App() {
   };
 
   const handleStartDrillWrong = () => {
+    setHatSearchQuery('');
+    setStartWrongReview(true);
     setActiveTab('exam');
   };
 
@@ -97,7 +100,10 @@ export default function App() {
       {/* Universal Header */}
       <Header
         activeTab={activeTab}
-        onSelectTab={setActiveTab}
+        onSelectTab={(tab) => {
+          setStartWrongReview(false);
+          setActiveTab(tab);
+        }}
         onOpenQuickQuiz={() => setIsQuickQuizOpen(true)}
         todayCount={todayCount}
         dueReviewCount={dueReviewCount}
@@ -125,6 +131,7 @@ export default function App() {
             onReviewUpdated={loadData}
             onOpenConfusionModal={() => setIsConfusionModalOpen(true)}
             initialSearch={hatSearchQuery}
+            startWrongReview={startWrongReview}
           />
         )}
 
