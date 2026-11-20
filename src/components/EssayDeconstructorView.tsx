@@ -1,6 +1,7 @@
 import React, { useState } from 'react';
 import { EssayDrillQuestion, EssayTemplate } from '../types';
 import { ESSAY_DRILLS } from '../data/essayDrills';
+import { ESSAY_SOURCE_KNOWLEDGE_DRILLS } from '../data/essaySourceKnowledgeDrills';
 import { 
   BookOpen, 
   Search, 
@@ -112,7 +113,7 @@ export const EssayDeconstructorView: React.FC<EssayDeconstructorViewProps> = ({
     // questions remain together. Preserve unmatched high-quality sample drills at the end of
     // their own subject group.
     const templateOrder = new Map(templates.map((tpl, index) => [tpl.id, index]));
-    return [...ESSAY_DRILLS, ...generated].sort((a, b) => {
+    return [...ESSAY_DRILLS, ...ESSAY_SOURCE_KNOWLEDGE_DRILLS, ...generated].sort((a, b) => {
       const subjectOrder = ['马原', '新思想', '史纲', '思修法治', '当代'];
       const subjectDiff = subjectOrder.indexOf(a.subject) - subjectOrder.indexOf(b.subject);
       if (subjectDiff !== 0) return subjectDiff;
@@ -232,12 +233,7 @@ ${currentDrill.fullScoringGuide.trapAvoidance}
           </div>
         </div>
 
-        <div className="flex flex-wrap justify-end gap-2 pt-2">
-          <a href={`${import.meta.env.BASE_URL}essay-knowledge-base.html`} target="_blank" rel="noreferrer" className="inline-flex items-center gap-2 rounded-lg border border-emerald-300 dark:border-emerald-800 bg-emerald-50 dark:bg-emerald-950/30 px-3 py-2 text-xs font-bold text-emerald-900 dark:text-emerald-200 hover:bg-emerald-100 dark:hover:bg-emerald-900/40">
-            <BookOpen className="w-3.5 h-3.5" />
-            打开大题全量知识库（原资料整合）
-            <ArrowRight className="w-3.5 h-3.5" />
-          </a>
+        <div className="flex justify-end pt-2">
           <a href={`${import.meta.env.BASE_URL}essay-coverage-audit.html`} target="_blank" rel="noreferrer" className="inline-flex items-center gap-2 rounded-lg border border-amber-300 dark:border-amber-800 bg-amber-50 dark:bg-amber-950/30 px-3 py-2 text-xs font-bold text-amber-900 dark:text-amber-200 hover:bg-amber-100 dark:hover:bg-amber-900/40">
             <FileText className="w-3.5 h-3.5" />
             查看历年真题覆盖核验报告
