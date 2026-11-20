@@ -37,6 +37,7 @@ interface FlashcardDeckViewProps {
   onReviewUpdated: () => void;
   onOpenConfusionModal: () => void;
   initialSubject?: SubjectType;
+  startWrongReview?: boolean;
 }
 
 const SUBJECT_LIST: SubjectType[] = ['全部', '马原', '毛中特', '新思想', '史纲', '思修法治'];
@@ -64,11 +65,14 @@ export const FlashcardDeckView: React.FC<FlashcardDeckViewProps> = ({
   onReviewUpdated,
   onOpenConfusionModal,
   initialSubject = '全部',
+  startWrongReview = false,
 }) => {
   const [selectedSubject, setSelectedSubject] = useState<SubjectType>(initialSubject);
   const [selectedHat, setSelectedHat] = useState<HatKeywordType>('全部');
   const [searchQuery, setSearchQuery] = useState<string>('');
-  const [onlyRedMarked, setOnlyRedMarked] = useState<boolean>(false);
+  const [onlyRedMarked, setOnlyRedMarked] = useState<boolean>(startWrongReview);
+  const getCardReview = (id: string) => reviews[getReviewKey(id, 'hat-card')] || reviews[id];
+  useEffect(() => { setOnlyRedMarked(startWrongReview); setCurrentIndex(0); }, [startWrongReview]);
   const [onlyDueReview, setOnlyDueReview] = useState<boolean>(false);
 
   const [currentIndex, setCurrentIndex] = useState<number>(0);
@@ -85,7 +89,7 @@ export const FlashcardDeckView: React.FC<FlashcardDeckViewProps> = ({
       if (selectedSubject !== '全部' && q.subject !== selectedSubject) return false;
       if (selectedHat !== '全部' && q.hatType !== selectedHat) return false;
       
-      const review = reviews[getReviewKey(q.id, 'hat-card')] || reviews[q.id];
+      const review = getCardReview(q.id);
       if (onlyRedMarked && !review?.isMarkedRed) return false;
       if (onlyDueReview) {
         const now = Date.now();
@@ -365,9 +369,9 @@ export const FlashcardDeckView: React.FC<FlashcardDeckViewProps> = ({
                 <span className="font-semibold text-stone-800 dark:text-stone-200">
                   卡片 {currentIndex + 1} / {filteredQuestions.length}
                 </span>
-                {reviews[getReviewKey(activeQuestion.id, 'hat-card')] || reviews[activeQuestion.id]?.level !== undefined && (
+                {getCardReview(activeQuestion.id)?.level !== undefined && (
                   <span className="text-[10px] px-2 py-0.5 rounded bg-stone-100 dark:bg-stone-800 text-stone-600 dark:text-stone-400">
-                    阶段 {reviews[getReviewKey(activeQuestion.id, 'hat-card')] || reviews[activeQuestion.id].level} · 错 {reviews[getReviewKey(activeQuestion.id, 'hat-card')] || reviews[activeQuestion.id].mistakeCount} 次
+                    阶段 {getCardReview(activeQuestion.id)!.level} · 错 {getCardReview(activeQuestion.id)!.mistakeCount} 次
                   </span>
                 )}
               </div>
@@ -383,13 +387,13 @@ export const FlashcardDeckView: React.FC<FlashcardDeckViewProps> = ({
                 <button
                   onClick={() => handleToggleRed(activeQuestion.id)}
                   className={`p-1.5 rounded-lg transition-colors ${
-                    reviews[getReviewKey(activeQuestion.id, 'hat-card')] || reviews[activeQuestion.id]?.isMarkedRed
+                    getCardReview(activeQuestion.id)?.isMarkedRed
                       ? 'text-rose-600 bg-rose-50 dark:bg-rose-950/60'
                       : 'text-stone-400 hover:text-stone-700 hover:bg-stone-100 dark:hover:bg-stone-800'
                   }`}
                   title="加入/移出重点标红错题本"
                 >
-                  <Bookmark className={`w-4 h-4 ${reviews[getReviewKey(activeQuestion.id, 'hat-card')] || reviews[activeQuestion.id]?.isMarkedRed ? 'fill-rose-600' : ''}`} />
+                  <Bookmark className={`w-4 h-4 ${getCardReview(activeQuestion.id)?.isMarkedRed ? 'fill-rose-600' : ''}`} />
                 </button>
               </div>
             </div>
@@ -397,7 +401,7 @@ export const FlashcardDeckView: React.FC<FlashcardDeckViewProps> = ({
             {/* The Flashcard Body */}
             <div
               className={`relative bg-white dark:bg-stone-900 rounded-3xl p-6 sm:p-9 border shadow-sm transition-all duration-300 ${
-                reviews[getReviewKey(activeQuestion.id, 'hat-card')] || reviews[activeQuestion.id]?.isMarkedRed
+                getCardReview(activeQuestion.id)?.isMarkedRed
                   ? 'border-rose-300 dark:border-rose-900/60 ring-1 ring-rose-200 dark:ring-rose-950'
                   : 'border-stone-200 dark:border-stone-800'
               }`}
