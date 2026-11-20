@@ -30,6 +30,8 @@ export default function App() {
   // Cross-component jump search filter
   const [hatSearchQuery, setHatSearchQuery] = useState<string>('');
   const [startWrongReview, setStartWrongReview] = useState<boolean>(false);
+  const [wrongReviewMode, setWrongReviewMode] = useState<'card' | 'quiz'>('quiz');
+  const [startCardWrongReview, setStartCardWrongReview] = useState<boolean>(false);
   const [targetQuestionId, setTargetQuestionId] = useState<string | undefined>(undefined);
 
   // Dark mode
@@ -83,10 +85,13 @@ export default function App() {
     }
   };
 
-  const handleStartDrillWrong = () => {
+  const handleStartDrillWrong = (mode: 'card' | 'quiz') => {
     setHatSearchQuery('');
-    setStartWrongReview(true);
-    setActiveTab('exam');
+    setTargetQuestionId(undefined);
+    setWrongReviewMode(mode);
+    setStartWrongReview(mode === 'quiz');
+    setStartCardWrongReview(mode === 'card');
+    setActiveTab(mode === 'quiz' ? 'exam' : 'flashcard');
   };
 
   const handleNavigateTab = (tab: TabKey, filterParam?: string) => {
@@ -103,6 +108,7 @@ export default function App() {
         activeTab={activeTab}
         onSelectTab={(tab) => {
           setStartWrongReview(false);
+          setStartCardWrongReview(false);
           setTargetQuestionId(undefined);
           setActiveTab(tab);
         }}
@@ -122,6 +128,7 @@ export default function App() {
             reviews={reviews}
             onReviewUpdated={loadData}
             onOpenConfusionModal={() => setIsConfusionModalOpen(true)}
+            startWrongReview={startCardWrongReview}
           />
         )}
 
