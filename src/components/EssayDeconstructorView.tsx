@@ -232,6 +232,14 @@ ${currentDrill.fullScoringGuide.trapAvoidance}
           </div>
         </div>
 
+        <div className="flex justify-end pt-2">
+          <a href={`${import.meta.env.BASE_URL}essay-coverage-audit.html`} target="_blank" rel="noreferrer" className="inline-flex items-center gap-2 rounded-lg border border-amber-300 dark:border-amber-800 bg-amber-50 dark:bg-amber-950/30 px-3 py-2 text-xs font-bold text-amber-900 dark:text-amber-200 hover:bg-amber-100 dark:hover:bg-amber-900/40">
+            <FileText className="w-3.5 h-3.5" />
+            查看历年真题覆盖核验报告
+            <ArrowRight className="w-3.5 h-3.5" />
+          </a>
+        </div>
+
         {/* First choose the subject; question tabs below are always scoped to that subject. */}
         <div className="flex flex-wrap items-center gap-2 pt-2 border-t border-stone-100 dark:border-stone-800">
           <span className="text-xs text-stone-400 shrink-0">先选科目：</span>
