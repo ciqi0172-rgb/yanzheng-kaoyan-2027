@@ -20,7 +20,7 @@ import {
   Zap,
   BarChart3
 } from 'lucide-react';
-import { recordReviewAttempt, toggleMarkRed } from '../services/ebbinghausStorage';
+import { recordReviewAttempt, toggleMarkRed, getReviewKey } from '../services/ebbinghausStorage';
 
 interface EbbinghausDashboardProps {
   reviews: Record<string, UserReviewItem>;
@@ -28,7 +28,7 @@ interface EbbinghausDashboardProps {
   todayCount: number;
   onReviewUpdated: () => void;
   onJumpToHatQuestion: (questionId: string) => void;
-  onStartDrillWrong: () => void;
+  onStartDrillWrong: (mode: 'card' | 'quiz') => void;
 }
 
 const SUBJECT_LIST: ('马原' | '毛中特' | '新思想' | '史纲' | '思修法治')[] = [
@@ -108,7 +108,7 @@ export const EbbinghausDashboard: React.FC<EbbinghausDashboardProps> = ({
       let redCount = 0;
 
       subjQuestions.forEach((q) => {
-        const rev = reviews[q.id];
+        const rev = reviews[getReviewKey(q.id, 'hat-card')] || reviews[getReviewKey(q.id, 'hat-quiz')] || reviews[q.id];
         if (rev && rev.totalAttempts > 0) {
           practiced++;
           if (rev.level >= 5) mastered++;
@@ -122,12 +122,12 @@ export const EbbinghausDashboard: React.FC<EbbinghausDashboardProps> = ({
   }, [hatQuestions, reviews]);
 
   const handleQuickResolve = (item: UserReviewItem, rating: 'easy' | 'forgot') => {
-    recordReviewAttempt(item.id, 'hat', rating);
+    recordReviewAttempt(item.id, item.type === 'hat-quiz' ? 'hat-quiz' : 'hat-card', rating);
     onReviewUpdated();
   };
 
   const handleToggleRed = (item: UserReviewItem) => {
-    toggleMarkRed(item.id, 'hat');
+    toggleMarkRed(item.id, item.type === 'hat-quiz' ? 'hat-quiz' : 'hat-card');
     onReviewUpdated();
   };
 
@@ -154,13 +154,19 @@ export const EbbinghausDashboard: React.FC<EbbinghausDashboardProps> = ({
           </div>
 
           <div className="flex items-center gap-2">
-            {redMarkedItems.length > 0 && (
+            {redMarkedItems.some((item) => item.type === 'hat-card' || item.type === 'hat') && (
+              <button onClick={() => onStartDrillWrong('card')} className="flex items-center gap-1.5 px-3.5 py-2 rounded-xl bg-amber-600 hover:bg-amber-500 text-white text-xs font-bold shadow-sm transition-all">
+                <Layers className="w-3.5 h-3.5" />
+                <span>卡片错题复习 ({redMarkedItems.filter((item) => item.type === 'hat-card' || item.type === 'hat').length})</span>
+              </button>
+            )}
+            {redMarkedItems.some((item) => item.type === 'hat-quiz' || item.type === 'hat') && (
               <button
-                onClick={onStartDrillWrong}
+                onClick={() => onStartDrillWrong('quiz')}
                 className="flex items-center gap-1.5 px-3.5 py-2 rounded-xl bg-rose-600 hover:bg-rose-500 text-white text-xs font-bold shadow-sm transition-all"
               >
                 <AlertOctagon className="w-3.5 h-3.5" />
-                <span>开启错题歼灭战 ({redMarkedItems.length})</span>
+                <span>选择题错题歼灭 ({redMarkedItems.filter((item) => item.type === 'hat-quiz' || item.type === 'hat').length})</span>
               </button>
             )}
 
