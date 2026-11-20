@@ -1,6 +1,7 @@
 import React, { useState } from 'react';
 import { EssayDrillQuestion, EssayTemplate } from '../types';
 import { ESSAY_DRILLS } from '../data/essayDrills';
+import { ESSAY_SOURCE_KNOWLEDGE_DRILLS } from '../data/essaySourceKnowledgeDrills';
 import { 
   BookOpen, 
   Search, 
