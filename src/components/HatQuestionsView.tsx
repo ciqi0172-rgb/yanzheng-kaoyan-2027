@@ -272,7 +272,7 @@ export const HatQuestionsView: React.FC<HatQuestionsViewProps> = ({
                 }`}
               >
                 <Grid className="w-3.5 h-3.5" />
-                <span>全题目清单</span>
+                <span>{startWrongReview ? '错题歼灭战' : '全题目清单'}</span>
               </button>
             </div>
           </div>
@@ -740,7 +740,7 @@ export const HatQuestionsView: React.FC<HatQuestionsViewProps> = ({
             </div>
           )}
           <div className="flex items-center justify-between text-xs text-stone-500">
-            <span>{drillMode === 'pending' ? `待处理 ${filteredQuestions.length} 道：按“答案待核验 / 待补干扰项”分别标记` : `找到 ${filteredQuestions.length} 道原文题目（含待核验记录）`}</span>
+            <span>{drillMode === 'pending' ? `待处理 ${filteredQuestions.length} 道：按“答案待核验 / 待补干扰项”分别标记` : startWrongReview ? `今日错题歼灭任务：${filteredQuestions.length} 道标红考点（含待核验记录）` : `找到 ${filteredQuestions.length} 道原文题目（含待核验记录）`}</span>
             <span>仅答案已核验且选项合格的题目可启动四选一模考</span>
           </div>
 
