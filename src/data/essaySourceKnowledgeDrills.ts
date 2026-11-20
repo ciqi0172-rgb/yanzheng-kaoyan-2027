@@ -31,7 +31,7 @@ export const ESSAY_SOURCE_KNOWLEDGE_DRILLS: EssayDrillQuestion[] = SOURCE_KNOWLE
     questionNumber,
     subject,
     theme: card.title,
-    materialBackground: '【原资料知识点整合练习｜非历年真题原卷】\\n来源：考研政治万能答题模板（17页，可以打印）· ' + card.page + '\\n\\n本题将原资料中的一个核心知识点转化为三步自测题，练习识别题眼、提取采分点并结合材料作答。\\n\\n知识点：' + card.title + '\\n题眼提示：' + card.trigger,
+    materialBackground: '【原资料知识点整合练习｜非历年真题原卷】\n来源：考研政治万能答题模板（17页，可以打印）· ' + card.page + '\n\n本题将原资料中的一个核心知识点转化为三步自测题，练习识别题眼、提取采分点并结合材料作答。\n\n知识点：' + card.title + '\n题眼提示：' + card.trigger,
     questionPrompt: card.trigger + ' 请围绕“' + card.title + '”完成点题定性、核心采分点回忆和方法论收尾。',
     step1Options: [
       { key: 'A', text: '本题应围绕“' + card.title + '”对应的学科原理或政策史实展开，先准确点题，再逐层解释材料中的具体体现。', isBest: true, scoreRationale: '【定性得分】直接命中本题知识主题，且要求将原理与材料建立对应关系。' },
