@@ -96,7 +96,8 @@ export const ConfusionView: React.FC<ConfusionViewProps> = ({ onJumpToHatSearch 
           const isQuizReady = (q: typeof HAT_QUESTIONS[number]) => !q.needsReview && !!q.answer.trim() && buildHatQuestionOptions(q, HAT_QUESTIONS).length === 4;
           const explicitQuestion = item.sourceQuestionId ? HAT_QUESTIONS.find((q) => q.id === item.sourceQuestionId && isQuizReady(q)) : undefined;
           const sameSubject = (q: typeof HAT_QUESTIONS[number]) => item.subject.split('/').some((subject) => q.subject === subject.trim());
-          const exactAnswerMatches = HAT_QUESTIONS.filter((q) => isQuizReady(q) && q.answer.trim() === item.targetAnswer.trim() && sameSubject(q));
+          const normalize = (value: string) => value.replace(/[\\s，。；：、“”‘’（）()【】《》]/g, '').toLowerCase();
+          const exactAnswerMatches = HAT_QUESTIONS.filter((q) => isQuizReady(q) && normalize(q.answer) === normalize(item.targetAnswer) && sameSubject(q));
           const termMatches = HAT_QUESTIONS.filter((q) => isQuizReady(q) && sameSubject(q) && (q.stem.trim() === item.term.trim() || q.stem.includes(item.term.trim())));
           const matchedQuestion = explicitQuestion || (exactAnswerMatches.length === 1 ? exactAnswerMatches[0] : undefined) || (termMatches.length === 1 ? termMatches[0] : undefined);
           return (
