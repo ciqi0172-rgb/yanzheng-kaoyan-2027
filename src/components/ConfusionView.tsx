@@ -3,6 +3,7 @@ import { Search, CheckCircle2, AlertTriangle, ArrowRight, BookOpen, SplitSquareV
 
 import { CONFUSION_DATA } from '../data/confusionMatrix';
 import { HAT_QUESTIONS } from '../data/hatQuestions';
+import { buildHatQuestionOptions } from '../services/quizGenerator';
 
 
 interface ConfusionViewProps {
@@ -92,10 +93,11 @@ export const ConfusionView: React.FC<ConfusionViewProps> = ({ onJumpToHatSearch 
       {/* Grid of Comparison Cards */}
       <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
         {filteredItems.map((item, idx) => {
-          const explicitQuestion = item.sourceQuestionId ? HAT_QUESTIONS.find((q) => q.id === item.sourceQuestionId) : undefined;
+          const isQuizReady = (q: typeof HAT_QUESTIONS[number]) => !q.needsReview && !!q.answer.trim() && buildHatQuestionOptions(q, HAT_QUESTIONS).length === 4;
+          const explicitQuestion = item.sourceQuestionId ? HAT_QUESTIONS.find((q) => q.id === item.sourceQuestionId && isQuizReady(q)) : undefined;
           const sameSubject = (q: typeof HAT_QUESTIONS[number]) => item.subject.split('/').some((subject) => q.subject === subject.trim());
-          const exactAnswerMatches = HAT_QUESTIONS.filter((q) => q.answer.trim() === item.targetAnswer.trim() && sameSubject(q));
-          const termMatches = HAT_QUESTIONS.filter((q) => sameSubject(q) && (q.stem.trim() === item.term.trim() || q.stem.includes(item.term.trim())));
+          const exactAnswerMatches = HAT_QUESTIONS.filter((q) => isQuizReady(q) && q.answer.trim() === item.targetAnswer.trim() && sameSubject(q));
+          const termMatches = HAT_QUESTIONS.filter((q) => isQuizReady(q) && sameSubject(q) && (q.stem.trim() === item.term.trim() || q.stem.includes(item.term.trim())));
           const matchedQuestion = explicitQuestion || (exactAnswerMatches.length === 1 ? exactAnswerMatches[0] : undefined) || (termMatches.length === 1 ? termMatches[0] : undefined);
           return (
           <div
