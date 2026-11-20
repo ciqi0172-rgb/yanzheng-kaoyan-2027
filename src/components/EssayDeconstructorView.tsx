@@ -464,7 +464,7 @@ ${currentDrill.fullScoringGuide.trapAvoidance}
 
             {/* Material Background text */}
             <div className="p-4 rounded-xl bg-stone-50 dark:bg-stone-850 border border-stone-200 dark:border-stone-800 text-xs sm:text-sm text-stone-800 dark:text-stone-200 leading-relaxed font-serif whitespace-pre-line">
-              {currentDrill.materialBackground}
+              {currentDrill.materialBackground.replace(/\\\\n/g, '\n').replace(/^【原资料知识点整合练习[^】]*】\\s*\\n?来源：[^\\n]*\\n?/u, '').replace(/【原资料知识点整合练习[^】]*】/g, '').trim()}
             </div>
 
             {/* Prompt */}
