@@ -13,7 +13,7 @@ const subjectMap: Record<string, string> = {
 };
 
 function makeCloze(point: string, keys: string, index: number) {
-  const candidates = keys.split(/\\s+/).filter((word) => word.length >= 2).sort((a, b) => b.length - a.length);
+  const candidates = keys.split(/\s+/).filter((word) => word.length >= 2).sort((a, b) => b.length - a.length);
   const matched = candidates.find((word) => point.includes(word));
   const answer = matched || point.slice(0, Math.min(8, Math.max(4, Math.floor(point.length / 3))));
   const position = point.indexOf(answer);
@@ -24,28 +24,57 @@ function makeCloze(point: string, keys: string, index: number) {
 export const ESSAY_SOURCE_KNOWLEDGE_DRILLS: EssayDrillQuestion[] = SOURCE_KNOWLEDGE.map((card, index) => {
   const subject = subjectMap[card.q] || '马原';
   const questionNumber = card.q.slice(0, 3) as EssayDrillQuestion['questionNumber'];
+  const sameSubject = SOURCE_KNOWLEDGE.filter((candidate) => candidate.q === card.q);
+  const localIndex = sameSubject.findIndex((candidate) => candidate.title === card.title);
+  const distractorCards = [
+    sameSubject[(localIndex + 1) % sameSubject.length],
+    sameSubject[(localIndex + 2) % sameSubject.length],
+  ].filter((candidate) => candidate && candidate.title !== card.title);
+  const firstPoint = card.points[0] || card.title;
+  const lastPoint = card.points[card.points.length - 1] || firstPoint;
   const corePoints = card.points.map((point: string, i: number) => makeCloze(point, card.keys, i));
+  const step1Options = [
+    {
+      key: 'A',
+      text: '本题考查“' + card.title + '”：' + firstPoint,
+      isBest: true,
+      scoreRationale: '【定性得分】准确对应本题题眼，并用资料中的专属知识点解释，而不是只写泛化结论。',
+    },
+    ...distractorCards.map((other, i) => ({
+      key: i === 0 ? 'B' : 'C',
+      text: '本题应主要从“' + other.title + '”展开：' + (other.points[0] || other.title),
+      isBest: false,
+      scoreRationale: '【辨析失分】这是同科目另一知识点“' + other.title + '”，不能替代本题要求的“' + card.title + '”。先抓设问关键词，再区分相近考点。',
+    })),
+  ];
+  const step3Options = [
+    {
+      key: 'A',
+      text: '回扣“' + card.title + '”：' + lastPoint + ' 因此，作答要将这一知识点落实到材料中的具体事实和设问要求，做到原理、材料与结论相互对应。',
+      isBest: true,
+      rationale: '【正确收束】结尾直接回扣本题的专属采分点，并要求结合材料，避免万能句脱离题意。',
+    },
+    {
+      key: 'B',
+      text: '结尾只需套用“这一问题具有重要意义，我们要努力奋斗、不断进步”，不必再回应“' + card.title + '”或材料细节。',
+      isBest: false,
+      rationale: '【失分原因】空泛结尾没有落到本题的专属知识点，不能替代材料分析和理论论证。',
+    },
+  ];
   return {
     id: 'source-knowledge-' + String(index + 1).padStart(2, '0'),
     templateId: 'source-knowledge-' + String(index + 1).padStart(2, '0'),
     questionNumber,
     subject,
     theme: card.title,
-    materialBackground: '【原资料知识点整合练习｜非历年真题原卷】\n来源：考研政治万能答题模板（17页，可以打印）· ' + card.page + '\n\n本题将原资料中的一个核心知识点转化为三步自测题，练习识别题眼、提取采分点并结合材料作答。\n\n知识点：' + card.title + '\n题眼提示：' + card.trigger,
-    questionPrompt: card.trigger + ' 请围绕“' + card.title + '”完成点题定性、核心采分点回忆和方法论收尾。',
-    step1Options: [
-      { key: 'A', text: '本题应围绕“' + card.title + '”对应的学科原理或政策史实展开，先准确点题，再逐层解释材料中的具体体现。', isBest: true, scoreRationale: '【定性得分】直接命中本题知识主题，且要求将原理与材料建立对应关系。' },
-      { key: 'B', text: '不必判断具体考点，只要写“坚持党的领导、努力奋斗、具有重要意义”等通用结尾即可。', isBest: false, scoreRationale: '【失分原因】空泛套话没有回应题眼，不能替代本题专属知识点。' },
-      { key: 'C', text: '只抄写材料现象，不写对应原理、政策依据或历史意义。', isBest: false, scoreRationale: '【失分原因】缺少理论定性与分析，不能形成完整论证。' },
-    ],
+    materialBackground: '【原资料知识点整合练习｜非历年真题原卷】\\n来源：考研政治万能答题模板（17页，可以打印）· ' + card.page + '\\n\\n本题将原资料中的完整核心知识点纳入原有三步作答格式。先辨认题眼，再逐条回忆采分点，最后结合材料收束。\\n\\n知识点：' + card.title + '\\n题眼提示：' + card.trigger,
+    questionPrompt: card.trigger + ' 请围绕“' + card.title + '”完成点题定性、核心采分点回忆和升华收尾。',
+    step1Options,
     step2ClozeDrills: corePoints,
-    step3Options: [
-      { key: 'A', text: '作答时应回扣材料，结合“' + card.title + '”的具体要求提出针对性认识或实践路径，避免把万能结尾机械套在所有题目上。', isBest: true, rationale: '【方法论收束】把本题知识点落实到材料与设问，形成论证闭环。' },
-      { key: 'B', text: '因此，只要重视这一问题，就一定能够自动解决所有实际困难。', isBest: false, rationale: '【失分原因】绝对化、空泛化，缺少具体条件和行动路径。' },
-    ],
+    step3Options,
     fullScoringGuide: {
-      standardPoints: ['【定性点题】' + card.title, ...card.points.map((point: string) => '【核心采分点】' + point), '【材料回扣】' + card.trigger],
-      trapAvoidance: card.trap + ' 本题来源于原资料知识点整理，不是历年真题原卷逐字题干；考场必须根据实际材料调整表述。',
+      standardPoints: ['【定性点题】' + card.title, ...card.points.map((point: string) => '【核心采分点】' + point), '【题眼回扣】' + card.trigger],
+      trapAvoidance: card.trap + ' 本题是原资料知识点整合练习，不是历年真题原卷逐字题干；正式作答时须结合题目材料调整。',
     },
   };
 });
