@@ -24,6 +24,10 @@ export const EBBINGHAUS_INTERVALS_MS = [
   360 * 60 * 60 * 1000,
 ];
 
+export function getReviewKey(itemId: string, itemType: UserReviewItem['type']): string {
+  return itemType === 'hat' || itemType === 'clinical' ? itemId : `${itemType}:${itemId}`;
+}
+
 export function getStoredReviews(): Record<string, UserReviewItem> {
   try {
     const raw = localStorage.getItem(STORAGE_KEY);
@@ -51,11 +55,13 @@ export function saveStoredReviews(data: Record<string, UserReviewItem>): void {
  */
 export function recordReviewAttempt(
   itemId: string,
-  itemType: 'hat' | 'clinical',
+  itemType: UserReviewItem['type'],
   rating: 'easy' | 'fuzzy' | 'forgot'
 ): UserReviewItem {
   const reviews = getStoredReviews();
-  const existing = reviews[itemId] || {
+  const reviewKey = getReviewKey(itemId, itemType);
+  // Legacy untyped hat records remain available as a fallback for card review only.
+  const existing = reviews[reviewKey] || (itemType === 'hat-card' ? reviews[itemId] : undefined) || {
     id: itemId,
     type: itemType,
     level: 0,
@@ -106,15 +112,16 @@ export function recordReviewAttempt(
     lastRating: rating,
   };
 
-  reviews[itemId] = updatedItem;
+  reviews[reviewKey] = updatedItem;
   saveStoredReviews(reviews);
   updateTodayStudyCount();
   return updatedItem;
 }
 
-export function toggleMarkRed(itemId: string, itemType: 'hat' | 'clinical'): boolean {
+export function toggleMarkRed(itemId: string, itemType: UserReviewItem['type']): boolean {
   const reviews = getStoredReviews();
-  const existing = reviews[itemId] || {
+  const reviewKey = getReviewKey(itemId, itemType);
+  const existing = reviews[reviewKey] || (itemType === 'hat-card' ? reviews[itemId] : undefined) || {
     id: itemId,
     type: itemType,
     level: 0,
@@ -128,7 +135,7 @@ export function toggleMarkRed(itemId: string, itemType: 'hat' | 'clinical'): boo
   };
 
   existing.isMarkedRed = !existing.isMarkedRed;
-  reviews[itemId] = existing;
+  reviews[reviewKey] = existing;
   saveStoredReviews(reviews);
   return existing.isMarkedRed;
 }
