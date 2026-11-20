@@ -75,7 +75,7 @@ export const HatQuestionsView: React.FC<HatQuestionsViewProps> = ({
   const [onlyDueReview, setOnlyDueReview] = useState<boolean>(false);
 
   // Drill Mode: 'exam' (Real 4-choice question) vs 'recall' (Blank/Active recall) vs 'grid' (All questions)
-  const [drillMode, setDrillMode] = useState<'exam' | 'recall' | 'grid' | 'pending'>(startWrongReview ? 'grid' : 'exam');
+  const [drillMode, setDrillMode] = useState<'exam' | 'recall' | 'grid' | 'pending'>('exam');
   const [cardIndex, setCardIndex] = useState<number>(0);
   const [selectedOptionKey, setSelectedOptionKey] = useState<string | null>(null);
   const [hasAnswered, setHasAnswered] = useState<boolean>(false);
@@ -201,6 +201,31 @@ export const HatQuestionsView: React.FC<HatQuestionsViewProps> = ({
 
   return (
     <div className="space-y-6">
+      {isWrongReviewMode && (
+        <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-3 rounded-xl border border-rose-200 bg-rose-50 dark:bg-rose-950/30 dark:border-rose-900 p-3">
+          <div>
+            <div className="text-sm font-bold text-rose-800 dark:text-rose-200">错题歼灭战 · 四选一重做</div>
+            <div className="text-xs text-rose-700 dark:text-rose-300 mt-1">当前只显示已标红且具备完整四选一选项的题目。原始完整题库仍保留在普通做题模式中。</div>
+          </div>
+          <button
+            onClick={() => {
+              setIsWrongReviewMode(false);
+              setOnlyRedMarked(false);
+              setOnlyDueReview(false);
+              setSearchQuery('');
+              setSelectedSubject('全部');
+              setSelectedHat('全部');
+              setCardIndex(0);
+              setSelectedOptionKey(null);
+              setHasAnswered(false);
+              setDrillMode('exam');
+            }}
+            className="shrink-0 px-3 py-2 rounded-lg bg-white dark:bg-stone-900 border border-rose-300 dark:border-rose-800 text-xs font-bold text-rose-700 dark:text-rose-200"
+          >
+            退出专项，恢复正常题库
+          </button>
+        </div>
+      )}
       {/* Top Banner & Control Deck */}
       <div className="bg-white dark:bg-stone-900 rounded-2xl p-5 border border-stone-200 dark:border-stone-800 shadow-sm space-y-4">
         <div className="flex flex-col lg:flex-row lg:items-center justify-between gap-4">
