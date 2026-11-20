@@ -4,6 +4,119 @@ import { ESSAY_DRILLS } from '../data/essayDrills';
 import { ESSAY_SOURCE_KNOWLEDGE_DRILLS } from '../data/essaySourceKnowledgeDrills';
 import essaySourcePagesText from '../../all_17_pages_templates.txt?raw';
 
+
+type PromptFocusOption = { key: string; text: string; correct: boolean; reason: string };
+type PromptFocusCase = {
+  id: string; subject: string; theme: string; material: string; prompt: string;
+  clue: string; options: PromptFocusOption[]; answerScope: string; avoid: string;
+};
+const PROMPT_FOCUS_CASES: PromptFocusCase[] = [
+  {
+    id:'focus-1', subject:'马原', theme:'材料信息多，设问范围窄',
+    material:'某地推进乡村振兴，干部先走访农户、记录不同村庄的产业条件和就业需求，再对大量信息进行归纳比较，发现各村发展瓶颈并不相同，最终制定差异化方案。材料还提到当地收入增长、环境改善和基层治理能力提升。',
+    prompt:'运用认识论原理，说明调查研究为什么不能停留在收集材料的层面。',
+    clue:'“运用认识论原理”限定学科；“不能停留在……层面”要求解释从收集感性材料到形成理性认识的过程。',
+    options:[
+      {key:'A',text:'重点论述乡村振兴的意义、共同富裕和基层治理现代化。',correct:false,reason:'这些是材料涉及的成果，但没有直接回答“调查研究不能停留在哪、还要完成什么认识过程”。'},
+      {key:'B',text:'围绕感性认识与理性认识的关系，说明获取丰富真实材料后，还要经过分析综合和科学抽象，把握事物本质与规律。',correct:true,reason:'紧扣“认识论”“不能停留在收集材料”，把材料行为翻译成理论过程，并解释为什么。'},
+      {key:'C',text:'只写实践是认识的来源，实践是检验真理的唯一标准。',correct:false,reason:'实践与认识相关，但只罗列实践的地位，漏掉题目特别强调的“收集材料之后还要做什么”。'}
+    ],
+    answerScope:'主线：感性认识→理性认识。①调查实践提供丰富、真实的感性材料；②运用理性思维加工材料，去粗取精、去伪存真、由此及彼、由表及里；③形成对本质和规律的认识。可点到实践是认识的基础，但不能用“实践的作用”替代核心论证。',
+    avoid:'不要把收入增长、环境改善等材料结果写成主体；不要只背实践决定认识的几个分句，却不解释认识如何深化。'
+  },
+  {
+    id:'focus-2', subject:'马原', theme:'相近原理辨析',
+    material:'某城市治理交通拥堵，先在两个街区试行错峰通行，根据反馈调整方案，再逐步推广。不同城区因道路条件、人口密度不同，采用了不同措施。材料还提到市民参与和数字技术支持。',
+    prompt:'结合材料，说明为什么治理方案不能简单照搬其他地区的经验。',
+    clue:'“为什么不能简单照搬”是判断依据；“不同地区条件不同”指向共性与个性、普遍性与特殊性的关系及具体问题具体分析。',
+    options:[
+      {key:'A',text:'主要论述科技革命推动生产方式变革，数字技术促进社会进步。',correct:false,reason:'数字技术只是材料中的辅助信息，设问问的是不能照搬经验的原因。'},
+      {key:'B',text:'围绕矛盾普遍性与特殊性的辩证关系，说明一般经验具有借鉴价值，但矛盾的具体特点不同，必须具体问题具体分析。',correct:true,reason:'直接解释“不能照搬”，也兼顾了经验可借鉴与方案需调整两面。'},
+      {key:'C',text:'重点写人民群众是历史的创造者，因此治理必须依靠群众。',correct:false,reason:'群众参与有意义，但不能直接解释不同地区为何不能使用完全相同的方案。'}
+    ],
+    answerScope:'主线：矛盾的普遍性与特殊性相统一。①不同地区都存在治理问题，具有共性；②道路、人口等条件不同，矛盾有特殊性；③借鉴一般经验必须结合本地实际，具体问题具体分析。',
+    avoid:'不要因为材料出现“群众”“数字技术”就转写群众史观或科技作用；先回答设问中的“为什么不能照搬”。'
+  },
+  {
+    id:'focus-3', subject:'新思想', theme:'问“成就原因”还是“未来怎么做”',
+    material:'新时代以来，某地推进产业升级、改善民生、加强生态保护，发展质量不断提高。报道还介绍了当地下一阶段将深化改革、扩大开放、加强人才培养的计划。',
+    prompt:'结合新时代发展成就，分析我国推动高质量发展的制度优势和根本保证。',
+    clue:'动词“分析”要求解释原因；“制度优势和根本保证”限定答案方向。材料末尾的未来计划不是本题主问。',
+    options:[
+      {key:'A',text:'列出深化改革、扩大开放、培养人才等下一阶段措施。',correct:false,reason:'这些是材料中的未来计划，但设问问的是成就背后的制度优势和根本保证，不是提出措施。'},
+      {key:'B',text:'围绕党的领导、中国特色社会主义制度优势以及以人民为中心的发展思想，结合材料解释发展成就的制度和领导保障。',correct:true,reason:'对应“制度优势和根本保证”，既有理论判断，也需要联系材料说明。'},
+      {key:'C',text:'只写高质量发展是全面建设社会主义现代化国家的首要任务。',correct:false,reason:'这句话重要，但它是对发展任务的定位，不能完整回答“制度优势和根本保证”的原因分析。'}
+    ],
+    answerScope:'主线是“为什么能够取得发展成就”。先明确党的领导是根本保证，再结合中国特色社会主义制度优势和以人民为中心的发展思想解释材料。可简要点明高质量发展的重要性，但不能把答案主体写成未来举措清单。',
+    avoid:'看到材料中“下一阶段”不要自动答“怎么做”；要以题干的“成就”“制度优势”“根本保证”为准。'
+  },
+  {
+    id:'focus-4', subject:'新思想', theme:'“是什么、为什么、怎么做”不能混答',
+    material:'某地保护传统村落，修缮历史建筑、整理地方文献、培养非遗传承人，同时利用数字平台传播传统文化。当地也引入现代设计，使传统技艺进入当代生活。',
+    prompt:'结合材料，说明推动中华优秀传统文化创造性转化、创新性发展的重要意义。',
+    clue:'“说明……重要意义”问价值和作用；材料中的具体措施可作为例证，但不是要求你逐条提出工作方案。',
+    options:[
+      {key:'A',text:'说明创造性转化、创新性发展有利于激活传统文化生命力、满足人民精神文化需求、增强文化自信，并结合材料举例。',correct:true,reason:'“重要意义”要求回答价值和作用，材料例子用于支撑观点。'},
+      {key:'B',text:'按步骤写修缮建筑、整理文献、培养传承人、建设数字平台的操作流程。',correct:false,reason:'这回答的是“具体怎么做”，没有回答题干所问的“意义”。'},
+      {key:'C',text:'只讨论文化产业能增加就业、带动旅游收入。',correct:false,reason:'经济效益可以作为一个相关方面，但不能缩窄为单一经济收益，忽略文化传承与文化自信。'}
+    ],
+    answerScope:'主线是文化传承创新的意义：激活中华优秀传统文化生命力、满足人民精神文化需求、增强文化自信和文化主体性、推动文化繁荣发展。用修缮、传承、数字传播等材料对应说明即可。',
+    avoid:'“意义”题不要写成纯措施题；也不要只写旅游收入，把文化价值缩成经济价值。'
+  },
+  {
+    id:'focus-5', subject:'史纲', theme:'历史评价要抓评价对象',
+    material:'近代中国面临民族独立和人民解放的历史任务。某次旧民主主义革命动员了群众、冲击了封建统治，但由于缺乏先进阶级领导和科学理论指导，最终未能改变中国半殖民地半封建社会的性质。材料还介绍了当时一些思想文化变化。',
+    prompt:'结合材料，分析旧民主主义革命不能完成反帝反封建历史任务的原因。',
+    clue:'“不能完成……的原因”要求解释失败原因，不是概述全部历史贡献，也不是只评价思想文化变化。',
+    options:[
+      {key:'A',text:'全面赞扬其历史贡献，重点写它推动思想解放和群众觉醒。',correct:false,reason:'贡献相关，但题目明确要求分析“不能完成历史任务的原因”，不能只写积极意义。'},
+      {key:'B',text:'围绕领导阶级、指导思想、群众基础和革命道路等局限，解释旧民主主义革命失败的历史原因，并联系半殖民地半封建社会国情。',correct:true,reason:'直接回应“原因”，并把失败原因与革命所处的历史条件联系起来。'},
+      {key:'C',text:'直接转入论述新时代中国式现代化取得的成就。',correct:false,reason:'属于后来的历史阶段，与本题评价对象和时间范围不符。'}
+    ],
+    answerScope:'主线是失败原因：旧式阶级力量及其局限、缺乏先进阶级及其政党领导、缺乏科学理论指导、未能提出彻底的反帝反封建纲领等。具体表述应以所问革命和教材对应结论为准。',
+    avoid:'不要把“有历史贡献”误当成“成功完成历史任务”；注意区分历史作用与失败原因，不能跳到当代成就。'
+  },
+  {
+    id:'focus-6', subject:'史纲', theme:'问“历史意义”不等于问“经验启示”',
+    material:'中国共产党在探索革命道路的过程中，经历过挫折，也不断总结经验。遵义会议在危急关头纠正了错误军事和组织路线，确立了正确领导，推动中国革命转危为安。材料还提到此后革命力量不断发展。',
+    prompt:'说明遵义会议在中国革命史上的历史地位和意义。',
+    clue:'核心词是“历史地位和意义”；可写转折作用和领导集体形成，但不要把答案全部写成一般性的青年启示或做法。',
+    options:[
+      {key:'A',text:'重点写今天青年要坚定理想信念、勇于担当。',correct:false,reason:'价值导向正确，但不是遵义会议的历史地位和意义。'},
+      {key:'B',text:'指出遵义会议在危急关头挽救党、挽救红军、挽救中国革命，是党历史上生死攸关的转折点，并说明其对独立自主解决中国革命实际问题的意义。',correct:true,reason:'直接围绕历史地位与意义组织答案，内容对象和历史阶段匹配。'},
+      {key:'C',text:'只写会议召开的大致时间，不展开其历史作用。',correct:false,reason:'时间只是背景信息，不能替代题目要求的“地位和意义”。'}
+    ],
+    answerScope:'围绕会议本身的历史地位、转折意义、独立自主解决中国革命实际问题的意义展开。最后可以概括历史经验，但不能用泛泛启示替代史实评价。',
+    avoid:'题目问历史意义，不要只背时间；也不要把任何历史题都收尾成“青年要努力奋斗”。'
+  },
+  {
+    id:'focus-7', subject:'思修法治', theme:'个人价值与社会价值要按设问取舍',
+    material:'一名基层医务工作者长期在偏远地区工作，改善当地居民的健康状况，也在工作中不断提升专业能力。报道同时提到他获得荣誉、收入有所提高，并带动更多年轻人参与基层服务。',
+    prompt:'结合材料，说明怎样理解人生的自我价值与社会价值的辩证关系。',
+    clue:'“辩证关系”要求两个方面及其关系，不能只谈奉献，也不能只谈个人成长或荣誉回报。',
+    options:[
+      {key:'A',text:'只写人生价值在于奉献社会，个人需要无条件牺牲自己的需要。',correct:false,reason:'把社会价值绝对化，忽略自我价值，也把二者关系写成单向牺牲。'},
+      {key:'B',text:'说明人生自我价值和社会价值相互联系、相互促进；社会价值是实现自我价值的重要基础，个人也在服务社会中发展能力、实现自身价值。',correct:true,reason:'回应“辩证关系”，同时结合专业成长与服务居民两类材料信息。'},
+      {key:'C',text:'主要论述荣誉和收入是衡量人生价值的唯一标准。',correct:false,reason:'荣誉和收入不是衡量人生价值的唯一标准，且忽略了社会贡献与人的全面发展。'}
+    ],
+    answerScope:'主线是自我价值与社会价值的辩证统一：个人通过劳动和社会实践满足自身合理需要、发展能力，同时创造社会价值；社会价值的实现与社会条件、社会贡献密切相关。结合材料分别落到专业成长和改善居民健康。',
+    avoid:'不要把社会价值写成无条件自我牺牲；不要把收入、荣誉当作唯一尺度。'
+  },
+  {
+    id:'focus-8', subject:'当代', theme:'全球倡议与共同体理念不能混成空话',
+    material:'面对气候变化、地区冲突、发展不平衡等全球性挑战，中国提出加强对话协商、推进发展合作、促进文明交流，并参与多边机制。不同国家对具体议题存在分歧，但越来越多国家希望通过合作寻找共同利益。',
+    prompt:'结合材料，说明推动构建人类命运共同体为什么需要坚持真正的多边主义。',
+    clue:'“为什么需要”问必要性和作用；“真正的多边主义”是设问中心，全球挑战和合作实践是论据。',
+    options:[
+      {key:'A',text:'只罗列三大全球倡议的名称，不解释它们与多边主义的关系。',correct:false,reason:'倡议名称可能相关，但题目要求解释坚持多边主义的必要性，罗列名称不能形成论证。'},
+      {key:'B',text:'从全球性挑战具有跨国性、单边行动难以有效应对、平等协商与合作有助于汇聚共识和维护共同利益等方面展开，并联系构建人类命运共同体。',correct:true,reason:'围绕“为什么需要多边主义”给出因果链，并把论证落回共同体目标。'},
+      {key:'C',text:'主要介绍中国经济增长和科技创新成就。',correct:false,reason:'中国发展成就不是本题设问的中心，不能替代对多边主义的解释。'}
+    ],
+    answerScope:'主线：全球性问题相互关联、任何国家难以独善其身；单边主义不利于解决共同挑战；真正的多边主义强调平等协商、国际合作和共同利益，有助于完善全球治理、推动构建人类命运共同体。',
+    avoid:'不要把“全球治理”题写成中国成就罗列；不要只写倡议名称而缺少“挑战—合作必要性—共同体目标”的解释链。'
+  }
+];
+
 const ESSAY_SOURCE_PAGES = Array.from(
   essaySourcePagesText.matchAll(/={10} PAGE (\d+) ={10}\s*\n([\s\S]*?)(?=\n={10} PAGE \d+ ={10}|$)/g),
 ).map((match) => {
@@ -40,7 +153,11 @@ export const EssayDeconstructorView: React.FC<EssayDeconstructorViewProps> = ({
 }) => {
   const [activeSubject, setActiveSubject] = useState<string>('马原');
   const [activeDrillIndex, setActiveDrillIndex] = useState<number>(0);
-  const [activeMode, setActiveMode] = useState<'drill' | 'reference'>('drill');
+  const [activeMode, setActiveMode] = useState<'drill' | 'reference' | 'focus'>('drill');
+  const [focusIndex, setFocusIndex] = useState(0);
+  const [focusSelectedKey, setFocusSelectedKey] = useState<string | null>(null);
+  const [focusSubmitted, setFocusSubmitted] = useState(false);
+  const currentFocusCase = PROMPT_FOCUS_CASES[focusIndex];
   
   // Interactive Drill State
   const [step1SelectedKey, setStep1SelectedKey] = useState<string | null>(null);
@@ -226,6 +343,18 @@ ${currentDrill.fullScoringGuide.trapAvoidance}
             >
               <Zap className="w-3.5 h-3.5" />
               <span>历年真题主题训练</span>
+            </button>
+
+            <button
+              onClick={() => setActiveMode('focus')}
+              className={`flex items-center gap-1.5 px-3 py-1.5 rounded-lg font-medium transition-all ${
+                activeMode === 'focus'
+                  ? 'bg-amber-600 text-white font-bold shadow-xs'
+                  : 'text-stone-600 dark:text-stone-400'
+              }`}
+            >
+              <Search className="w-3.5 h-3.5" />
+              <span>题眼提取训练</span>
             </button>
 
             <button
