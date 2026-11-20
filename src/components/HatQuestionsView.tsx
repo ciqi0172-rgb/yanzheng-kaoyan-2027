@@ -37,6 +37,7 @@ interface HatQuestionsViewProps {
   onReviewUpdated: () => void;
   onOpenConfusionModal: () => void;
   initialSearch?: string;
+  startWrongReview?: boolean;
 }
 
 const SUBJECT_LIST: SubjectType[] = ['全部', '马原', '毛中特', '新思想', '史纲', '思修法治'];
@@ -64,15 +65,16 @@ export const HatQuestionsView: React.FC<HatQuestionsViewProps> = ({
   onReviewUpdated,
   onOpenConfusionModal,
   initialSearch = '',
+  startWrongReview = false,
 }) => {
   const [selectedSubject, setSelectedSubject] = useState<SubjectType>('全部');
   const [selectedHat, setSelectedHat] = useState<HatKeywordType>('全部');
   const [searchQuery, setSearchQuery] = useState<string>(initialSearch);
-  const [onlyRedMarked, setOnlyRedMarked] = useState<boolean>(false);
+  const [onlyRedMarked, setOnlyRedMarked] = useState<boolean>(startWrongReview);
   const [onlyDueReview, setOnlyDueReview] = useState<boolean>(false);
 
   // Drill Mode: 'exam' (Real 4-choice question) vs 'recall' (Blank/Active recall) vs 'grid' (All questions)
-  const [drillMode, setDrillMode] = useState<'exam' | 'recall' | 'grid' | 'pending'>('exam');
+  const [drillMode, setDrillMode] = useState<'exam' | 'recall' | 'grid' | 'pending'>(startWrongReview ? 'grid' : 'exam');
   const [cardIndex, setCardIndex] = useState<number>(0);
   const [selectedOptionKey, setSelectedOptionKey] = useState<string | null>(null);
   const [hasAnswered, setHasAnswered] = useState<boolean>(false);
