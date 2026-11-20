@@ -72,6 +72,13 @@ export const HatQuestionsView: React.FC<HatQuestionsViewProps> = ({
   const [searchQuery, setSearchQuery] = useState<string>(initialSearch);
   const [onlyRedMarked, setOnlyRedMarked] = useState<boolean>(startWrongReview);
   const [isWrongReviewMode, setIsWrongReviewMode] = useState<boolean>(startWrongReview);
+  // Freeze the wrong-review queue when the session starts. Review status changes after an answer
+  // must not mutate the array currently indexed by cardIndex, or the user can be jumped to another item.
+  const [wrongReviewQueueIds, setWrongReviewQueueIds] = useState<string[]>(() =>
+    startWrongReview
+      ? questions.filter(q => !q.needsReview && !!q.answer.trim() && !!reviews[q.id]?.isMarkedRed).map(q => q.id)
+      : []
+  );
   const [onlyDueReview, setOnlyDueReview] = useState<boolean>(false);
 
   // Drill Mode: 'exam' (Real 4-choice question) vs 'recall' (Blank/Active recall) vs 'grid' (All questions)
@@ -109,7 +116,10 @@ export const HatQuestionsView: React.FC<HatQuestionsViewProps> = ({
         return false;
       }
       const review = reviews[q.id];
-      if (onlyRedMarked && !review?.isMarkedRed) {
+      if (isWrongReviewMode) {
+        // Use the session snapshot, not the live red-mark flag. The queue remains stable while answers update.
+        if (!wrongReviewQueueIds.includes(q.id)) return false;
+      } else if (onlyRedMarked && !review?.isMarkedRed) {
         return false;
       }
       if (onlyDueReview) {
@@ -128,7 +138,7 @@ export const HatQuestionsView: React.FC<HatQuestionsViewProps> = ({
       }
       return true;
     });
-  }, [questions, selectedSubject, selectedHat, onlyRedMarked, onlyDueReview, searchQuery, reviews, drillMode, fourChoiceReadyIds]);
+  }, [questions, selectedSubject, selectedHat, onlyRedMarked, onlyDueReview, searchQuery, reviews, drillMode, fourChoiceReadyIds, isWrongReviewMode, wrongReviewQueueIds]);
 
   const activeQuestion: HatQuestion | undefined = filteredQuestions[cardIndex];
 
@@ -216,6 +226,7 @@ export const HatQuestionsView: React.FC<HatQuestionsViewProps> = ({
           <button
             onClick={() => {
               setIsWrongReviewMode(false);
+              setWrongReviewQueueIds([]);
               setOnlyRedMarked(false);
               setOnlyDueReview(false);
               setSearchQuery('');
