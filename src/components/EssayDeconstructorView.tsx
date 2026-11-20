@@ -1,7 +1,6 @@
 import React, { useState } from 'react';
 import { EssayDrillQuestion, EssayTemplate } from '../types';
 import { ESSAY_DRILLS } from '../data/essayDrills';
-import { ESSAY_SOURCE_KNOWLEDGE_DRILLS } from '../data/essaySourceKnowledgeDrills';
 import { 
   BookOpen, 
   Search, 
@@ -32,6 +31,7 @@ export const EssayDeconstructorView: React.FC<EssayDeconstructorViewProps> = ({
   const [activeSubject, setActiveSubject] = useState<string>('马原');
   const [activeDrillIndex, setActiveDrillIndex] = useState<number>(0);
   const [activeMode, setActiveMode] = useState<'drill' | 'reference'>('drill');
+  const [referenceSection, setReferenceSection] = useState<'templates' | 'source'>('templates');
   
   // Interactive Drill State
   const [step1SelectedKey, setStep1SelectedKey] = useState<string | null>(null);
@@ -113,7 +113,7 @@ export const EssayDeconstructorView: React.FC<EssayDeconstructorViewProps> = ({
     // questions remain together. Preserve unmatched high-quality sample drills at the end of
     // their own subject group.
     const templateOrder = new Map(templates.map((tpl, index) => [tpl.id, index]));
-    return [...ESSAY_DRILLS, ...ESSAY_SOURCE_KNOWLEDGE_DRILLS, ...generated].sort((a, b) => {
+    return [...ESSAY_DRILLS, ...generated].sort((a, b) => {
       const subjectOrder = ['马原', '新思想', '史纲', '思修法治', '当代'];
       const subjectDiff = subjectOrder.indexOf(a.subject) - subjectOrder.indexOf(b.subject);
       if (subjectDiff !== 0) return subjectDiff;
@@ -547,7 +547,14 @@ ${currentDrill.fullScoringGuide.trapAvoidance}
 
       {/* MODE 2: QUICK REFERENCE MODE (Templates view) */}
       {activeMode === 'reference' && (
-        <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+        <div className="space-y-4">
+          <div className="flex flex-wrap items-center gap-2">
+            <button onClick={() => setReferenceSection('templates')} className={`px-3 py-2 rounded-lg text-xs font-bold ${referenceSection === 'templates' ? 'bg-amber-600 text-white' : 'bg-stone-100 dark:bg-stone-800 text-stone-600 dark:text-stone-300'}`}>原有模板速查</button>
+            <button onClick={() => setReferenceSection('source')} className={`px-3 py-2 rounded-lg text-xs font-bold ${referenceSection === 'source' ? 'bg-amber-600 text-white' : 'bg-stone-100 dark:bg-stone-800 text-stone-600 dark:text-stone-300'}`}>原资料全量知识点（按科目）</button>
+            <span className="text-xs text-stone-500">资料知识点在这里完整查阅，不混入模拟作答题序。</span>
+          </div>
+          {referenceSection === 'templates' ? (
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
           {templates.map((tpl) => (
             <div
               key={tpl.id}
@@ -584,6 +591,33 @@ ${currentDrill.fullScoringGuide.trapAvoidance}
               </div>
             </div>
           ))}
+          </div>
+          ) : (
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+              {ESSAY_SOURCE_KNOWLEDGE_DRILLS.filter((item) => item.subject === activeSubject).map((item) => (
+                <article key={item.id} className="p-5 rounded-2xl bg-white dark:bg-stone-900 border border-stone-200 dark:border-stone-800 space-y-3">
+                  <div className="flex flex-wrap items-center gap-2">
+                    <span className="px-2 py-0.5 rounded text-[10px] font-bold bg-amber-600 text-white">{item.questionNumber} · {item.subject}</span>
+                    <span className="text-[10px] text-stone-500">{item.materialBackground.match(/PDF第[^\\n】]+页/)?.[0] || '原资料知识点'}</span>
+                  </div>
+                  <h4 className="text-sm font-bold text-stone-900 dark:text-stone-100">{item.theme}</h4>
+                  <div className="p-3 rounded-lg bg-blue-50 dark:bg-blue-950/30 text-xs text-blue-900 dark:text-blue-200 whitespace-pre-line">{item.materialBackground}</div>
+                  <div className="p-3 rounded-lg bg-amber-50 dark:bg-amber-950/30 text-xs text-amber-950 dark:text-amber-200">
+                    <strong>题眼触发：</strong>{item.questionPrompt}
+                  </div>
+                  <div className="space-y-2 text-xs text-stone-700 dark:text-stone-300">
+                    <strong className="block text-amber-800 dark:text-amber-300">完整核心采分点：</strong>
+                    {item.fullScoringGuide.standardPoints.map((point, index) => (
+                      <p key={index} className="leading-relaxed">{point}</p>
+                    ))}
+                  </div>
+                  <div className="p-3 rounded-lg bg-rose-50 dark:bg-rose-950/30 text-xs text-rose-800 dark:text-rose-200">
+                    <strong>易错提醒：</strong>{item.fullScoringGuide.trapAvoidance}
+                  </div>
+                </article>
+              ))}
+            </div>
+          )}
         </div>
       )}
     </div>
