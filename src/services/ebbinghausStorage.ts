@@ -61,7 +61,13 @@ export function recordReviewAttempt(
   const reviews = getStoredReviews();
   const reviewKey = getReviewKey(itemId, itemType);
   // Legacy untyped hat records remain available as a fallback for card review only.
-  const existing = reviews[reviewKey] || (itemType === 'hat-card' ? reviews[itemId] : undefined) || {
+  const legacyCardReview = itemType === 'hat-card' && !reviews[reviewKey] ? reviews[itemId] : undefined;
+  if (legacyCardReview) {
+    // Migrate the legacy untyped record to the card namespace without losing its history.
+    reviews[reviewKey] = legacyCardReview;
+    delete reviews[itemId];
+  }
+  const existing = reviews[reviewKey] || legacyCardReview || {
     id: itemId,
     type: itemType,
     level: 0,
@@ -121,7 +127,13 @@ export function recordReviewAttempt(
 export function toggleMarkRed(itemId: string, itemType: UserReviewItem['type']): boolean {
   const reviews = getStoredReviews();
   const reviewKey = getReviewKey(itemId, itemType);
-  const existing = reviews[reviewKey] || (itemType === 'hat-card' ? reviews[itemId] : undefined) || {
+  const legacyCardReview = itemType === 'hat-card' && !reviews[reviewKey] ? reviews[itemId] : undefined;
+  if (legacyCardReview) {
+    // Migrate legacy card state before toggling so the old key cannot create duplicate red items.
+    reviews[reviewKey] = legacyCardReview;
+    delete reviews[itemId];
+  }
+  const existing = reviews[reviewKey] || legacyCardReview || {
     id: itemId,
     type: itemType,
     level: 0,
