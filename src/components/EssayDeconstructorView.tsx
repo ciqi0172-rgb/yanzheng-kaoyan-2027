@@ -407,34 +407,35 @@ ${currentDrill.fullScoringGuide.trapAvoidance}
           </a>
         </div>
 
-        {/* First choose the subject; question tabs below are always scoped to that subject. */}
-        <div className="flex flex-wrap items-center gap-2 pt-2 border-t border-stone-100 dark:border-stone-800">
-          <span className="text-xs text-stone-400 shrink-0">先选科目：</span>
-          {['马原', '新思想', '史纲', '思修法治', '当代'].map((subject) => (
-            <button key={subject} onClick={() => { setActiveSubject(subject); setActiveDrillIndex(0); handleResetDrill(); }} className={`px-3 py-1.5 rounded-lg text-xs font-bold transition-all ${activeSubject === subject ? 'bg-amber-600 text-white' : 'bg-stone-100 dark:bg-stone-800 text-stone-600 dark:text-stone-300'}`}>
-              {subject} <span className="opacity-75">{allDrills.filter((d) => d.subject === subject).length}题</span>
-            </button>
-          ))}
-        </div>
-        <div className="flex items-center gap-2 overflow-x-auto no-scrollbar">
-          <span className="text-xs text-stone-400 shrink-0">本学科题目：</span>
-          {subjectDrills.map((drill, idx) => (
-            <button
-              key={drill.id}
-              onClick={() => {
-                setActiveDrillIndex(idx);
-                handleResetDrill();
-              }}
-              className={`max-w-[260px] truncate px-3 py-1.5 rounded-lg text-xs font-semibold whitespace-nowrap transition-all ${
-                activeDrillIndex === idx
-                  ? 'bg-stone-900 text-white dark:bg-stone-100 dark:text-stone-900 shadow-xs'
-                  : 'bg-stone-100 dark:bg-stone-800 text-stone-600 dark:text-stone-300 hover:bg-stone-200'
-              }`}
-            >
-              {idx + 1}. {drill.questionNumber} · {drill.theme}
-            </button>
-          ))}
-        </div>
+        {activeMode === 'drill' && (
+          <>
+            {/* First choose the subject; question tabs below are scoped to that subject. */}
+            <div className="flex flex-wrap items-center gap-2 pt-2 border-t border-stone-100 dark:border-stone-800">
+              <span className="text-xs text-stone-400 shrink-0">先选科目：</span>
+              {['马原', '新思想', '史纲', '思修法治', '当代'].map((subject) => (
+                <button key={subject} onClick={() => { setActiveSubject(subject); setActiveDrillIndex(0); handleResetDrill(); }} className={`px-3 py-1.5 rounded-lg text-xs font-bold transition-all ${activeSubject === subject ? 'bg-amber-600 text-white' : 'bg-stone-100 dark:bg-stone-800 text-stone-600 dark:text-stone-300'}`}>
+                  {subject} <span className="opacity-75">{allDrills.filter((d) => d.subject === subject).length}题</span>
+                </button>
+              ))}
+            </div>
+            <div className="flex items-center gap-2 overflow-x-auto no-scrollbar">
+              <span className="text-xs text-stone-400 shrink-0">本学科题目：</span>
+              {subjectDrills.map((drill, idx) => (
+                <button
+                  key={drill.id}
+                  onClick={() => { setActiveDrillIndex(idx); handleResetDrill(); }}
+                  className={`max-w-[260px] truncate px-3 py-1.5 rounded-lg text-xs font-semibold whitespace-nowrap transition-all ${
+                    activeDrillIndex === idx
+                      ? 'bg-stone-900 text-white dark:bg-stone-100 dark:text-stone-900 shadow-xs'
+                      : 'bg-stone-100 dark:bg-stone-800 text-stone-600 dark:text-stone-300 hover:bg-stone-200'
+                  }`}
+                >
+                  {idx + 1}. {drill.questionNumber} · {drill.theme}
+                </button>
+              ))}
+            </div>
+          </>
+        )}
       </div>
 
       {/* MODE 1: INTERACTIVE DRILL EXAM */}
@@ -708,6 +709,55 @@ ${currentDrill.fullScoringGuide.trapAvoidance}
               </div>
             </div>
           )}
+        </div>
+      )}
+
+      {/* MODE: PROMPT-FOCUS TRAINING */}
+      {activeMode === 'focus' && (
+        <div className="space-y-5">
+          <div className="rounded-2xl border border-stone-200 dark:border-stone-800 bg-white dark:bg-stone-900 p-5 shadow-sm space-y-3">
+            <div className="flex flex-wrap items-center justify-between gap-2">
+              <span className="rounded-md bg-amber-600 px-2.5 py-1 text-xs font-black text-white">{currentFocusCase.subject} · 题眼训练 {focusIndex + 1}/{PROMPT_FOCUS_CASES.length}</span>
+              <span className="text-xs text-stone-500">{currentFocusCase.theme}</span>
+            </div>
+            <h3 className="text-base font-black text-stone-900 dark:text-stone-100">先读材料，不急着套模板</h3>
+            <p className="text-sm leading-7 text-stone-800 dark:text-stone-200">{currentFocusCase.material}</p>
+            <div className="rounded-xl border border-amber-200 dark:border-amber-800 bg-amber-50 dark:bg-amber-950/30 p-4">
+              <strong className="text-sm text-amber-950 dark:text-amber-200">试题设问：</strong>
+              <p className="mt-1 text-sm font-bold leading-7 text-amber-950 dark:text-amber-100">{currentFocusCase.prompt}</p>
+            </div>
+          </div>
+
+          <div className="rounded-2xl border border-stone-200 dark:border-stone-800 bg-white dark:bg-stone-900 p-5 shadow-sm space-y-3">
+            <h3 className="font-black text-stone-900 dark:text-stone-100">你认为答案主线应该是什么？</h3>
+            <p className="text-xs text-stone-500">先判断设问到底要你解释什么，再选最贴题的答题方向。提交后才会显示解析。</p>
+            <div className="space-y-2">
+              {currentFocusCase.options.map((option) => {
+                const selected = focusSelectedKey === option.key;
+                const show = focusSubmitted;
+                return (
+                  <button key={option.key} type="button" onClick={() => !focusSubmitted && setFocusSelectedKey(option.key)} className={`w-full rounded-xl border p-4 text-left transition-colors ${show && option.correct ? 'border-emerald-400 bg-emerald-50 dark:bg-emerald-950/30' : show && selected ? 'border-rose-400 bg-rose-50 dark:bg-rose-950/30' : selected ? 'border-amber-400 bg-amber-50 dark:bg-amber-950/20' : 'border-stone-200 dark:border-stone-700 bg-stone-50 dark:bg-stone-850'}`}>
+                    <span className="mr-2 inline-flex h-6 w-6 items-center justify-center rounded-lg border text-xs font-black">{option.key}</span>
+                    <span className="text-sm leading-6 text-stone-800 dark:text-stone-200">{option.text}</span>
+                    {show && <p className="mt-2 text-xs leading-5 text-stone-700 dark:text-stone-300">{option.reason}</p>}
+                  </button>
+                );
+              })}
+            </div>
+            {!focusSubmitted ? (
+              <button type="button" disabled={!focusSelectedKey} onClick={() => setFocusSubmitted(true)} className="w-full rounded-xl bg-amber-600 px-4 py-3 text-sm font-bold text-white disabled:opacity-40">提交判断，查看题眼拆解</button>
+            ) : (
+              <div className="space-y-3 rounded-xl border border-amber-200 dark:border-amber-800 bg-amber-50/70 dark:bg-amber-950/20 p-4">
+                <div><strong className="text-sm">题眼拆解</strong><p className="mt-1 text-sm leading-6">{currentFocusCase.clue}</p></div>
+                <div><strong className="text-sm">答案应覆盖的范围</strong><p className="mt-1 text-sm leading-6">{currentFocusCase.answerScope}</p></div>
+                <div><strong className="text-sm">本题最容易跑题的地方</strong><p className="mt-1 text-sm leading-6">{currentFocusCase.avoid}</p></div>
+                <div className="flex flex-wrap gap-2">
+                  <button type="button" onClick={() => { setFocusSelectedKey(null); setFocusSubmitted(false); }} className="rounded-lg border border-stone-300 dark:border-stone-700 bg-white dark:bg-stone-800 px-4 py-2 text-xs font-bold">重新判断</button>
+                  <button type="button" onClick={() => { setFocusIndex((prev) => (prev + 1) % PROMPT_FOCUS_CASES.length); setFocusSelectedKey(null); setFocusSubmitted(false); }} className="rounded-lg bg-stone-900 px-4 py-2 text-xs font-bold text-white dark:bg-stone-100 dark:text-stone-900">下一题 →</button>
+                </div>
+              </div>
+            )}
+          </div>
         </div>
       )}
 
