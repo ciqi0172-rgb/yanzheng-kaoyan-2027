@@ -259,13 +259,13 @@ ${currentDrill.fullScoringGuide.trapAvoidance}
                 setActiveDrillIndex(idx);
                 handleResetDrill();
               }}
-              className={`px-3 py-1.5 rounded-lg text-xs font-semibold whitespace-nowrap transition-all ${
+              className={`max-w-[260px] truncate px-3 py-1.5 rounded-lg text-xs font-semibold whitespace-nowrap transition-all ${
                 activeDrillIndex === idx
                   ? 'bg-stone-900 text-white dark:bg-stone-100 dark:text-stone-900 shadow-xs'
                   : 'bg-stone-100 dark:bg-stone-800 text-stone-600 dark:text-stone-300 hover:bg-stone-200'
               }`}
             >
-              {drill.questionNumber} ({drill.subject})
+              {idx + 1}. {drill.questionNumber} · {drill.theme}
             </button>
           ))}
         </div>
