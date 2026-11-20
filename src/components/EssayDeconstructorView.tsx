@@ -236,7 +236,7 @@ ${currentDrill.fullScoringGuide.trapAvoidance}
         <div className="flex flex-wrap items-center gap-2 pt-2 border-t border-stone-100 dark:border-stone-800">
           <span className="text-xs text-stone-400 shrink-0">先选科目：</span>
           {['马原', '新思想', '史纲', '思修法治', '当代'].map((subject) => (
-            <button key={subject} onClick={() => { setActiveSubject(subject); setActiveDrillIndex(0); handleResetDrill(); }} className={\`px-3 py-1.5 rounded-lg text-xs font-bold transition-all \${activeSubject === subject ? 'bg-amber-600 text-white' : 'bg-stone-100 dark:bg-stone-800 text-stone-600 dark:text-stone-300'}\`}>
+            <button key={subject} onClick={() => { setActiveSubject(subject); setActiveDrillIndex(0); handleResetDrill(); }} className={`px-3 py-1.5 rounded-lg text-xs font-bold transition-all ${activeSubject === subject ? 'bg-amber-600 text-white' : 'bg-stone-100 dark:bg-stone-800 text-stone-600 dark:text-stone-300'}`}>
               {subject} <span className="opacity-75">{allDrills.filter((d) => d.subject === subject).length}题</span>
             </button>
           ))}
