@@ -155,7 +155,7 @@ export type MemoryStatus = 'new' | 'learning' | 'reviewing' | 'mastered';
 
 export interface UserReviewItem {
   id: string; // target id (question id or clinical point id)
-  type: 'hat' | 'clinical';
+  type: 'hat' | 'clinical' | 'hat-card' | 'hat-quiz';
   level: number; // 0 to 7 (Ebbinghaus stage)
   lastReviewedAt: number; // timestamp
   nextReviewAt: number; // timestamp
