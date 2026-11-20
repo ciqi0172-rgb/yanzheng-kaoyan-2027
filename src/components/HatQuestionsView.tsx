@@ -28,7 +28,7 @@ import {
   Flame,
   ArrowRight
 } from 'lucide-react';
-import { recordReviewAttempt, toggleMarkRed } from '../services/ebbinghausStorage';
+import { recordReviewAttempt, toggleMarkRed, getReviewKey } from '../services/ebbinghausStorage';
 import { buildHatQuestionOptions } from '../services/quizGenerator';
 
 interface HatQuestionsViewProps {
@@ -78,7 +78,7 @@ export const HatQuestionsView: React.FC<HatQuestionsViewProps> = ({
   // must not mutate the array currently indexed by cardIndex, or the user can be jumped to another item.
   const [wrongReviewQueueIds, setWrongReviewQueueIds] = useState<string[]>(() =>
     startWrongReview
-      ? questions.filter(q => !q.needsReview && !!q.answer.trim() && !!reviews[q.id]?.isMarkedRed).map(q => q.id)
+      ? questions.filter(q => !q.needsReview && !!q.answer.trim() && !!(reviews[getReviewKey(q.id, 'hat-quiz')] || reviews[getReviewKey(q.id, 'hat-quiz')] || reviews[q.id])?.isMarkedRed).map(q => q.id)
       : []
   );
   const [onlyDueReview, setOnlyDueReview] = useState<boolean>(false);
@@ -118,7 +118,7 @@ export const HatQuestionsView: React.FC<HatQuestionsViewProps> = ({
       if (selectedHat !== '全部' && q.hatType !== selectedHat) {
         return false;
       }
-      const review = reviews[q.id];
+      const review = reviews[getReviewKey(q.id, 'hat-quiz')] || reviews[getReviewKey(q.id, 'hat-quiz')] || reviews[q.id];
       if (isWrongReviewMode) {
         // Use the session snapshot, not the live red-mark flag. The queue remains stable while answers update.
         if (!wrongReviewQueueIds.includes(q.id)) return false;
@@ -185,22 +185,22 @@ export const HatQuestionsView: React.FC<HatQuestionsViewProps> = ({
     setHasAnswered(true);
 
     if (isCorrect) {
-      const updatedReview = recordReviewAttempt(activeQuestion.id, 'hat', 'easy');
+      const updatedReview = recordReviewAttempt(activeQuestion.id, 'hat-quiz', 'easy');
       // During the wrong-review battle, keep the current item in this session's queue.
       // The shared Ebbinghaus rule may auto-unmark after 3 consecutive correct answers;
       // restore the mark here so the filtered list does not shift under the user's click.
       if (isWrongReviewMode && !updatedReview.isMarkedRed) {
-        toggleMarkRed(activeQuestion.id, 'hat');
+        toggleMarkRed(activeQuestion.id, 'hat-quiz');
       }
     } else {
-      recordReviewAttempt(activeQuestion.id, 'hat', 'forgot');
+      recordReviewAttempt(activeQuestion.id, 'hat-quiz', 'forgot');
     }
     onReviewUpdated();
   };
 
   const handleRate = (rating: 'easy' | 'fuzzy' | 'forgot') => {
     if (!activeQuestion) return;
-    recordReviewAttempt(activeQuestion.id, 'hat', rating);
+    recordReviewAttempt(activeQuestion.id, 'hat-quiz', rating);
     onReviewUpdated();
     setTimeout(() => {
       handleNextCard();
@@ -208,7 +208,7 @@ export const HatQuestionsView: React.FC<HatQuestionsViewProps> = ({
   };
 
   const handleToggleRed = (qId: string) => {
-    toggleMarkRed(qId, 'hat');
+    toggleMarkRed(qId, 'hat-quiz');
     onReviewUpdated();
   };
 
@@ -451,9 +451,9 @@ export const HatQuestionsView: React.FC<HatQuestionsViewProps> = ({
                   <span className="font-semibold text-stone-800 dark:text-stone-200">
                     第 {cardIndex + 1} / {filteredQuestions.length} 题
                   </span>
-                  {reviews[activeQuestion.id]?.level !== undefined && (
+                  {reviews[getReviewKey(activeQuestion.id, 'hat-quiz')] || reviews[activeQuestion.id]?.level !== undefined && (
                     <span className="text-[10px] px-2 py-0.5 rounded bg-stone-100 dark:bg-stone-800 text-stone-600 dark:text-stone-400">
-                      艾宾浩斯第 {reviews[activeQuestion.id].level} 阶 · 错 {reviews[activeQuestion.id].mistakeCount} 次
+                      艾宾浩斯第 {reviews[getReviewKey(activeQuestion.id, 'hat-quiz')] || reviews[activeQuestion.id].level} 阶 · 错 {reviews[getReviewKey(activeQuestion.id, 'hat-quiz')] || reviews[activeQuestion.id].mistakeCount} 次
                     </span>
                   )}
                 </div>
@@ -469,13 +469,13 @@ export const HatQuestionsView: React.FC<HatQuestionsViewProps> = ({
                   <button
                     onClick={() => handleToggleRed(activeQuestion.id)}
                     className={`p-1.5 rounded-lg transition-colors ${
-                      reviews[activeQuestion.id]?.isMarkedRed
+                      reviews[getReviewKey(activeQuestion.id, 'hat-quiz')] || reviews[activeQuestion.id]?.isMarkedRed
                         ? 'text-rose-600 bg-rose-50 dark:bg-rose-950/60'
                         : 'text-stone-400 hover:text-stone-700 hover:bg-stone-100 dark:hover:bg-stone-800'
                     }`}
                     title="加入/移出重点错题本"
                   >
-                    <Bookmark className={`w-4 h-4 ${reviews[activeQuestion.id]?.isMarkedRed ? 'fill-rose-600' : ''}`} />
+                    <Bookmark className={`w-4 h-4 ${reviews[getReviewKey(activeQuestion.id, 'hat-quiz')] || reviews[activeQuestion.id]?.isMarkedRed ? 'fill-rose-600' : ''}`} />
                   </button>
                 </div>
               </div>
@@ -483,7 +483,7 @@ export const HatQuestionsView: React.FC<HatQuestionsViewProps> = ({
               {/* The Exam Question Card */}
               <div
                 className={`bg-white dark:bg-stone-900 rounded-3xl p-6 sm:p-8 border shadow-sm transition-all duration-300 ${
-                  reviews[activeQuestion.id]?.isMarkedRed
+                  reviews[getReviewKey(activeQuestion.id, 'hat-quiz')] || reviews[activeQuestion.id]?.isMarkedRed
                     ? 'border-rose-300 dark:border-rose-900/60 ring-1 ring-rose-200 dark:ring-rose-950'
                     : 'border-stone-200 dark:border-stone-800'
                 }`}
@@ -817,7 +817,7 @@ export const HatQuestionsView: React.FC<HatQuestionsViewProps> = ({
 
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
             {filteredQuestions.map((q, idx) => {
-              const review = reviews[q.id];
+              const review = reviews[getReviewKey(q.id, 'hat-quiz')] || reviews[q.id];
               return (
                 <div
                   key={q.id}
@@ -877,8 +877,8 @@ export const HatQuestionsView: React.FC<HatQuestionsViewProps> = ({
                             .filter(item => !item.needsReview && fourChoiceReadyIds.has(item.id))
                             .filter(item => selectedSubject === '全部' || item.subject === selectedSubject)
                             .filter(item => selectedHat === '全部' || item.hatType === selectedHat)
-                            .filter(item => !onlyRedMarked || reviews[item.id]?.isMarkedRed)
-                            .filter(item => !onlyDueReview || Boolean(reviews[item.id] && reviews[item.id].nextReviewAt <= Date.now()))
+                            .filter(item => !onlyRedMarked || reviews[getReviewKey(item.id, 'hat-quiz')] || reviews[item.id]?.isMarkedRed)
+                            .filter(item => !onlyDueReview || Boolean(reviews[getReviewKey(item.id, 'hat-quiz')] || reviews[item.id] && reviews[getReviewKey(item.id, 'hat-quiz')] || reviews[item.id].nextReviewAt <= Date.now()))
                             .filter(item => !searchQuery.trim() || [item.stem, item.answer, item.hatKeyword, item.trapAnalysis].some(value => value.toLowerCase().includes(searchQuery.toLowerCase().trim())))
                             .findIndex(item => item.id === q.id);
                           if (examIdx !== -1) {
