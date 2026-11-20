@@ -71,6 +71,7 @@ export const HatQuestionsView: React.FC<HatQuestionsViewProps> = ({
   const [selectedHat, setSelectedHat] = useState<HatKeywordType>('全部');
   const [searchQuery, setSearchQuery] = useState<string>(initialSearch);
   const [onlyRedMarked, setOnlyRedMarked] = useState<boolean>(startWrongReview);
+  const [isWrongReviewMode, setIsWrongReviewMode] = useState<boolean>(startWrongReview);
   const [onlyDueReview, setOnlyDueReview] = useState<boolean>(false);
 
   // Drill Mode: 'exam' (Real 4-choice question) vs 'recall' (Blank/Active recall) vs 'grid' (All questions)
@@ -272,7 +273,7 @@ export const HatQuestionsView: React.FC<HatQuestionsViewProps> = ({
                 }`}
               >
                 <Grid className="w-3.5 h-3.5" />
-                <span>{startWrongReview ? '错题歼灭战' : '全题目清单'}</span>
+                <span>{isWrongReviewMode ? '错题歼灭战' : '全题目清单'}</span>
               </button>
             </div>
           </div>
@@ -740,9 +741,34 @@ export const HatQuestionsView: React.FC<HatQuestionsViewProps> = ({
             </div>
           )}
           <div className="flex items-center justify-between text-xs text-stone-500">
-            <span>{drillMode === 'pending' ? `待处理 ${filteredQuestions.length} 道：按“答案待核验 / 待补干扰项”分别标记` : startWrongReview ? `今日错题歼灭任务：${filteredQuestions.length} 道标红考点（含待核验记录）` : `找到 ${filteredQuestions.length} 道原文题目（含待核验记录）`}</span>
+            <span>{drillMode === 'pending' ? `待处理 ${filteredQuestions.length} 道：按“答案待核验 / 待补干扰项”分别标记` : isWrongReviewMode ? `今日错题歼灭任务：${filteredQuestions.length} 道标红考点（含待核验记录）` : `找到 ${filteredQuestions.length} 道原文题目（含待核验记录）`}</span>
             <span>仅答案已核验且选项合格的题目可启动四选一模考</span>
           </div>
+          {isWrongReviewMode && (
+            <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-2 rounded-xl border border-rose-200 bg-rose-50 dark:bg-rose-950/30 dark:border-rose-900 p-3">
+              <div>
+                <div className="text-xs font-bold text-rose-800 dark:text-rose-200">当前为错题歼灭专项，不是完整题库</div>
+                <div className="text-[11px] text-rose-700 dark:text-rose-300 mt-1">退出专项会恢复全部符合条件的四选一题目，不会删除错题标记或复习记录。</div>
+              </div>
+              <button
+                onClick={() => {
+                  setIsWrongReviewMode(false);
+                  setOnlyRedMarked(false);
+                  setOnlyDueReview(false);
+                  setSearchQuery('');
+                  setSelectedSubject('全部');
+                  setSelectedHat('全部');
+                  setCardIndex(0);
+                  setSelectedOptionKey(null);
+                  setHasAnswered(false);
+                  setDrillMode('exam');
+                }}
+                className="shrink-0 px-3 py-2 rounded-lg bg-white dark:bg-stone-900 border border-rose-300 dark:border-rose-800 text-xs font-bold text-rose-700 dark:text-rose-200"
+              >
+                退出专项，恢复正常题库
+              </button>
+            </div>
+          )}
 
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
             {filteredQuestions.map((q, idx) => {
