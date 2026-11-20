@@ -160,13 +160,13 @@ export const EbbinghausDashboard: React.FC<EbbinghausDashboardProps> = ({
                 <span>卡片错题复习 ({redMarkedItems.filter((item) => item.type === 'hat-card' || item.type === 'hat').length})</span>
               </button>
             )}
-            {redMarkedItems.some((item) => item.type === 'hat-quiz' || item.type === 'hat') && (
+            {redMarkedItems.some((item) => item.type === 'hat-quiz') && (
               <button
                 onClick={() => onStartDrillWrong('quiz')}
                 className="flex items-center gap-1.5 px-3.5 py-2 rounded-xl bg-rose-600 hover:bg-rose-500 text-white text-xs font-bold shadow-sm transition-all"
               >
                 <AlertOctagon className="w-3.5 h-3.5" />
-                <span>选择题错题歼灭 ({redMarkedItems.filter((item) => item.type === 'hat-quiz' || item.type === 'hat').length})</span>
+                <span>选择题错题歼灭 ({redMarkedItems.filter((item) => item.type === 'hat-quiz').length})</span>
               </button>
             )}
 
