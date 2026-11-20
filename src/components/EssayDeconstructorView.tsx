@@ -2,6 +2,15 @@ import React, { useState } from 'react';
 import { EssayDrillQuestion, EssayTemplate } from '../types';
 import { ESSAY_DRILLS } from '../data/essayDrills';
 import { ESSAY_SOURCE_KNOWLEDGE_DRILLS } from '../data/essaySourceKnowledgeDrills';
+import essaySourcePagesText from '../../all_17_pages_templates.txt?raw';
+
+const ESSAY_SOURCE_PAGES = Array.from(
+  essaySourcePagesText.matchAll(/={10} PAGE (\d+) ={10}\s*\n([\s\S]*?)(?=\n={10} PAGE \d+ ={10}|$)/g),
+).map((match) => {
+  const page = Number(match[1]);
+  const subject = page <= 3 ? '34题 · 马原' : page <= 7 ? '35题 · 新思想' : page <= 11 ? '36题 · 史纲毛中特' : page <= 14 ? '37题 · 思修法治' : '38题 · 当代';
+  return { page, subject, content: match[2].trim() };
+});
 import { 
   BookOpen, 
   Search, 
@@ -547,39 +556,74 @@ ${currentDrill.fullScoringGuide.trapAvoidance}
 
       {/* MODE 2: QUICK REFERENCE MODE (Templates view) */}
       {activeMode === 'reference' && (
-        <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-          {templates.map((tpl) => (
-            <div
-              key={tpl.id}
-              className="p-5 rounded-2xl bg-white dark:bg-stone-850 border border-stone-200 dark:border-stone-800 space-y-3"
-            >
-              <div className="flex items-center justify-between">
-                <span className="px-2 py-0.5 rounded text-[10px] font-bold bg-amber-600 text-white">
-                  {tpl.questionNumber} · {tpl.subject}
-                </span>
-                <span className="text-[10px] text-stone-400">
-                  {tpl.keywords.slice(0, 3).join('、')}
-                </span>
+        <div className="space-y-6">
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+            {templates.map((tpl) => (
+              <div
+                key={tpl.id}
+                className="p-5 rounded-2xl bg-white dark:bg-stone-850 border border-stone-200 dark:border-stone-800 space-y-3"
+              >
+                <div className="flex items-center justify-between gap-2">
+                  <span className="px-2 py-0.5 rounded text-[10px] font-bold bg-amber-600 text-white">
+                    {tpl.questionNumber} · {tpl.subject}
+                  </span>
+                  <span className="text-[10px] text-stone-400">
+                    {tpl.keywords.slice(0, 3).join('、')}
+                  </span>
+                </div>
+                <h4 className="text-sm font-bold text-stone-900 dark:text-stone-100">
+                  {tpl.theme}
+                </h4>
+                <div className="p-2.5 rounded-lg bg-blue-50 dark:bg-blue-950/30 text-xs text-blue-900 dark:text-blue-200">
+                  <strong>点题公式：</strong>{tpl.step1Qualitative.formula}
+                </div>
+                <div className="space-y-2 text-xs text-stone-700 dark:text-stone-300">
+                  <strong className="block text-amber-800 dark:text-amber-300">核心采分踩分点：</strong>
+                  {tpl.step2CoreMaterial.points.map((p, i) => (
+                    <p key={i} className="leading-relaxed">
+                      <strong>{p.subtitle}：</strong>{p.content}
+                    </p>
+                  ))}
+                  {tpl.step2CoreMaterial.trapWarning && (
+                    <p className="rounded-lg bg-rose-50 dark:bg-rose-950/30 p-2 text-rose-800 dark:text-rose-200">
+                      <strong>易漏分提醒：</strong>{tpl.step2CoreMaterial.trapWarning}
+                    </p>
+                  )}
+                </div>
+                <div className="p-2 rounded-lg bg-emerald-50 dark:bg-emerald-950/30 text-[11px] text-emerald-800 dark:text-emerald-300">
+                  <strong>升华结尾公式：</strong>{tpl.step3Sublimation.closingFormula}
+                  <p className="mt-1"><strong>示范句：</strong>{tpl.step3Sublimation.sampleClosing}</p>
+                </div>
               </div>
-              <h4 className="text-sm font-bold text-stone-900 dark:text-stone-100">
-                {tpl.theme}
-              </h4>
-              <div className="p-2.5 rounded-lg bg-blue-50 dark:bg-blue-950/30 text-xs text-blue-900 dark:text-blue-200">
-                <strong>点题公式：</strong>{tpl.step1Qualitative.formula}
-              </div>
-              <div className="space-y-1.5 text-xs text-stone-700 dark:text-stone-300">
-                <strong className="block text-amber-800 dark:text-amber-300">核心采分踩分点：</strong>
-                {tpl.step2CoreMaterial.points.map((p, i) => (
-                  <p key={i} className="line-clamp-2">
-                    {p.subtitle}: {p.content}
-                  </p>
+            ))}
+          </div>
+
+          <section className="space-y-3">
+            <div className="rounded-2xl border border-amber-200 dark:border-amber-900 bg-amber-50 dark:bg-amber-950/20 p-4">
+              <h3 className="text-base font-black text-stone-900 dark:text-stone-100">原 PDF 17 页完整逐页资料</h3>
+              <p className="mt-1 text-xs leading-relaxed text-stone-700 dark:text-stone-300">
+                下面按原 PDF 页序逐页展开，保留原有核心板块、设问/题干触发条件、编号得分点和答题思路；不是摘要，也不以现有模板卡片代替原文。原文中的每一页均可直接展开阅读与检索。
+              </p>
+              <div className="mt-2 flex flex-wrap gap-2 text-[11px]">
+                {['34题·马原（第1—3页）', '35题·新思想（第4—7页）', '36题·史纲毛中特（第8—11页）', '37题·思修法治（第12—14页）', '38题·当代（第15—17页）'].map((label) => (
+                  <span key={label} className="rounded-lg border border-amber-200 dark:border-amber-800 px-2 py-1 text-amber-900 dark:text-amber-200">{label}</span>
                 ))}
               </div>
-              <div className="p-2 rounded-lg bg-emerald-50 dark:bg-emerald-950/30 text-[11px] text-emerald-800 dark:text-emerald-300">
-                <strong>升华结尾：</strong>{tpl.step3Sublimation.sampleClosing}
-              </div>
             </div>
-          ))}
+            <div className="grid grid-cols-1 gap-4">
+              {ESSAY_SOURCE_PAGES.map((page) => (
+                <article key={page.page} className="rounded-2xl border border-stone-200 dark:border-stone-800 bg-white dark:bg-stone-900 overflow-hidden">
+                  <div className="flex flex-wrap items-center justify-between gap-2 border-b border-stone-100 dark:border-stone-800 px-4 py-3">
+                    <div className="font-bold text-sm text-stone-900 dark:text-stone-100">原资料第 {page.page} / 17 页</div>
+                    <span className="rounded-md bg-amber-600 px-2 py-1 text-[10px] font-bold text-white">{page.subject}</span>
+                  </div>
+                  <div className="px-4 py-4 sm:px-5 text-xs sm:text-sm leading-7 text-stone-800 dark:text-stone-200 whitespace-pre-wrap break-words">
+                    {page.content}
+                  </div>
+                </article>
+              ))}
+            </div>
+          </section>
         </div>
       )}
     </div>
