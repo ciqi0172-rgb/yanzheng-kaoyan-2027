@@ -202,7 +202,7 @@ export const EssayDeconstructorView: React.FC<EssayDeconstructorViewProps> = ({
     const points = tpl.step2CoreMaterial.points;
     const clozeDrills = points.map((point, index) => {
       const word = point.highlightWords.find((w) => w.trim() && point.content.includes(w)) || '';
-      const maskedText = word ? point.content.replace(word, '【________】') : point.content;
+      const maskedText = word ? point.content.replace(word, `【${word}】`) : point.content;
       return {
         subtitle: point.subtitle,
         maskedText,
