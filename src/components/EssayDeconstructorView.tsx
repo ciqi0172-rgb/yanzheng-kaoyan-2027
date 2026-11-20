@@ -215,7 +215,7 @@ ${currentDrill.fullScoringGuide.trapAvoidance}
               }`}
             >
               <Zap className="w-3.5 h-3.5" />
-              <span>真题大题闯关实测</span>
+              <span>历年真题主题训练</span>
             </button>
 
             <button
