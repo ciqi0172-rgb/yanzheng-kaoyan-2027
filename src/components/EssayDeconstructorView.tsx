@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { EssayTemplate } from '../types';
+import { EssayDrillQuestion, EssayTemplate } from '../types';
 import { ESSAY_DRILLS } from '../data/essayDrills';
 import { 
   BookOpen, 
@@ -28,6 +28,7 @@ interface EssayDeconstructorViewProps {
 export const EssayDeconstructorView: React.FC<EssayDeconstructorViewProps> = ({
   templates,
 }) => {
+  const [activeSubject, setActiveSubject] = useState<string>('马原');
   const [activeDrillIndex, setActiveDrillIndex] = useState<number>(0);
   const [activeMode, setActiveMode] = useState<'drill' | 'reference'>('drill');
   
@@ -39,7 +40,96 @@ export const EssayDeconstructorView: React.FC<EssayDeconstructorViewProps> = ({
   const [isDrillSubmitted, setIsDrillSubmitted] = useState<boolean>(false);
   const [hasCopied, setHasCopied] = useState<boolean>(false);
 
-  const currentDrill = ESSAY_DRILLS[activeDrillIndex] || ESSAY_DRILLS[0];
+  // Keep the five high-quality sample drills, and generate a complete template-based practice
+  // for every remaining template. Generated items are explicitly labelled as training scenarios,
+  // never presented as verbatim official exam materials.
+  const buildTemplateDrill = (tpl: EssayTemplate): EssayDrillQuestion => {
+    const points = tpl.step2CoreMaterial.points;
+    const clozeDrills = points.map((point, index) => {
+      const word = point.highlightWords.find((w) => w.trim() && point.content.includes(w)) || '';
+      const maskedText = word ? point.content.replace(word, '【________】') : point.content;
+      return {
+        subtitle: point.subtitle,
+        maskedText,
+        blanks: word ? [{ index: 1, answer: word, hint: `本采分点关键词：${point.subtitle}` }] : [],
+        fullAnswer: point.content,
+      };
+    });
+    return {
+      id: `template-practice-${tpl.id}`,
+      templateId: tpl.id,
+      questionNumber: tpl.questionNumber,
+      subject: tpl.subject,
+      theme: tpl.theme,
+      materialBackground: `【模板迁移训练情境｜非原卷逐字材料】\n本题依据资料中的题干触发条件与核心采分点整理，用于练习“题眼识别—理论定性—分层作答”。\n\n题干特征：${tpl.triggerConditions}\n\n作答提示：请先从题干提取关键词，再判断对应原理，不要只背结尾万能句。`,
+      questionPrompt: tpl.triggerConditions,
+      step1Options: [
+        {
+          key: 'A',
+          text: tpl.step1Qualitative.sampleText,
+          isBest: true,
+          scoreRationale: `【对应采分点】${tpl.step1Qualitative.description}`,
+        },
+        {
+          key: 'B',
+          text: '只复述材料中的现象，不指出题目要求的理论原理，也不解释材料与原理的关系。',
+          isBest: false,
+          scoreRationale: '【失分原因】缺少理论定性，只有材料复述，无法形成有效的原理得分点。',
+        },
+      ],
+      step2ClozeDrills: clozeDrills,
+      step3Options: [
+        {
+          key: 'A',
+          text: tpl.step3Sublimation.sampleClosing,
+          isBest: true,
+          rationale: '【方法论收束】将核心原理落实到题干对应的实践要求，完成论证闭环。',
+        },
+        {
+          key: 'B',
+          text: '因此，我们只要重视这个问题，就一定能够自动取得成功。',
+          isBest: false,
+          rationale: '【失分原因】表述绝对化，没有体现具体方法、实践条件与理论依据。',
+        },
+      ],
+      fullScoringGuide: {
+        standardPoints: [
+          `【定性点题】${tpl.step1Qualitative.sampleText}`,
+          ...points.map((point) => `【核心采分点】${point.subtitle}：${point.content}`),
+          `【升华收尾】${tpl.step3Sublimation.sampleClosing}`,
+        ],
+        trapAvoidance: tpl.step2CoreMaterial.trapWarning || '避免只写结论不解释原理；按设问逐层作答，并使用本题对应的学科术语。',
+      },
+    };
+  };
+
+  const allDrills = React.useMemo(() => {
+    const existingTemplateIds = new Set(ESSAY_DRILLS.map((drill) => drill.templateId));
+    const generated = templates
+      .filter((tpl) => !existingTemplateIds.has(tpl.id))
+      .map(buildTemplateDrill);
+    // Order by subject and by the source template order, so each subject's first/second/third
+    // questions remain together. Preserve unmatched high-quality sample drills at the end of
+    // their own subject group.
+    const templateOrder = new Map(templates.map((tpl, index) => [tpl.id, index]));
+    return [...ESSAY_DRILLS, ...generated].sort((a, b) => {
+      const subjectOrder = ['马原', '新思想', '史纲', '思修法治', '当代'];
+      const subjectDiff = subjectOrder.indexOf(a.subject) - subjectOrder.indexOf(b.subject);
+      if (subjectDiff !== 0) return subjectDiff;
+      const ai = templateOrder.get(a.templateId);
+      const bi = templateOrder.get(b.templateId);
+      if (ai !== undefined && bi !== undefined) return ai - bi;
+      if (ai !== undefined) return -1;
+      if (bi !== undefined) return 1;
+      return a.id.localeCompare(b.id);
+    });
+  }, [templates]);
+
+  const subjectDrills = React.useMemo(
+    () => allDrills.filter((drill) => drill.subject === activeSubject),
+    [allDrills, activeSubject],
+  );
+  const currentDrill = subjectDrills[activeDrillIndex] || subjectDrills[0] || allDrills[0];
 
   const handleNextDrill = () => {
     setStep1SelectedKey(null);
@@ -47,7 +137,7 @@ export const EssayDeconstructorView: React.FC<EssayDeconstructorViewProps> = ({
     setUserBlankInputs({});
     setStep3SelectedKey(null);
     setIsDrillSubmitted(false);
-    setActiveDrillIndex((prev) => (prev + 1) % ESSAY_DRILLS.length);
+    setActiveDrillIndex((prev) => (prev + 1) % subjectDrills.length);
   };
 
   const handleResetDrill = () => {
@@ -142,10 +232,18 @@ ${currentDrill.fullScoringGuide.trapAvoidance}
           </div>
         </div>
 
-        {/* Drill Tabs: 34题, 35题, 36题, 37题, 38题 */}
-        <div className="flex items-center gap-2 overflow-x-auto no-scrollbar pt-2 border-t border-stone-100 dark:border-stone-800">
-          <span className="text-xs text-stone-400 shrink-0">选择大题：</span>
-          {ESSAY_DRILLS.map((drill, idx) => (
+        {/* First choose the subject; question tabs below are always scoped to that subject. */}
+        <div className="flex flex-wrap items-center gap-2 pt-2 border-t border-stone-100 dark:border-stone-800">
+          <span className="text-xs text-stone-400 shrink-0">先选科目：</span>
+          {['马原', '新思想', '史纲', '思修法治', '当代'].map((subject) => (
+            <button key={subject} onClick={() => { setActiveSubject(subject); setActiveDrillIndex(0); handleResetDrill(); }} className={\`px-3 py-1.5 rounded-lg text-xs font-bold transition-all \${activeSubject === subject ? 'bg-amber-600 text-white' : 'bg-stone-100 dark:bg-stone-800 text-stone-600 dark:text-stone-300'}\`}>
+              {subject} <span className="opacity-75">{allDrills.filter((d) => d.subject === subject).length}题</span>
+            </button>
+          ))}
+        </div>
+        <div className="flex items-center gap-2 overflow-x-auto no-scrollbar">
+          <span className="text-xs text-stone-400 shrink-0">本学科题目：</span>
+          {subjectDrills.map((drill, idx) => (
             <button
               key={drill.id}
               onClick={() => {
@@ -430,7 +528,7 @@ ${currentDrill.fullScoringGuide.trapAvoidance}
                   onClick={handleNextDrill}
                   className="px-5 py-2 rounded-xl bg-stone-900 text-white dark:bg-stone-100 dark:text-stone-900 text-xs font-bold"
                 >
-                  下一道真题演练 ↗
+                  {activeDrillIndex + 1 < subjectDrills.length ? '本学科下一题 ↗' : '本学科已完成 · 返回第一题 ↗'}
                 </button>
               </div>
             </div>
