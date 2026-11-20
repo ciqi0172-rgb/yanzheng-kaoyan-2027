@@ -94,7 +94,7 @@ export const ESSAY_DRILLS: EssayDrillQuestion[] = [
   // ================= 35题 新思想大题 =================
   {
     id: 'drill-35-1',
-    templateId: 'xsx-35-1',
+    templateId: 'xsx-35-3',
     questionNumber: '35题',
     subject: '新思想',
     theme: '高质量发展与发展新质生产力',
@@ -157,7 +157,7 @@ export const ESSAY_DRILLS: EssayDrillQuestion[] = [
   // ================= 36题 史纲大题 =================
   {
     id: 'drill-36-1',
-    templateId: 'sg-36-1',
+    templateId: 'sg-36-extra-1',
     questionNumber: '36题',
     subject: '史纲',
     theme: '历史和人民选择了中国共产党，跳出治乱兴衰历史周期率',
