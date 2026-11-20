@@ -198,10 +198,10 @@ ${currentDrill.fullScoringGuide.trapAvoidance}
               </span>
             </div>
             <h1 className="text-xl sm:text-2xl font-black text-stone-900 dark:text-stone-100 tracking-tight">
-              万能大题三步法·真题材料全真实战模拟考场
+              万能大题三步法·真题样板与模板迁移实战考场
             </h1>
             <p className="text-xs text-stone-600 dark:text-stone-400 mt-0.5">
-              读真实考研材料 ➡️ 题一：定性点题实选 ➡️ 题二：核心踩分点填空闯关 ➡️ 题三：大局观升华 ➡️ 即时给出10分制阅卷报告！
+              按科目连续练习：定性点题 ➡️ 核心采分点填空 ➡️ 大局观升华 ➡️ 10分制阅卷报告。样板题保留原有材料；补全题明确标注为模板迁移训练。
             </p>
           </div>
 
@@ -270,7 +270,7 @@ ${currentDrill.fullScoringGuide.trapAvoidance}
             <div className="flex items-center justify-between pb-3 border-b border-stone-100 dark:border-stone-800">
               <div className="flex items-center gap-2">
                 <span className="px-2.5 py-1 rounded-md text-xs font-black bg-amber-600 text-white">
-                  {currentDrill.questionNumber} · {currentDrill.subject} 全真模考
+                  {currentDrill.questionNumber} · {currentDrill.subject} · 本学科第{activeDrillIndex + 1}题
                 </span>
                 <span className="text-xs font-bold text-stone-800 dark:text-stone-200">
                   主题：{currentDrill.theme}
