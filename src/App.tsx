@@ -30,6 +30,7 @@ export default function App() {
   // Cross-component jump search filter
   const [hatSearchQuery, setHatSearchQuery] = useState<string>('');
   const [startWrongReview, setStartWrongReview] = useState<boolean>(false);
+  const [targetQuestionId, setTargetQuestionId] = useState<string | undefined>(undefined);
 
   // Dark mode
   const [darkMode, setDarkMode] = useState<boolean>(() => {
@@ -102,6 +103,7 @@ export default function App() {
         activeTab={activeTab}
         onSelectTab={(tab) => {
           setStartWrongReview(false);
+          setTargetQuestionId(undefined);
           setActiveTab(tab);
         }}
         onOpenQuickQuiz={() => setIsQuickQuizOpen(true)}
@@ -132,6 +134,7 @@ export default function App() {
             onOpenConfusionModal={() => setIsConfusionModalOpen(true)}
             initialSearch={hatSearchQuery}
             startWrongReview={startWrongReview}
+            targetQuestionId={targetQuestionId}
           />
         )}
 
@@ -143,8 +146,10 @@ export default function App() {
         {/* Tab 4: 混淆概念横向对撞矩阵 */}
         {activeTab === 'confusion' && (
           <ConfusionView
-            onJumpToHatSearch={(term) => {
-              setHatSearchQuery(term);
+            onJumpToHatSearch={(term, questionId) => {
+              setHatSearchQuery(questionId ? '' : term);
+              setTargetQuestionId(questionId);
+              setStartWrongReview(false);
               setActiveTab('exam');
             }}
           />
