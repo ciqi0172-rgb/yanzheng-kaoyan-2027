@@ -328,6 +328,9 @@ ${currentDrill.step1Options.find((o) => o.isBest)?.text}
 第二步：硬核核心踩分点
 ${currentDrill.step2ClozeDrills.map((d) => `${d.subtitle}\n${d.fullAnswer}`).join('\n\n')}
 
+【逐小问完整参考答案】
+${(currentDrill.subquestionAnswers || []).map((item) => `${item.label}\n设问：${item.question}\n审题推理：${item.reasoning}\n完整答案：${item.answer}\n采分检查：${item.checklist.join('；')}`).join('\n\n')}
+
 第三步：万能升华大局观
 ${currentDrill.step3Options.find((o) => o.isBest)?.text}
 
@@ -698,6 +701,38 @@ ${currentDrill.fullScoringGuide.trapAvoidance}
                   得分估算：{isStep1Correct && isStep3Correct ? '9 - 10 分（高分档）' : isStep1Correct ? '7 - 8 分（良好档）' : '5 - 6 分'}
                 </div>
               </div>
+
+              {currentDrill.subquestionAnswers && currentDrill.subquestionAnswers.length > 0 && (
+                <section className="rounded-2xl border-2 border-blue-200 dark:border-blue-900 bg-blue-50/60 dark:bg-blue-950/20 p-4 sm:p-5 space-y-4">
+                  <div>
+                    <h3 className="text-base font-black text-blue-950 dark:text-blue-100">逐小问完整作答｜先看设问，再看推理与答案</h3>
+                    <p className="mt-1 text-xs leading-5 text-blue-900/80 dark:text-blue-200/80">以下按原卷每个编号小问分别回答，不用一段通用论述代替多问。核对时逐项检查设问要求是否全部覆盖。</p>
+                  </div>
+                  {currentDrill.subquestionAnswers.map((item, idx) => (
+                    <article key={item.label} className="rounded-xl border border-blue-200 dark:border-blue-800 bg-white dark:bg-stone-900 p-4 space-y-3">
+                      <h4 className="font-black text-sm text-blue-950 dark:text-blue-100">{item.label}</h4>
+                      <div>
+                        <p className="text-xs font-bold text-stone-500 dark:text-stone-400">原题小问</p>
+                        <p className="mt-1 text-sm font-semibold leading-6 text-stone-900 dark:text-stone-100">{item.question}</p>
+                      </div>
+                      <div>
+                        <p className="text-xs font-bold text-amber-700 dark:text-amber-300">审题与推理过程</p>
+                        <p className="mt-1 text-sm leading-7 text-stone-800 dark:text-stone-200">{item.reasoning}</p>
+                      </div>
+                      <div>
+                        <p className="text-xs font-bold text-emerald-700 dark:text-emerald-300">完整参考答案</p>
+                        <p className="mt-1 text-sm leading-7 text-stone-900 dark:text-stone-100 whitespace-pre-line">{item.answer}</p>
+                      </div>
+                      <div className="rounded-lg bg-amber-50 dark:bg-amber-950/30 p-3">
+                        <p className="text-xs font-bold text-amber-800 dark:text-amber-200">逐项核对采分点</p>
+                        <ul className="mt-1 list-disc pl-5 space-y-1 text-xs leading-5 text-stone-800 dark:text-stone-200">
+                          {item.checklist.map((point) => <li key={point}>{point}</li>)}
+                        </ul>
+                      </div>
+                    </article>
+                  ))}
+                </section>
+              )}
 
               {/* Rubric Breakdown */}
               <div className="space-y-2 text-xs text-stone-800 dark:text-stone-200">
