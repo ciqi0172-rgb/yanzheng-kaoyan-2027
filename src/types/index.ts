@@ -88,6 +88,7 @@ export interface EssayDrillQuestion {
   theme: string;
   materialBackground: string; // 真实考研材料
   questionPrompt: string; // 真实设问
+  subquestionAnswers?: { label: string; question: string; reasoning: string; answer: string; checklist: string[] }[]; // 按原题每个小问分别作答
   step1Options: {
     key: string;
     text: string;
