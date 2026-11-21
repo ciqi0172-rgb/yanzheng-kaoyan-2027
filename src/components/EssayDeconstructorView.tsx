@@ -2,6 +2,7 @@ import React, { useState } from 'react';
 import { EssayDrillQuestion, EssayTemplate } from '../types';
 import { ESSAY_DRILLS } from '../data/essayDrills';
 import { ESSAY_SOURCE_KNOWLEDGE_DRILLS } from '../data/essaySourceKnowledgeDrills';
+import { XIAO8_SET1_DRILLS } from '../data/xiao8Set1EssayDrills';
 import essaySourcePagesText from '../../all_17_pages_templates.txt?raw';
 
 
@@ -152,6 +153,7 @@ export const EssayDeconstructorView: React.FC<EssayDeconstructorViewProps> = ({
   templates,
 }) => {
   const [activeSubject, setActiveSubject] = useState<string>('马原');
+  const [activePaper, setActivePaper] = useState<'base' | 'xiao8-1'>('base');
   const [activeDrillIndex, setActiveDrillIndex] = useState<number>(0);
   const [activeMode, setActiveMode] = useState<'drill' | 'reference' | 'focus'>('drill');
   const [focusIndex, setFocusIndex] = useState(0);
@@ -267,7 +269,7 @@ export const EssayDeconstructorView: React.FC<EssayDeconstructorViewProps> = ({
     // questions remain together. Preserve unmatched high-quality sample drills at the end of
     // their own subject group.
     const templateOrder = new Map(templates.map((tpl, index) => [tpl.id, index]));
-    return [...ESSAY_DRILLS, ...ESSAY_SOURCE_KNOWLEDGE_DRILLS, ...generated].sort((a, b) => {
+    return [...ESSAY_DRILLS, ...ESSAY_SOURCE_KNOWLEDGE_DRILLS, ...generated, ...XIAO8_SET1_DRILLS].sort((a, b) => {
       const subjectOrder = ['马原', '新思想', '史纲', '思修法治', '当代'];
       const subjectDiff = subjectOrder.indexOf(a.subject) - subjectOrder.indexOf(b.subject);
       if (subjectDiff !== 0) return subjectDiff;
@@ -280,9 +282,13 @@ export const EssayDeconstructorView: React.FC<EssayDeconstructorViewProps> = ({
     });
   }, [templates]);
 
+  const paperDrills = React.useMemo(
+    () => activePaper === 'xiao8-1' ? allDrills.filter((drill) => drill.id.startsWith('xiao8-1-')) : allDrills.filter((drill) => !drill.id.startsWith('xiao8-1-')),
+    [allDrills, activePaper],
+  );
   const subjectDrills = React.useMemo(
-    () => allDrills.filter((drill) => drill.subject === activeSubject),
-    [allDrills, activeSubject],
+    () => paperDrills.filter((drill) => drill.subject === activeSubject),
+    [paperDrills, activeSubject],
   );
   const currentDrill = subjectDrills[activeDrillIndex] || subjectDrills[0] || allDrills[0];
 
@@ -409,14 +415,37 @@ ${currentDrill.fullScoringGuide.trapAvoidance}
 
         {activeMode === 'drill' && (
           <>
-            {/* First choose the subject; question tabs below are scoped to that subject. */}
-            <div className="flex flex-wrap items-center gap-2 pt-2 border-t border-stone-100 dark:border-stone-800">
+            {/* Paper directory: extensible for future mock papers; each paper can expand to its question index. */}
+            <div className="grid grid-cols-1 lg:grid-cols-[minmax(0,1fr)_240px] gap-3 pt-2 border-t border-stone-100 dark:border-stone-800">
+              <div className="space-y-3">
+                <div className="flex flex-wrap items-center gap-2">
+                  <span className="text-xs text-stone-400 shrink-0">试卷：</span>
+                  <button onClick={() => { setActivePaper('base'); setActiveSubject('马原'); setActiveDrillIndex(0); handleResetDrill(); }} className={`px-3 py-1.5 rounded-lg text-xs font-bold ${activePaper === 'base' ? 'bg-amber-600 text-white' : 'bg-stone-100 dark:bg-stone-800 text-stone-600 dark:text-stone-300'}`}>历年真题主题训练 / 模板库</button>
+                  <button onClick={() => { setActivePaper('xiao8-1'); setActiveSubject('马原'); setActiveDrillIndex(0); handleResetDrill(); }} className={`px-3 py-1.5 rounded-lg text-xs font-bold ${activePaper === 'xiao8-1' ? 'bg-amber-600 text-white' : 'bg-stone-100 dark:bg-stone-800 text-stone-600 dark:text-stone-300'}`}>肖八 · 第一套 <span className="opacity-80">5题</span></button>
+                </div>
+                <div className="flex flex-wrap items-center gap-2">
               <span className="text-xs text-stone-400 shrink-0">先选科目：</span>
               {['马原', '新思想', '史纲', '思修法治', '当代'].map((subject) => (
                 <button key={subject} onClick={() => { setActiveSubject(subject); setActiveDrillIndex(0); handleResetDrill(); }} className={`px-3 py-1.5 rounded-lg text-xs font-bold transition-all ${activeSubject === subject ? 'bg-amber-600 text-white' : 'bg-stone-100 dark:bg-stone-800 text-stone-600 dark:text-stone-300'}`}>
-                  {subject} <span className="opacity-75">{allDrills.filter((d) => d.subject === subject).length}题</span>
+                  {subject} <span className="opacity-75">{paperDrills.filter((d) => d.subject === subject).length}题</span>
                 </button>
               ))}
+                </div>
+              </div>
+              <aside className="rounded-xl border border-amber-200 dark:border-amber-900/60 bg-amber-50/70 dark:bg-amber-950/20 p-3 self-start">
+                <div className="text-xs font-black text-amber-950 dark:text-amber-200 mb-2">试卷小目录</div>
+                <details open={activePaper === 'xiao8-1'} className="text-xs">
+                  <summary className="cursor-pointer font-bold text-stone-800 dark:text-stone-200 py-1">肖八</summary>
+                  <div className="ml-2 mt-1 border-l border-amber-300 dark:border-amber-800 pl-2 space-y-1.5">
+                    <button onClick={() => { setActivePaper('xiao8-1'); setActiveSubject('马原'); setActiveDrillIndex(0); handleResetDrill(); }} className={`block text-left w-full rounded px-2 py-1.5 ${activePaper === 'xiao8-1' ? 'bg-amber-200/70 dark:bg-amber-900/50 font-bold' : 'hover:bg-amber-100 dark:hover:bg-amber-900/30'}`}>第一套 · 34题 马原</button>
+                    {['35题 · 新思想','36题 · 史纲','37题 · 思修法治','38题 · 当代'].map((label, idx) => <button key={label} onClick={() => { setActivePaper('xiao8-1'); setActiveSubject(['新思想','史纲','思修法治','当代'][idx]); setActiveDrillIndex(0); handleResetDrill(); }} className={`block text-left w-full rounded px-2 py-1.5 ${activePaper === 'xiao8-1' && activeSubject === ['新思想','史纲','思修法治','当代'][idx] ? 'bg-amber-200/70 dark:bg-amber-900/50 font-bold' : 'hover:bg-amber-100 dark:hover:bg-amber-900/30'}`}>{label}</button>)}
+                  </div>
+                </details>
+                <details className="text-xs mt-2">
+                  <summary className="cursor-pointer font-bold text-stone-500 dark:text-stone-400 py-1">后续试卷（待添加）</summary>
+                  <p className="pl-2 text-stone-500 dark:text-stone-400 leading-5">肖八第二套、第三套……后续按同一格式加入这里，不影响现有题库。</p>
+                </details>
+              </aside>
             </div>
             <div className="flex items-center gap-2 overflow-x-auto no-scrollbar">
               <span className="text-xs text-stone-400 shrink-0">本学科题目：</span>
