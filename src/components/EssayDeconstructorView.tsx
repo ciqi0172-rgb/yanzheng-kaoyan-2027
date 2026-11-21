@@ -434,6 +434,7 @@ ${currentDrill.fullScoringGuide.trapAvoidance}
               </div>
               <aside className="rounded-xl border border-amber-200 dark:border-amber-900/60 bg-amber-50/70 dark:bg-amber-950/20 p-3 self-start">
                 <div className="text-xs font-black text-amber-950 dark:text-amber-200 mb-2">试卷小目录</div>
+                <a href="https://bu.cnies.org/posts/graduate-entrance/politics/2027-xiao8/paper-01/" target="_blank" rel="noreferrer" className="block mb-2 text-[11px] leading-5 text-amber-800 dark:text-amber-300 underline underline-offset-2">查看第一套参考答案来源</a>
                 <details open={activePaper === 'xiao8-1'} className="text-xs">
                   <summary className="cursor-pointer font-bold text-stone-800 dark:text-stone-200 py-1">肖八</summary>
                   <div className="ml-2 mt-1 border-l border-amber-300 dark:border-amber-800 pl-2 space-y-1.5">
