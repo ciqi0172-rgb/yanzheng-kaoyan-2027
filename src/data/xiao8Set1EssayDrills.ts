@@ -4,6 +4,7 @@ import { EssayDrillQuestion } from '../types';
 type Xiao8Case = {
   id: string; questionNumber: EssayDrillQuestion['questionNumber']; subject: string; theme: string;
   material: string; prompt: string; opening: string; points: { title: string; content: string; blank: string }[];
+  subquestionAnswers: { label: string; question: string; reasoning: string; answer: string; checklist: string[] }[];
   closing: string; trap: string;
 };
 
